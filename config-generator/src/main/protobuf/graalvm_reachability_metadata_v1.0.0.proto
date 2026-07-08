@@ -1,5 +1,5 @@
 /*
-Protobuf messages that produce JSON that conforms to GraalVM's reachability metadata spec. Native-image
+Protobuf messages that produce JSON that conforms to GraalVM's legacy v1.0.0 reachability metadata spec. Native-image
 looks in any directory below 'META-INF/native-image', but it is recommended to use
  * 'META-INF/native-image/<group.id>/<artifact.id>/<feature>-config.json'
 
@@ -12,8 +12,8 @@ See links for details and examples:
  */
 
 syntax = "proto2";
-package us.hebi.ffi.generator.fxml.schema;
-option java_package = "us.hebi.ffi.generator.fxml.schema";
+package us.hebi.graalvm.config.schema.v1_0_0;
+option java_package = "us.hebi.graalvm.config.schema.v1_0_0";
 option java_generate_equals_and_hash = true;
 option java_multiple_files = true;
 

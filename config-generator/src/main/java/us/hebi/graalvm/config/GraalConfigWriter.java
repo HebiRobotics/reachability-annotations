@@ -20,11 +20,11 @@
 
 package us.hebi.graalvm.config;
 
-import us.hebi.ffi.generator.fxml.schema.Condition;
-import us.hebi.ffi.generator.fxml.schema.ProxyConfig;
-import us.hebi.ffi.generator.fxml.schema.ReflectConfig;
-import us.hebi.ffi.generator.fxml.schema.ResourceConfig;
-import us.hebi.ffi.generator.fxml.schema.ResourceConfig.BundleIdentifier;
+import us.hebi.graalvm.config.schema.v1_0_0.Condition;
+import us.hebi.graalvm.config.schema.v1_0_0.ProxyConfig;
+import us.hebi.graalvm.config.schema.v1_0_0.ReflectConfig;
+import us.hebi.graalvm.config.schema.v1_0_0.ResourceConfig;
+import us.hebi.graalvm.config.schema.v1_0_0.ResourceConfig.BundleIdentifier;
 import us.hebi.quickbuf.JsonSink;
 
 import javax.annotation.processing.ProcessingEnvironment;
