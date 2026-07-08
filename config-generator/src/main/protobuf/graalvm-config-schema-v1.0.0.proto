@@ -1,0 +1,191 @@
+/*
+Protobuf messages that produce JSON that conforms to GraalVM's reachability metadata spec. Native-image
+looks in any directory below 'META-INF/native-image', but it is recommended to use
+ * 'META-INF/native-image/<group.id>/<artifact.id>/<feature>-config.json'
+
+See links for details and examples:
+* https://github.com/oracle/graal/blob/f9dcffcea2b3c474d163357c21ff385ba4bca446/docs/reference-manual/native-image/ReachabilityMetadata.md
+* https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/assets/reflect-config-schema-v1.0.0.json
+* https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/assets/jni-config-schema-v1.0.0.json
+* https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/assets/resource-config-schema-v1.0.0.json
+* https://github.com/oracle/graalvm-reachability-metadata
+ */
+
+syntax = "proto2";
+package us.hebi.ffi.generator.fxml.schema;
+option java_package = "us.hebi.ffi.generator.fxml.schema";
+option java_generate_equals_and_hash = true;
+option java_multiple_files = true;
+
+// Serialized as a list
+message ReflectConfig {
+  repeated ReflectConfigEntry entries = 1;
+}
+
+// Serialized as a list
+message ProxyConfig {
+  repeated ProxyEntry entries = 1;
+}
+
+// JSON schema for the reflect-config and jni-config that GraalVM Native Image uses (type: array)
+message ReflectConfigEntry {
+
+  // Required condition to apply the class configuration. Conditional entries will not be fused with agent-collected entries
+  optional Condition condition = 1;
+
+  // Name of the class that should be registered for reflection or access through JNI
+  required string name = 2;
+
+  // List of methods from this class that are registered for reflection or access through JNI
+  repeated MethodIdentifier methods = 3;
+
+  // List of methods to register for this class that are only looked up but not invoked
+  repeated MethodIdentifier queriedMethods = 4;
+
+  // List of class fields that can be looked up, read, or modified for the class declared in <name>
+  repeated FieldIdentifier fields = 5;
+
+  // Register classes which would be returned by the java.lang.Class#getDeclaredClasses call
+  optional bool allDeclaredClasses = 6;
+
+  // Register methods which would be returned by the java.lang.Class#getDeclaredMethods call
+  optional bool allDeclaredMethods = 7;
+
+  // Register fields which would be returned by the java.lang.Class#getDeclaredFields call
+  optional bool allDeclaredFields = 8;
+
+  // Register constructors which would be returned by the java.lang.Class#getDeclaredConstructors call
+  optional bool allDeclaredConstructors = 9;
+
+  // Register all public classes which would be returned by the java.lang.Class#getClasses call
+  optional bool allPublicClasses = 10;
+
+  // Register all public methods which would be returned by the java.lang.Class#getMethods call
+  optional bool allPublicMethods = 11;
+
+  // Register all public fields which would be returned by the java.lang.Class#getFields call
+  optional bool allPublicFields = 12;
+
+  // Register all public constructors which would be returned by the java.lang.Class#getConstructors call
+  optional bool allPublicConstructors = 13;
+
+  // Register record components which would be returned by the java.lang.Class#getRecordComponents call
+  optional bool allRecordComponents = 14;
+
+  // Register permitted subclasses which would be returned by the java.lang.Class#getPermittedSubclasses call
+  optional bool allPermittedSubclasses = 15;
+
+  // Register nest members which would be returned by the java.lang.Class#getNestMembers call
+  optional bool allNestMembers = 16;
+
+  // Register signers which would be returned by the java.lang.Class#getSigners call
+  optional bool allSigners = 17;
+
+  // Register methods which would be returned by the java.lang.Class#getDeclaredMethods call but only for lookup
+  optional bool queryAllDeclaredMethods = 18;
+
+  // Register constructors which would be returned by the java.lang.Class#getDeclaredConstructors call but only for lookup
+  optional bool queryAllDeclaredConstructors = 19;
+
+  // Register all public methods which would be returned by the java.lang.Class#getMethods call but only for lookup
+  optional bool queryAllPublicMethods = 20;
+
+  // Register all public constructors which would be returned by the java.lang.Class#getConstructors call but only for lookup
+  optional bool queryAllPublicConstructors = 21;
+
+  // Allow objects of this class to be instantiated with a call to jdk.internal.misc.Unsafe#allocateInstance
+  optional bool unsafeAllocated = 22;
+
+  message MethodIdentifier {
+    // Required condition to apply the method configuration
+    optional Condition condition = 1;
+
+    // Method name that should be registered or queried for this class
+    required string name = 2;
+
+    // List of types for the parameters of the this method
+    repeated string parameterTypes = 3;
+  }
+
+  message FieldIdentifier {
+    // Required condition to apply the field configuration
+    optional Condition condition = 1;
+
+    // Name of the field that should be registered for reflection or access through JNI
+    required string name = 2;
+  }
+
+}
+
+// JSON schema for the resource-config that GraalVM Native Image uses (type: object)
+message ResourceConfig {
+
+  // set of included and excluded lists of patterns
+  required ResourceList resources = 1;
+
+  // List of resource bundles that should be registered
+  repeated BundleIdentifier bundles = 2;
+
+  /*
+  Native Image will iterate over all resources and match their relative paths against the Java Regex specified in
+  <includes>. If the path matches the Regex, the resource is included. The <excludes> statement instructs Native Image
+  to omit certain included resources that match the given <pattern>
+   */
+  message ResourceList {
+
+    // List of included resource patterns
+    repeated ResourcePattern includes = 1;
+
+    // List of excluded resource patterns
+    repeated ResourcePattern excludes = 2;
+
+  }
+
+  message ResourcePattern {
+
+    //  Required condition to apply the configuration
+    optional Condition condition = 1;
+
+    // Resource matching pattern
+    optional string pattern = 2;
+
+  }
+
+  message BundleIdentifier {
+
+    //  Required condition to apply the configuration
+    optional Condition condition = 1;
+
+    // Fully qualified name of the resource bundle
+    // e.g. "fully.qualified.bundle.name"
+    optional string name = 2;
+
+    // List of locales that should be registered for this resource bundle
+    // e.g. ["en", "de", "sk"]
+    repeated string locales = 3;
+
+    // List of fully qualified classnames of resource bundles that are directly included without performing the lookup by basename and locale.
+    // e.g. [ "fully.qualified.bundle.name_en", "fully.qualified.bundle.name_de" ]
+    repeated string classNames = 4;
+
+  }
+
+}
+
+// JSON schema for the proxy-config that GraalVM Native Image uses (type: array)
+message ProxyEntry {
+
+    // Condition for when this proxy should be registered
+    optional Condition condition = 1;
+
+    // Required list of interfaces implemented by the dynamic proxy
+    repeated string interfaces = 2;
+
+}
+
+// Each entry in json-based metadata should be conditional to avoid unnecessary growth in the size of the native binary.
+// An entry with a typeReachable condition is considered only when the fully-qualified class is reachable.
+message Condition {
+  // Fully qualified class name of the class that must be reachable in order to apply the configuration
+  required string typeReachable = 1;
+}

@@ -1,0 +1,104 @@
+/*-
+ * #%L
+ * Native Config Generator
+ * %%
+ * Copyright (C) 2026 HEBI Robotics
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+package us.hebi.ffi.generator.fxml;
+
+import com.google.mu.util.Substring;
+
+import java.net.URI;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
+
+/**
+ * @author Florian Enner
+ * @since 25 Nov 2025
+ */
+public class CssParser {
+
+    public void addCssFile(URI uri) {
+        if (resources.contains(uri)) {
+            return;
+        }
+
+        var contentOpt = FxmlParser.tryReadContent(uri);
+        if (contentOpt.isEmpty()) {
+            return; // TODO: warn if a file does not exist?
+        }
+        var content = contentOpt.get();
+        resources.add(uri);
+
+        // Parse import statements
+        Substring.between("@import", ";")
+                .repeatedly()
+                .match(content)
+                .map(Substring.Match::toString)
+                .map(String::trim)
+                .map(CssParser::removeUrlAndQuotes)
+                .filter(s -> !s.isEmpty())
+                .map(uri::resolve)
+                .forEach(this::addCssFile);
+
+        // Parse other url() resources, e.g., in @font-face rules or background images
+        Substring.between("url(", ")")
+                .repeatedly()
+                .match(content)
+                .map(Object::toString)
+                .map(CssParser::removeUrlAndQuotes)
+                .filter(s -> !s.isEmpty())
+                .map(uri::resolve)
+                .forEach(this::addResource);
+
+    }
+
+    private void addResource(URI uri) {
+        if (resources.contains(uri)) {
+            return;
+        }
+        if (uri.getRawPath().endsWith(".css")) {
+            addCssFile(uri);
+        } else {
+            resources.add(uri);
+        }
+    }
+
+    private static String removeUrlAndQuotes(String url) {
+        // Trim whitespace
+        url = url.trim();
+
+        // Remove url() wrapper if present
+        if (url.startsWith("url(") && url.endsWith(")")) {
+            url = url.substring(4, url.length() - 1).trim();
+        }
+
+        // Remove quotes
+        if ((url.startsWith("\"") && url.endsWith("\"")) || (url.startsWith("'") && url.endsWith("'"))) {
+            url = url.substring(1, url.length() - 1);
+        }
+        return url.trim();
+    }
+
+    final Set<URI> resources = new TreeSet<>(Comparator.comparing(URI::getPath));
+
+    public Set<URI> getResources() {
+        return resources;
+    }
+
+}
