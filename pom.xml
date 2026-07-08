@@ -5,22 +5,205 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>us.hebi.graalvm</groupId>
-    <artifactId>config-generator-parent</artifactId>
+    <artifactId>config-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
+    <modules>
+        <module>config-annotations</module>
+        <module>config-generator</module>
+        <module>config-sample</module>
+    </modules>
 
     <properties>
 
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.deploy.skip>true</maven.deploy.skip>
+
+        <!-- gpg info set via settings.xml to sign release artifacts-->
+        <gpg.keyname/>
+
+        <!-- License Headers (http://www.mojohaus.org/license-maven-plugin/update-file-header-mojo.html) -->
+        <license.licenseName>apache_v2</license.licenseName>
+        <license.addJavaLicenseAfterPackage>false</license.addJavaLicenseAfterPackage>
+        <license.trimHeaderLine>true</license.trimHeaderLine>
+        <license.excludes>**/*.json,**/*.xml,**/*.sh,**/*.bat</license.excludes>
+
+        <!-- For now, disable 'missing' warnings about undocumented @param and @throws -->
+        <doclint>html,syntax,accessibility,reference</doclint>
 
     </properties>
 
-    <modules>
-        <module>config-generator</module>
-        <module>config-sample</module>
-    </modules>
+    <name>Native Image Configuration</name>
+    <url>https://github.com/HebiRobotics/native-config-generator</url>
+
+    <organization>
+        <name>HEBI Robotics</name>
+        <url>http://www.hebirobotics.com</url>
+    </organization>
+    <inceptionYear>2026</inceptionYear>
+
+    <!-- source control information: -->
+    <scm>
+        <url>https://github.com/HebiRobotics/native-config-generator</url>
+        <connection>scm:git:git://github.com/HebiRobotics/native-config-generator.git</connection>
+        <developerConnection>scm:git:git@github.com:HebiRobotics/native-config-generator.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <!-- license information: -->
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!-- developer information: -->
+    <developers>
+        <developer>
+            <id>ennerf</id>
+            <name>Florian Enner</name>
+            <email>florian at hebirobotics.com</email>
+            <url>https://github.com/ennerf</url>
+            <organization>HEBI Robotics</organization>
+            <organizationUrl>https://github.com/HebiRobotics</organizationUrl>
+        </developer>
+    </developers>
+
+    <!-- Maven Central Distribution -->
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+
+            <!-- Add licenses to files -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>1.16</version>
+                <configuration>
+                    <licenseName>apache_v2</licenseName>
+                    <trimHeaderLine>true</trimHeaderLine>
+                    <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>first</id>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <profiles>
+
+        <!-- Other plugins required for publishing to Maven Central -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+
+                    <!-- Required: Source Jar -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- ensure the manifest contains artifact version information: -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>2.4</version>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </plugin>
+
+                    <!-- Required: Javadoc Jar -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadoc</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Required: Sign Artifacts -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <keyname>${gpg.keyname}</keyname>
+                                    <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Deploy to Maven Central -->
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.9.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
+                        </configuration>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
 
 </project>
