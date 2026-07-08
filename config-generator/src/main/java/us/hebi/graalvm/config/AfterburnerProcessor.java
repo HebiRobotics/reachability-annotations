@@ -18,14 +18,13 @@
  * #L%
  */
 
-package us.hebi.ffi.generator.fxml;
+package us.hebi.graalvm.config;
 
 import com.google.common.collect.ImmutableSetMultimap;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.MirroredTypesException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;

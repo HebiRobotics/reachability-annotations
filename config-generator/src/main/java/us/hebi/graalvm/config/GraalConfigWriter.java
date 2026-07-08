@@ -18,7 +18,7 @@
  * #L%
  */
 
-package us.hebi.ffi.generator.fxml;
+package us.hebi.graalvm.config;
 
 import us.hebi.ffi.generator.fxml.schema.Condition;
 import us.hebi.ffi.generator.fxml.schema.ProxyConfig;

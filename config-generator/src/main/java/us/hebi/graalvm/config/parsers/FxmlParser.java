@@ -18,7 +18,7 @@
  * #L%
  */
 
-package us.hebi.ffi.generator.fxml.demo;
+package us.hebi.graalvm.config.parsers;
 
 import com.google.mu.util.Substring;
 
@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static us.hebi.ffi.generator.fxml.demo.MugXmlParser.*;
+import static us.hebi.graalvm.config.parsers.MugXmlParser.*;
 import static com.google.common.base.Preconditions.*;
 
 /**

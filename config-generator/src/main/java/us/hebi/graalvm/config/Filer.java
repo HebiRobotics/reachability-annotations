@@ -18,7 +18,7 @@
  * #L%
  */
 
-package us.hebi.ffi.generator.fxml;
+package us.hebi.graalvm.config;
 
 import java.io.IOException;
 import java.io.Writer;

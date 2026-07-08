@@ -18,7 +18,7 @@
  * #L%
  */
 
-package us.hebi.ffi.generator.fxml;
+package us.hebi.graalvm.config;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

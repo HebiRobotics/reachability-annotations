@@ -18,7 +18,7 @@
  * #L%
  */
 
-package us.hebi.ffi.generator.fxml.demo;
+package us.hebi.graalvm.config.parsers;
 
 /**
  * @author Florian Enner
