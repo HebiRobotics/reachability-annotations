@@ -36,7 +36,7 @@ import java.util.function.Supplier;
  * @author Florian Enner
  * @since 27 Nov 2025
  */
-public class SpecAnnotationProcessor extends AbstractConfigStep {
+public class ReachableAnnotationStep extends AbstractConfigStep {
 
     @Override
     public Set<String> annotations() {
@@ -188,7 +188,7 @@ public class SpecAnnotationProcessor extends AbstractConfigStep {
         return java.util.Collections.emptyList();
     }
 
-    public SpecAnnotationProcessor(Supplier<ProcessingEnvironment> env) {
+    public ReachableAnnotationStep(Supplier<ProcessingEnvironment> env) {
         super("reachable-generated", env);
     }
 

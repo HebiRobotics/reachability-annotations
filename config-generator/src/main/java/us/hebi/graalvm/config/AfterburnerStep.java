@@ -21,6 +21,7 @@
 package us.hebi.graalvm.config;
 
 import com.google.common.collect.ImmutableSetMultimap;
+import us.hebi.graalvm.config.CssParser;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -33,7 +34,7 @@ import java.util.function.Supplier;
  * @author Florian Enner
  * @since 25 Nov 2025
  */
-public class AfterburnerProcessor extends AbstractConfigStep {
+public class AfterburnerStep extends AbstractConfigStep {
 
     @Override
     public Set<String> annotations() {
@@ -101,7 +102,7 @@ public class AfterburnerProcessor extends AbstractConfigStep {
         return className.substring(0, viewIndex);
     }
 
-    public AfterburnerProcessor(Supplier<ProcessingEnvironment> env) {
+    public AfterburnerStep(Supplier<ProcessingEnvironment> env) {
         super("generated-fxml", env);
     }
 

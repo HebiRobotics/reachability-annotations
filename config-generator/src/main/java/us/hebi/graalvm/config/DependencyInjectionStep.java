@@ -33,7 +33,7 @@ import java.util.function.Supplier;
  * @author Florian Enner
  * @since 27 Nov 2025
  */
-public class DependencyInjectionProcessor extends AbstractConfigStep {
+public class DependencyInjectionStep extends AbstractConfigStep {
 
     @Override
     public Set<String> annotations() {
@@ -78,7 +78,7 @@ public class DependencyInjectionProcessor extends AbstractConfigStep {
         }
     }
 
-    public DependencyInjectionProcessor(Supplier<ProcessingEnvironment> env) {
+    public DependencyInjectionStep(Supplier<ProcessingEnvironment> env) {
         super("generated-di", env);
     }
 

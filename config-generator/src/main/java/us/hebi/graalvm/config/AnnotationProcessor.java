@@ -26,7 +26,6 @@ import com.google.auto.service.AutoService;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,7 +37,7 @@ import java.util.Set;
  * @since 09 Jul 2026
  */
 @AutoService(Processor.class)
-public class NativeAnnotationProcessor extends BasicAnnotationProcessor {
+public class AnnotationProcessor extends BasicAnnotationProcessor {
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -55,12 +54,12 @@ public class NativeAnnotationProcessor extends BasicAnnotationProcessor {
 
     @Override
     protected Iterable<? extends BasicAnnotationProcessor.Step> steps() {
-        return configSteps;
+        return steps;
     }
 
     protected void postRound(RoundEnvironment roundEnv) {
         if (roundEnv.processingOver()) {
-            configSteps.forEach(AbstractConfigStep::finish);
+            steps.forEach(AbstractConfigStep::finish);
         }
     }
 
@@ -71,10 +70,10 @@ public class NativeAnnotationProcessor extends BasicAnnotationProcessor {
         return processingEnv;
     }
 
-    final List<AbstractConfigStep> configSteps = Arrays.asList(
-            new AfterburnerProcessor(this::getEnv),
-            new DependencyInjectionProcessor(this::getEnv),
-            new SpecAnnotationProcessor(this::getEnv)
+    final List<AbstractConfigStep> steps = Arrays.asList(
+            new ReachableAnnotationStep(this::getEnv),
+            new AfterburnerStep(this::getEnv),
+            new DependencyInjectionStep(this::getEnv)
     );
 
 }
