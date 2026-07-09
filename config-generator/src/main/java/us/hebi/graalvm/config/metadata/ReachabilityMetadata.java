@@ -26,10 +26,7 @@ import lombok.ToString;
 import lombok.Value;
 import us.hebi.graalvm.config.util.GlobUtil;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * @author Florian Enner
@@ -103,12 +100,14 @@ public class ReachabilityMetadata {
 
     public ConditionalMetadata getMetadata(String condition) {
         if (condition == null || condition.isBlank() || condition.equals("java.lang.Object")) {
-            return unconditional;
+            condition = "";
         }
         return conditionalMetadata.computeIfAbsent(condition, key -> new ConditionalMetadata(new Condition(key)));
     }
 
-    final ConditionalMetadata unconditional = new ConditionalMetadata(new Condition(null));
+    public Collection<ConditionalMetadata> getAll() {
+        return conditionalMetadata.values();
+    }
 
     final Map<String, ConditionalMetadata> conditionalMetadata = new TreeMap<>();
 
