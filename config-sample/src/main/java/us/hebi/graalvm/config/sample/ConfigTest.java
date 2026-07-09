@@ -20,7 +20,7 @@
 
 package us.hebi.graalvm.config.sample;
 
-import us.hebi.graalvm.config.NativeConfig;
+import us.hebi.graalvm.config.Reachable;
 
 /**
  * @author Florian Enner
@@ -28,17 +28,17 @@ import us.hebi.graalvm.config.NativeConfig;
  */
 public class ConfigTest {
 
-    @NativeConfig
+    @Reachable
     public enum ReflectEnum {
         Field1;
     }
 
-    @NativeConfig
+    @Reachable
     public static class NestedClass {
 
     }
 
-    @NativeConfig
+    @Reachable
     public static class NestedChildClass extends NestedClass {
 
     }

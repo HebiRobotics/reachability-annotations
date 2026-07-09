@@ -94,8 +94,8 @@ public class GraalConfigWriter {
             }
         }
 
-        public void addProxyInterface(String fullyQualifiedName) {
-            interfaces.add(fullyQualifiedName);
+        public void addProxyInterfaces(String... fullyQualifiedNames) {
+            proxies.add(String.join(PROXY_DELIMITER, fullyQualifiedNames));
         }
 
         public void addAllReflectedTypes(Collection<String> fullyQualifiedNames) {
@@ -103,16 +103,69 @@ public class GraalConfigWriter {
         }
 
         public void addAllResources(Collection<URI> resources) {
-            resources.forEach(this::addResource);
+            resources.forEach(this::addResourceGlob);
         }
 
-        public void addResource(URI resource) {
+        public void addResourceGlob(URI resource) {
             URI relativePath = rootDir != null ? rootDir.relativize(resource) : resource;
-            addResourcePattern("\\Q" + relativePath.getPath() + "\\E"); // literal path w/o Regex
+            addResourceGlob(relativePath.getPath());
         }
 
-        public void addResourcePattern(String pattern) {
-            resources.add(pattern);
+        public void addResourceGlob(String glob) {
+            resources.add(convertGlobToRegex(glob));
+        }
+
+        /**
+         * v1.0.0 used regex, but the v1.2.0 format uses globs. We want to be forwards
+         * compatible with the newer format, so we limit it to blobs from the start.
+         */
+        public static String convertGlobToRegex(String glob) {
+            if (glob == null || glob.isEmpty()) {
+                return "";
+            }
+
+            // If there are no glob wildcards, wrap the entire path in a literal regex block.
+            if (!glob.contains("*") && !glob.contains("?")) {
+                return "\\Q" + glob + "\\E";
+            }
+
+            StringBuilder regex = new StringBuilder();
+            int i = 0;
+            int len = glob.length();
+
+            while (i < len) {
+                char c = glob.charAt(i++);
+                switch (c) {
+                    case '*':
+                        // Handle double-star recursive wildcard (**) vs single-star (*)
+                        if (i < len && glob.charAt(i) == '*') {
+                            regex.append(".*");
+                            i++; // skip second star
+                        } else {
+                            regex.append("[^/]*"); // match within package level
+                        }
+                        break;
+                    case '?':
+                        regex.append(".");
+                        break;
+                    case '.':
+                    case '(':
+                    case ')':
+                    case '+':
+                    case '|':
+                    case '^':
+                    case '$':
+                    case '@':
+                    case '%':
+                        // Escape standard regex control meta-characters
+                        regex.append('\\').append(c);
+                        break;
+                    default:
+                        regex.append(c);
+                        break;
+                }
+            }
+            return regex.toString();
         }
 
         public BundleIdentifier getBundleIdentifier(String name) {
@@ -132,7 +185,7 @@ public class GraalConfigWriter {
         final Set<String> classes = new TreeSet<>();
         final Set<String> jniClasses = new TreeSet<>();
         final Set<String> resources = new TreeSet<>();
-        final Set<String> interfaces = new TreeSet<>();
+        final Set<String> proxies = new TreeSet<>();
         final Map<String, BundleIdentifier> bundles = new TreeMap<>();
 
     }
@@ -221,14 +274,14 @@ public class GraalConfigWriter {
                         .ifPresent(rule::setCondition);
             }
 
-            for (String fqdn : config.interfaces) {
+            for (String fqdn : config.proxies) {
 
                 var rule = proxyConfig.getMutableEntries().next();
                 Optional.ofNullable(config.condition)
                         .ifPresent(rule::setCondition);
 
-                if (fqdn.contains(";")) {
-                    for (var part : fqdn.split(";")) {
+                if (fqdn.contains(PROXY_DELIMITER)) {
+                    for (var part : fqdn.split(PROXY_DELIMITER)) {
                         rule.getMutableInterfaces().add(part.trim());
                     }
                 } else {
@@ -252,6 +305,8 @@ public class GraalConfigWriter {
         }
 
     }
+
+    private static final String PROXY_DELIMITER = ";";
 
     interface SinkWriter {
         void writeTo(JsonSink sink) throws IOException;

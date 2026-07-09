@@ -41,8 +41,8 @@ public class SpecAnnotationProcessor extends AbstractConfigStep {
     @Override
     public Set<String> annotations() {
         return Set.of(
-                NativeConfig.class.getCanonicalName(),
-                NativeConfig.List.class.getCanonicalName()
+                Reachable.class.getCanonicalName(),
+                Reachable.List.class.getCanonicalName()
         );
     }
 
@@ -50,22 +50,22 @@ public class SpecAnnotationProcessor extends AbstractConfigStep {
     public void process0(ImmutableSetMultimap<String, Element> elementMap) {
 
         // Add manually specified resources
-        for (Element element : elementMap.get(NativeConfig.class.getCanonicalName())) {
+        for (Element element : elementMap.get(Reachable.class.getCanonicalName())) {
             if (element instanceof TypeElement type) {
-                var mirror = getAnnotationMirror(type, NativeConfig.class);
+                var mirror = getAnnotationMirror(type, Reachable.class);
                 if (mirror != null) {
-                    NativeConfig annotation = type.getAnnotation(NativeConfig.class);
+                    Reachable annotation = type.getAnnotation(Reachable.class);
                     processConfigAnnotation(type, annotation, mirror);
                 }
             }
         }
 
         // Add manually specified resources from List annotations
-        for (Element element : elementMap.get(NativeConfig.List.class.getCanonicalName())) {
+        for (Element element : elementMap.get(Reachable.List.class.getCanonicalName())) {
             if (element instanceof TypeElement type) {
-                var listMirror = getAnnotationMirror(type, NativeConfig.List.class);
+                var listMirror = getAnnotationMirror(type, Reachable.List.class);
                 if (listMirror != null) {
-                    NativeConfig.List listAnnotation = type.getAnnotation(NativeConfig.List.class);
+                    Reachable.List listAnnotation = type.getAnnotation(Reachable.List.class);
                     var mirrors = getAnnotationArrayValue(listMirror, "value");
                     var annotations = listAnnotation.value();
                     for (int i = 0; i < annotations.length; i++) {
@@ -79,21 +79,24 @@ public class SpecAnnotationProcessor extends AbstractConfigStep {
 
     private final Set<String> tmpLocales = new HashSet<>();
 
-    private void processConfigAnnotation(TypeElement type, NativeConfig annotation, AnnotationMirror mirror) {
+    private void processConfigAnnotation(TypeElement type, Reachable annotation, AnnotationMirror mirror) {
         final var config = getConfig(type, mirror);
 
         // Absolute resources
         for (var pattern : annotation.resources()) {
-            config.addResourcePattern(pattern);
+            config.addResourceGlob(pattern);
         }
 
         // Resource bundles
-        for (String bundle : annotation.bundleNames()) {
-            var id = config.getBundleIdentifier(bundle);
+        for (var bundle : annotation.bundles()) {
+            var id = config.getBundleIdentifier(bundle.name());
+
+            // Save the previous locales in case we have multiple-definitions
             tmpLocales.clear();
             id.getMutableLocales().forEach(tmpLocales::add);
 
-            for (String locale : annotation.bundleLocales()) {
+            // Add the locally defined ones
+            for (String locale : bundle.locales()) {
                 if (!tmpLocales.contains(locale)) {
                     id.addLocales(locale);
                 }
@@ -103,12 +106,12 @@ public class SpecAnnotationProcessor extends AbstractConfigStep {
         // Resources (relative to the specified condition)
         var sourceDir = getSourceDirectory(type); // TODO: condition class or annotated type?
         for (String pattern : annotation.relativeResources()) {
-            config.addResourcePattern(sourceDir + pattern);
+            config.addResourceGlob(sourceDir + pattern);
         }
 
         // Explicitly added proxy interface names
-        for (String name : annotation.proxyInterfaceNames()) {
-            config.addProxyInterface(name);
+        for (var proxy : annotation.proxies()) {
+            config.addProxyInterfaces(proxy.interfaceNames());
         }
 
         // Reflectively accessible classes
@@ -129,18 +132,20 @@ public class SpecAnnotationProcessor extends AbstractConfigStep {
         }
 
         // JNI-accessible types
-        for (String name : annotation.jniClassNames()) {
-            config.addJniType(name);
-        }
-        try {
-            for (var clazz : annotation.jniClasses()) {
-                config.addJniType(clazz.getName());
+        if(annotation.jniAccessible()) {
+            for (String name : annotation.classNames()) {
+                config.addJniType(name);
             }
-        } catch (MirroredTypesException e) {
-            for (var typeMirror : e.getTypeMirrors()) {
-                Element classElement = processingEnv.getTypeUtils().asElement(typeMirror);
-                if (classElement instanceof TypeElement typeElement) {
-                    config.addJniType(typeElement);
+            try {
+                for (var clazz : annotation.classes()) {
+                    config.addJniType(clazz.getName());
+                }
+            } catch (MirroredTypesException e) {
+                for (var typeMirror : e.getTypeMirrors()) {
+                    Element classElement = processingEnv.getTypeUtils().asElement(typeMirror);
+                    if (classElement instanceof TypeElement typeElement) {
+                        config.addJniType(typeElement);
+                    }
                 }
             }
         }

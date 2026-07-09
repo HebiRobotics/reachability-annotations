@@ -26,7 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Creates a native image config according to afterburner.fx conventions,
+ * Creates a native image config based on afterburner.fx conventions,
  * including FXML, CSS, and property files.
  *
  * @author Florian Enner
@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface NativeAfterburnerView {
+public @interface ReachableAfterburnerView {
 
     /**
      * The value specifies the name of the fxml and optional css

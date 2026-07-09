@@ -38,7 +38,7 @@ public class AfterburnerProcessor extends AbstractConfigStep {
     @Override
     public Set<String> annotations() {
         return Set.of(
-                NativeAfterburnerView.class.getName()
+                ReachableAfterburnerView.class.getName()
         );
     }
 
@@ -46,12 +46,12 @@ public class AfterburnerProcessor extends AbstractConfigStep {
         var rootUri = getClassOutputUri();
 
         // Handle Afterburner.fx conventions
-        var views = elementMap.get(NativeAfterburnerView.class.getName());
+        var views = elementMap.get(ReachableAfterburnerView.class.getName());
         if (!views.isEmpty()) {
             for (Element viewClass : views) {
                 if (viewClass instanceof TypeElement type) {
-                    NativeAfterburnerView annotation = type.getAnnotation(NativeAfterburnerView.class);
-                    final var config = getConfig(type, NativeAfterburnerView.class);
+                    ReachableAfterburnerView annotation = type.getAnnotation(ReachableAfterburnerView.class);
+                    final var config = getConfig(type, ReachableAfterburnerView.class);
 
                     // Use Afterburner convention for the name
                     var sourceDir = getSourceDirectory(type);
@@ -63,7 +63,7 @@ public class AfterburnerProcessor extends AbstractConfigStep {
                     config.addReflectedType(type);
 
                     // Add language files
-                    config.addResourcePattern(sourceDir + conventionalName + ".*\\.properties");
+                    config.addResourceGlob(sourceDir + conventionalName + "*.properties");
 
                     // Add CSS files and all includes
                     var cssParser = new CssParser();
