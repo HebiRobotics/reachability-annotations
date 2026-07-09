@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.Value;
 import us.hebi.graalvm.config.util.GlobUtil;
+import us.hebi.graalvm.config.util.StringArrayComparator;
 
 import java.util.*;
 
@@ -83,17 +84,13 @@ public class ReachabilityMetadata {
         }
 
         public void addProxyInterfaces(String... fullyQualifiedNames) {
-            if (fullyQualifiedNames.length == 1) {
-                proxyInterfaceNames.add(fullyQualifiedNames[0]);
-            } else {
-                proxyInterfaceNames.add(String.join(PROXY_DELIMITER, fullyQualifiedNames));
-            }
+            proxyInterfaceNames.add(fullyQualifiedNames);
         }
 
         final Condition condition;
         final Map<String, ReflectionEntry> reflectedTypes = new TreeMap<>();
         final Set<String> resourcePatterns = new TreeSet<>();
-        final Set<String> proxyInterfaceNames = new TreeSet<>();
+        final Set<String[]> proxyInterfaceNames = new TreeSet<>(StringArrayComparator.INSTANCE);
         final Map<String, BundleEntry> bundles = new TreeMap<>();
 
     }
@@ -110,7 +107,5 @@ public class ReachabilityMetadata {
     }
 
     final Map<String, ConditionalMetadata> conditionalMetadata = new TreeMap<>();
-
-    static final String PROXY_DELIMITER = ";";
 
 }
