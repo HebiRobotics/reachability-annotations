@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -37,14 +38,17 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class ReflectionConfigTest {
 
-    private String reflectionConfig;
+    private static String reflectionConfig = readJsonContent("META-INF/native-image/reachable-generated/us.hebi.graalvm/config-sample/reflect-config.json");
+    private static String jniConfig =  readJsonContent("META-INF/native-image/reachable-generated/us.hebi.graalvm/config-sample/jni-config.json");
 
-    @BeforeEach
-    void loadReflectionConfig() throws Exception {
-        String resourcePath = "META-INF/native-image/reachable-generated/us.hebi.graalvm/config-sample/reflect-config.json";
+    public static String readJsonContent(String resourcePath) {
         URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(resourcePath);
         assertNotNull(resourceUrl, "The processor failed to generate the metadata file at: " + resourcePath);
-        reflectionConfig = Files.readString(Paths.get(resourceUrl.toURI()), StandardCharsets.UTF_8);
+        try {
+            return Files.readString(Paths.get(resourceUrl.toURI()), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -147,6 +151,32 @@ class ReflectionConfigTest {
     }
 
     @Test
+    void testJniSpecifiedChildClass() throws IOException {
+        assertContains(jniConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingChildClass"
+                  },
+                  "name": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedChildClass",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+        assertContains(jniConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingChildClass"
+                  },
+                  "name": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedParentClass",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
     void testMultipleClasses() throws IOException {
         assertContains(reflectionConfig, """
                 {
@@ -220,6 +250,5 @@ class ReflectionConfigTest {
             fail("The json source does not contain expected content:\n" + expected);
         }
     }
-
 
 }

@@ -46,7 +46,7 @@ public class ReflectionConfigOptions {
 
     }
 
-    @Reachable(classes = NestedChildClass.class)
+    @Reachable(classes = NestedChildClass.class, jniAccessible = true)
     public static class ReferencingChildClass {
 
     }
