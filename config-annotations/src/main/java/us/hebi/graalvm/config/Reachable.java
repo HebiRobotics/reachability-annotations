@@ -59,7 +59,8 @@ public @interface Reachable {
 
     /**
      * Classes that should be available for reflection. Defaults to the annotated class if
-     * no other items (classes, resources, proxies, bundles, ...) are specified.
+     * no other items (classes, resources, proxies, bundles, ...) are specified. Parent classes
+     * are automatically added with the same options.
      *
      * @return classes that should be available for reflection
      */

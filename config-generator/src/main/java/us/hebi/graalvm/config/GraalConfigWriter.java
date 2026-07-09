@@ -317,14 +317,11 @@ public class GraalConfigWriter {
         content.writeTo(sink);
 
         // Match convention of picocli-codegen
-        String artifactId = Optional.ofNullable(env)
+        String coordinates = Optional.ofNullable(env)
                 .map(ProcessingEnvironment::getOptions)
                 .map(opts -> opts.get("project"))
                 .orElse("");
-        if (!artifactId.isEmpty()) {
-            artifactId += "/";
-        }
-        filer.createFile("META-INF/native-image/" + artifactId + name, fileName, (ContentSource) writer -> {
+        filer.createFile("META-INF/native-image/" + name + "/" + coordinates, fileName, (ContentSource) writer -> {
             writer.write(sink.toString());
         });
     }

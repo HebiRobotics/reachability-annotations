@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,11 +22,14 @@ package us.hebi.graalvm.config.sample;
 
 import us.hebi.graalvm.config.Reachable;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+
 /**
  * @author Florian Enner
- * @since 08 Jul 2026
+ * @since 09 Jul 2026
  */
-public class ConfigTest {
+public class ReflectionConfigOptions {
 
     @Reachable
     public enum ReflectEnum {
@@ -34,12 +37,28 @@ public class ConfigTest {
     }
 
     @Reachable
-    public static class NestedClass {
+    public static class NestedParentClass {
 
     }
 
     @Reachable
-    public static class NestedChildClass extends NestedClass {
+    public static class NestedChildClass extends NestedParentClass {
+
+    }
+
+    @Reachable(classes = NestedChildClass.class)
+    public static class ReferencingChildClass {
+
+    }
+
+    @Reachable(classes = {
+            InetAddress.class,
+            InetSocketAddress.class,
+    }, classNames = {
+            "some.random.class$Nested",
+            "other.random.class",
+    })
+    public static class ReferencingMultipleClasses {
 
     }
 

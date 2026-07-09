@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -81,14 +81,17 @@ public class SpecAnnotationProcessor extends AbstractConfigStep {
 
     private void processConfigAnnotation(TypeElement type, Reachable annotation, AnnotationMirror mirror) {
         final var config = getConfig(type, mirror);
+        boolean fieldsEmpty = true;
 
         // Absolute resources
         for (var pattern : annotation.resources()) {
+            fieldsEmpty = false;
             config.addResourceGlob(pattern);
         }
 
         // Resource bundles
         for (var bundle : annotation.bundles()) {
+            fieldsEmpty = false;
             var id = config.getBundleIdentifier(bundle.name());
 
             // Save the previous locales in case we have multiple-definitions
@@ -106,24 +109,29 @@ public class SpecAnnotationProcessor extends AbstractConfigStep {
         // Resources (relative to the specified condition)
         var sourceDir = getSourceDirectory(type); // TODO: condition class or annotated type?
         for (String pattern : annotation.relativeResources()) {
+            fieldsEmpty = false;
             config.addResourceGlob(sourceDir + pattern);
         }
 
         // Explicitly added proxy interface names
         for (var proxy : annotation.proxies()) {
+            fieldsEmpty = false;
             config.addProxyInterfaces(proxy.interfaceNames());
         }
 
         // Reflectively accessible classes
         for (String name : annotation.classNames()) {
+            fieldsEmpty = false;
             config.addReflectedType(name);
         }
         try {
             for (var clazz : annotation.classes()) {
+                fieldsEmpty = false;
                 config.addReflectedType(clazz.getName());
             }
         } catch (MirroredTypesException e) {
             for (var typeMirror : e.getTypeMirrors()) {
+                fieldsEmpty = false;
                 Element classElement = processingEnv.getTypeUtils().asElement(typeMirror);
                 if (classElement instanceof TypeElement typeElement) {
                     config.addReflectedType(typeElement);
@@ -132,7 +140,7 @@ public class SpecAnnotationProcessor extends AbstractConfigStep {
         }
 
         // JNI-accessible types
-        if(annotation.jniAccessible()) {
+        if (annotation.jniAccessible()) {
             for (String name : annotation.classNames()) {
                 config.addJniType(name);
             }
@@ -148,6 +156,11 @@ public class SpecAnnotationProcessor extends AbstractConfigStep {
                     }
                 }
             }
+        }
+
+        // Nothing else defined -> enable reflection of the annotated type itself
+        if (fieldsEmpty) {
+            config.addReflectedType(type);
         }
 
     }
@@ -176,7 +189,7 @@ public class SpecAnnotationProcessor extends AbstractConfigStep {
     }
 
     public SpecAnnotationProcessor(Supplier<ProcessingEnvironment> env) {
-        super("generated-annotations", env);
+        super("reachable-generated", env);
     }
 
 }
