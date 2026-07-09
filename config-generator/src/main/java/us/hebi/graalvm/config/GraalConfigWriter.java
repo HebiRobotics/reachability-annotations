@@ -25,6 +25,7 @@ import us.hebi.graalvm.config.schema.v1_0_0.ProxyConfig;
 import us.hebi.graalvm.config.schema.v1_0_0.ReflectConfig;
 import us.hebi.graalvm.config.schema.v1_0_0.ResourceConfig;
 import us.hebi.graalvm.config.schema.v1_0_0.ResourceConfig.BundleIdentifier;
+import us.hebi.graalvm.config.util.GlobUtil;
 import us.hebi.quickbuf.JsonSink;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -111,61 +112,12 @@ public class GraalConfigWriter {
             addResourceGlob(relativePath.getPath());
         }
 
-        public void addResourceGlob(String glob) {
-            resources.add(convertGlobToRegex(glob));
-        }
-
         /**
          * v1.0.0 used regex, but the v1.2.0 format uses globs. We want to be forwards
          * compatible with the newer format, so we limit it to blobs from the start.
          */
-        public static String convertGlobToRegex(String glob) {
-            if (glob == null || glob.isEmpty()) {
-                return "";
-            }
-
-            // If there are no glob wildcards, wrap the entire path in a literal regex block.
-            if (!glob.contains("*") && !glob.contains("?")) {
-                return "\\Q" + glob + "\\E";
-            }
-
-            StringBuilder regex = new StringBuilder();
-            int i = 0;
-            int len = glob.length();
-
-            while (i < len) {
-                char c = glob.charAt(i++);
-                switch (c) {
-                    case '*':
-                        // Handle double-star recursive wildcard (**) vs single-star (*)
-                        if (i < len && glob.charAt(i) == '*') {
-                            regex.append(".*");
-                            i++; // skip second star
-                        } else {
-                            regex.append("[^/]*"); // match within package level
-                        }
-                        break;
-                    case '?':
-                        regex.append(".");
-                        break;
-                    case '.':
-                    case '(':
-                    case ')':
-                    case '+':
-                    case '|':
-                    case '^':
-                    case '$':
-                    case '@':
-                    case '%':
-                        // Escape standard regex control meta-characters
-                        regex.append('\\').append(c);
-                        break;
-                    default:
-                        regex.append(c);
-                        break;
-                }
-            }
-            return regex.toString();
+        public void addResourceGlob(String glob) {
+            resources.add(GlobUtil.convertGlobToRegex(glob));
         }
 
         public BundleIdentifier getBundleIdentifier(String name) {
