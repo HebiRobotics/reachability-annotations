@@ -20,11 +20,9 @@
 
 package us.hebi.graalvm.config.sample;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -36,10 +34,13 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Florian Enner
  * @since 09 Jul 2026
  */
-public class ReflectionConfigTest {
+public class ReachableConfigTest {
 
-    private static String reflectionConfig = readJsonContent("META-INF/native-image/reachable-generated/us.hebi.graalvm/config-sample/reflect-config.json");
-    private static String jniConfig =  readJsonContent("META-INF/native-image/reachable-generated/us.hebi.graalvm/config-sample/jni-config.json");
+    private final static String base = "META-INF/native-image/reachable-generated/us.hebi.graalvm/config-sample/";
+    private static String reflectionConfig = readJsonContent(base + "reflect-config.json");
+    private static String jniConfig = readJsonContent(base + "jni-config.json");
+    private static String resourceConfig = readJsonContent(base + "resource-config.json");
+    private static String proxyConfig = readJsonContent(base + "proxy-config.json");
 
     public static String readJsonContent(String resourcePath) {
         URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(resourcePath);
@@ -57,9 +58,9 @@ public class ReflectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                     "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReflectEnum"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReflectEnum"
                 },
-                    "name": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReflectEnum",
+                    "name": "us.hebi.graalvm.config.sample.ReachableConfig$ReflectEnum",
                         "allDeclaredMethods": true,
                         "allDeclaredFields": true,
                         "allDeclaredConstructors": true
@@ -70,7 +71,7 @@ public class ReflectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReflectEnum"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReflectEnum"
                   },
                   "name": "java.lang.Enum",
                   "allDeclaredMethods": true,
@@ -85,9 +86,9 @@ public class ReflectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                    "condition": {
-                     "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedParentClass"
+                     "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$NestedParentClass"
                    },
-                   "name": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedParentClass",
+                   "name": "us.hebi.graalvm.config.sample.ReachableConfig$NestedParentClass",
                    "allDeclaredMethods": true,
                    "allDeclaredFields": true,
                    "allDeclaredConstructors": true
@@ -101,9 +102,9 @@ public class ReflectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedChildClass"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$NestedChildClass"
                   },
-                  "name": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedChildClass",
+                  "name": "us.hebi.graalvm.config.sample.ReachableConfig$NestedChildClass",
                   "allDeclaredMethods": true,
                   "allDeclaredFields": true,
                   "allDeclaredConstructors": true
@@ -114,9 +115,9 @@ public class ReflectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedChildClass"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$NestedChildClass"
                   },
-                  "name": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedParentClass",
+                  "name": "us.hebi.graalvm.config.sample.ReachableConfig$NestedParentClass",
                   "allDeclaredMethods": true,
                   "allDeclaredFields": true,
                   "allDeclaredConstructors": true
@@ -129,9 +130,9 @@ public class ReflectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingChildClass"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReferencingChildClass"
                   },
-                  "name": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedChildClass",
+                  "name": "us.hebi.graalvm.config.sample.ReachableConfig$NestedChildClass",
                   "allDeclaredMethods": true,
                   "allDeclaredFields": true,
                   "allDeclaredConstructors": true
@@ -140,9 +141,9 @@ public class ReflectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingChildClass"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReferencingChildClass"
                   },
-                  "name": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedParentClass",
+                  "name": "us.hebi.graalvm.config.sample.ReachableConfig$NestedParentClass",
                   "allDeclaredMethods": true,
                   "allDeclaredFields": true,
                   "allDeclaredConstructors": true
@@ -155,9 +156,9 @@ public class ReflectionConfigTest {
         assertContains(jniConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingChildClass"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReferencingChildClass"
                   },
-                  "name": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedChildClass",
+                  "name": "us.hebi.graalvm.config.sample.ReachableConfig$NestedChildClass",
                   "allDeclaredMethods": true,
                   "allDeclaredFields": true,
                   "allDeclaredConstructors": true
@@ -166,9 +167,9 @@ public class ReflectionConfigTest {
         assertContains(jniConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingChildClass"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReferencingChildClass"
                   },
-                  "name": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedParentClass",
+                  "name": "us.hebi.graalvm.config.sample.ReachableConfig$NestedParentClass",
                   "allDeclaredMethods": true,
                   "allDeclaredFields": true,
                   "allDeclaredConstructors": true
@@ -181,7 +182,7 @@ public class ReflectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingMultipleClasses"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReferencingMultipleClasses"
                   },
                   "name": "java.net.InetAddress",
                   "allDeclaredMethods": true,
@@ -192,7 +193,7 @@ public class ReflectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingMultipleClasses"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReferencingMultipleClasses"
                   },
                   "name": "java.net.InetSocketAddress",
                   "allDeclaredMethods": true,
@@ -205,7 +206,7 @@ public class ReflectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingMultipleClasses"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReferencingMultipleClasses"
                   },
                   "name": "java.net.SocketAddress",
                   "allDeclaredMethods": true,
@@ -218,7 +219,7 @@ public class ReflectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingMultipleClasses"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReferencingMultipleClasses"
                   },
                   "name": "other.random.class",
                   "allDeclaredMethods": true,
@@ -229,12 +230,129 @@ public class ReflectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingMultipleClasses"
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReferencingMultipleClasses"
                   },
                   "name": "some.random.class$Nested",
                   "allDeclaredMethods": true,
                   "allDeclaredFields": true,
                   "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
+    void testKeepPrivateClass() throws IOException {
+        assertContains(reflectionConfig, """
+                {
+                  "name": "jdk.internal.vm.annotation.Stable",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "sun.misc.Unsafe"
+                  },
+                  "name": "sun.misc.Unsafe",
+                  "allDeclaredFields": true
+                }
+                """);
+    }
+
+    @Test
+    void testKeepPublicClass() throws IOException {
+        assertContains(reflectionConfig, """
+                {
+                  "name": "java.lang.String",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReferencingMultipleClasses"
+                  },
+                  "name": "java.net.InetAddress",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
+    void testKeepPrivateJni() throws IOException {
+        assertContains(jniConfig, """
+                {
+                   "condition": {
+                     "typeReachable": "sun.misc.Unsafe"
+                   },
+                   "name": "sun.misc.Unsafe",
+                   "allDeclaredFields": true
+                 }
+                """);
+    }
+
+    @Test
+    void testAbsoluteResources() throws IOException {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddResources"
+                  },
+                  "pattern": "assets/[^/]*\\\\.jpg"
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddResources"
+                  },
+                  "pattern": "assets/[^/]*\\\\.png"
+                }
+                """);
+    }
+
+    @Test
+    void testRelativeResources() throws IOException {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddResources"
+                  },
+                  "pattern": "us/hebi/graalvm/config/sample/images/[^/]*\\\\.jpg"
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddResources"
+                  },
+                  "pattern": "us/hebi/graalvm/config/sample/images/[^/]*\\\\.png"
+                }
+                """);
+    }
+
+    @Test
+    void testProxies() throws IOException {
+        assertContains(proxyConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddProxies"
+                  },
+                  "interfaces": ["name1", "name2"]
+                }
+                """);
+        assertContains(proxyConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddProxies"
+                  },
+                  "interfaces": ["name3", "name4"]
                 }
                 """);
     }

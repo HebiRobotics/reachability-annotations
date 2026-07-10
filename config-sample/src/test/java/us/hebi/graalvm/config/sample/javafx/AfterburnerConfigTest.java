@@ -28,7 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static us.hebi.graalvm.config.sample.ReflectionConfigTest.*;
+import static us.hebi.graalvm.config.sample.ReachableConfigTest.*;
 
 /**
  * @author Florian Enner
