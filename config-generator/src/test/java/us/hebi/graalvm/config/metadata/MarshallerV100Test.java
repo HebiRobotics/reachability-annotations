@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,9 +20,12 @@
 
 package us.hebi.graalvm.config.metadata;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Florian Enner
@@ -38,7 +41,14 @@ public class MarshallerV100Test {
 
     @Test
     public void testSaveMetadataTo() throws Exception {
-
+        var base = MarshallerV100Test.class.getResource("sampleV100").toURI();
+        var expected = MarshallerV100.mergeMetadataFrom(Path.of(base), new ReachabilityMetadata());
+        MarshallerV100.saveMetadataTo(expected, tempDir);
+        var actual = MarshallerV100.mergeMetadataFrom(tempDir, new ReachabilityMetadata());
+        assertEquals(expected, actual);
     }
+
+    @TempDir
+    Path tempDir;
 
 }

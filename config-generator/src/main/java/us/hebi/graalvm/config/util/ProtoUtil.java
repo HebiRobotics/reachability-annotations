@@ -57,6 +57,7 @@ public class ProtoUtil {
     }
 
     public static byte[] toJson(ProtoMessage<?> message) throws IOException {
+        if (message.isEmpty()) return new byte[]{'{', '}'};
         return JsonSink.newPrettyInstance()
                 .writeMessage(message)
                 .getBytes()
@@ -64,6 +65,7 @@ public class ProtoUtil {
     }
 
     public static byte[] toJson(RepeatedMessage<?> repeated) throws IOException {
+        if (repeated.length() == 0) return new byte[]{'[', ']'};
         return JsonSink.newPrettyInstance()
                 .writeRepeatedMessage(repeated)
                 .getBytes()

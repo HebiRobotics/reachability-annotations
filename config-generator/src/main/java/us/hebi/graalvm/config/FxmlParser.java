@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,12 +23,13 @@ package us.hebi.graalvm.config;
 import com.google.mu.util.Substring;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 
 /**
@@ -37,39 +38,29 @@ import java.util.function.Consumer;
  */
 public class FxmlParser {
 
-    public static Optional<String> tryReadContent(URI uri) {
+    public static Optional<String> tryReadContent(Path path) {
         try {
-            return Optional.of(new String(readAllBytes(uri), StandardCharsets.UTF_8));
+            return Optional.of(Files.readString(path, StandardCharsets.UTF_8));
         } catch (IOException e) {
             return Optional.empty();
         }
     }
 
-    public static byte[] readAllBytes(URI uri) throws IOException {
-        if ("file".equalsIgnoreCase(uri.getScheme())) {
-            return Files.readAllBytes(Paths.get(uri));
-        } else {
-            try (InputStream input = uri.toURL().openStream()) {
-                return input.readAllBytes();
-            }
-        }
-    }
-
-    public void addFxmlFile(URI uri) {
+    public void addFxmlFile(Path path) {
 
         // Ignore files that we already looked at (e.g. via includes)
-        if (resources.contains(uri)) {
+        if (resources.contains(path)) {
             return;
         }
 
-        var contentOpt = tryReadContent(uri);
+        var contentOpt = tryReadContent(path);
         if (contentOpt.isEmpty()) {
             return; // TODO: warn if a file does not exist?
         }
         var content = contentOpt.get();
 
         // Remove comments
-        resources.add(uri);
+        resources.add(path);
         content = Substring.spanningInOrder("<!--", "-->")
                 .repeatedly()
                 .removeAllFrom(content);
@@ -109,7 +100,7 @@ public class FxmlParser {
             // @../path are relative to the file while ../path are relative to the
             // working directory, i.e., outside of the jar.
             if (url.startsWith("@")) {
-                resources.add(uri.resolve(url.substring(1)));
+                resources.add(path.resolve(url.substring(1)));
             }
         };
 
@@ -118,7 +109,7 @@ public class FxmlParser {
 
         // Nested files
         onAttribute(content, "fx:include", "source", source -> {
-            addFxmlFile(uri.resolve(source));
+            addFxmlFile(path.resolve(source));
         });
 
         return;
@@ -163,12 +154,12 @@ public class FxmlParser {
         return controllers;
     }
 
-    public Set<URI> getResources() {
+    public Set<Path> getResources() {
         return resources;
     }
 
     final Set<String> imports = new TreeSet<>();
     final Set<String> controllers = new TreeSet<>();
-    final Set<URI> resources = new TreeSet<>(Comparator.comparing(URI::getPath));
+    final Set<Path> resources = new TreeSet<>();
 
 }

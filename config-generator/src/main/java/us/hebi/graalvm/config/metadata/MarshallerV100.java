@@ -21,6 +21,7 @@
 package us.hebi.graalvm.config.metadata;
 
 import us.hebi.graalvm.config.schema.v1_0_0.*;
+import us.hebi.graalvm.config.util.ExceptionUtil;
 import us.hebi.graalvm.config.util.ProtoUtil;
 import us.hebi.quickbuf.JsonSource;
 

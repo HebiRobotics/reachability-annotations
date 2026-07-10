@@ -20,10 +20,7 @@
 
 package us.hebi.graalvm.config.metadata;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import lombok.Value;
+import lombok.*;
 import us.hebi.graalvm.config.util.GlobUtil;
 import us.hebi.graalvm.config.util.StringArrayComparator;
 
@@ -34,6 +31,7 @@ import java.util.*;
  * @since 09 Jul 2026
  */
 @ToString
+@EqualsAndHashCode
 public class ReachabilityMetadata {
 
     @Value
@@ -46,10 +44,17 @@ public class ReachabilityMetadata {
     @RequiredArgsConstructor
     public static class ReflectionEntry {
         final String name;
-        boolean allDeclaredFields = false;
-        boolean allDeclaredMethods = false;
-        boolean allDeclaredConstructors = false;
-        boolean jniAccessible = false;
+        public boolean allDeclaredFields = false;
+        public boolean allDeclaredMethods = false;
+        public boolean allDeclaredConstructors = false;
+        public boolean jniAccessible = false;
+
+        public void enableFullReflection() {
+            allDeclaredFields = true;
+            allDeclaredMethods = true;
+            allDeclaredConstructors = true;
+        }
+
     }
 
     @Data
@@ -60,8 +65,22 @@ public class ReachabilityMetadata {
     }
 
     @ToString
+    @EqualsAndHashCode
     @RequiredArgsConstructor
     public static class ConditionalMetadata {
+
+        public ReflectionEntry addReflectedType(String typeName,
+                                                boolean allDeclaredConstructors,
+                                                boolean allDeclaredFields,
+                                                boolean allDeclaredMethods,
+                                                boolean jni) {
+            var entry = reflectedTypes.computeIfAbsent(typeName, ReflectionEntry::new);
+            entry.allDeclaredConstructors |= allDeclaredConstructors;
+            entry.allDeclaredFields |= allDeclaredFields;
+            entry.allDeclaredMethods |= allDeclaredMethods;
+            entry.jniAccessible |= jni;
+            return entry;
+        }
 
         public ReflectionEntry addReflectedType(String typeName) {
             return reflectedTypes.computeIfAbsent(typeName, ReflectionEntry::new);

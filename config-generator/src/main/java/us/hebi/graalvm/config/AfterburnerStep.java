@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,8 @@
 package us.hebi.graalvm.config;
 
 import com.google.common.collect.ImmutableSetMultimap;
-import us.hebi.graalvm.config.CssParser;
+import us.hebi.graalvm.config.metadata.ReachabilityMetadata.ReflectionEntry;
+import us.hebi.graalvm.config.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -34,7 +35,7 @@ import java.util.function.Supplier;
  * @author Florian Enner
  * @since 25 Nov 2025
  */
-public class AfterburnerStep extends AbstractConfigStep {
+public class AfterburnerStep extends AbstractMetadataStep {
 
     @Override
     public Set<String> annotations() {
@@ -44,7 +45,7 @@ public class AfterburnerStep extends AbstractConfigStep {
     }
 
     public void process0(ImmutableSetMultimap<String, Element> elementMap) {
-        var rootUri = getClassOutputUri();
+        var rootDir = getClassOutputDir();
 
         // Handle Afterburner.fx conventions
         var views = elementMap.get(ReachableAfterburnerView.class.getName());
@@ -52,31 +53,19 @@ public class AfterburnerStep extends AbstractConfigStep {
             for (Element viewClass : views) {
                 if (viewClass instanceof TypeElement type) {
                     ReachableAfterburnerView annotation = type.getAnnotation(ReachableAfterburnerView.class);
-                    final var config = getConfig(type, ReachableAfterburnerView.class);
+                    final var metadata = getConditionalMetadata(getConditionName(type, ReachableAfterburnerView.class));
 
                     // Use Afterburner convention for the name
-                    var sourceDir = getSourceDirectory(type);
+                    var baseDir = ProcessorUtil.getSourceDirectory(env, type);
                     var conventionalName = Optional.of(annotation.value())
                             .filter(s -> !s.isEmpty())
                             .orElseGet(() -> stripEnding(type.getSimpleName().toString()).toLowerCase());
 
-                    // Add annotated class so Afterburner can figure out the conventional name via reflection
-                    config.addReflectedType(type);
-
-                    // Add language files
-                    config.addResourceGlob(sourceDir + conventionalName + "*.properties");
-
-                    // Add CSS files and all includes
-                    var cssParser = new CssParser();
-                    cssParser.addCssFile(rootUri.resolve(sourceDir + conventionalName + ".css"));
-                    config.addAllResources(cssParser.getResources());
-
-                    // Add FXML files and all includes
+                    // Parse FXML and CSS contents
                     var fxmlParser = new FxmlParser();
-                    fxmlParser.addFxmlFile(rootUri.resolve(sourceDir + conventionalName + ".fxml"));
-                    config.addAllReflectedTypes(fxmlParser.getImports());
-                    config.addAllReflectedTypes(fxmlParser.getControllers());
-                    config.addAllResources(fxmlParser.getResources());
+                    fxmlParser.addFxmlFile(rootDir.resolve(baseDir + conventionalName + ".fxml"));
+                    var cssParser = new CssParser();
+                    cssParser.addCssFile(rootDir.resolve(baseDir + conventionalName + ".css"));
 
                     // Sanity check that we don't have wildcards
                     for (String clazz : fxmlParser.getImports()) {
@@ -86,6 +75,27 @@ public class AfterburnerStep extends AbstractConfigStep {
                         }
                     }
 
+                    // Add annotated class so Afterburner can figure out the conventional name via reflection
+                    addReflectedType(metadata, type, ReflectionEntry::enableFullReflection);
+
+                    // Add FXML files and all includes
+                    for (var name : fxmlParser.getImports()) {
+                        addReflectedType(metadata, name, ReflectionEntry::enableFullReflection);
+                    }
+                    for (var name : fxmlParser.getControllers()) {
+                        addReflectedType(metadata, name, ReflectionEntry::enableFullReflection);
+                    }
+                    for (var resource : fxmlParser.getResources()) {
+                        addResourceFile(metadata, resource);
+                    }
+
+                    // Add CSS files and all includes
+                    for (var resource : cssParser.getResources()) {
+                        addResourceFile(metadata, resource);
+                    }
+
+                    // Add wildcard for language files (NOTE: use property bundles instead?)
+                    addResourceGlob(metadata, baseDir + conventionalName + "*.properties");
                 }
             }
 

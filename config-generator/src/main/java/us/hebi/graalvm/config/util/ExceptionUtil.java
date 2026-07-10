@@ -1,6 +1,6 @@
 /*-
  * #%L
- * Native Config Generator
+ * config-generator
  * %%
  * Copyright (C) 2026 HEBI Robotics
  * %%
@@ -18,23 +18,25 @@
  * #L%
  */
 
-package us.hebi.graalvm.config;
+package us.hebi.graalvm.config.util;
 
-import java.io.IOException;
-import java.io.Writer;
+import lombok.experimental.UtilityClass;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * @author Florian Enner
- * @since 08 Jul 2026
+ * @since 10 Jul 2026
  */
-@FunctionalInterface
-public interface Filer {
-    Writer createWriter(String directory, String fileName) throws IOException;
+@UtilityClass
+public class ExceptionUtil {
 
-    default void createFile(String directory, String fileName, ContentSource source) throws IOException {
-        try (var writer = createWriter(directory, fileName)) {
-            source.writeTo(writer);
-        }
+    public static String getStackTrace(Throwable throwable) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        throwable.printStackTrace(printWriter);
+        return stringWriter.toString();
     }
 
 }

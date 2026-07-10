@@ -23,6 +23,7 @@ package us.hebi.graalvm.config;
 import com.google.mu.util.Substring;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,7 +34,7 @@ import java.util.TreeSet;
  */
 public class CssParser {
 
-    public void addCssFile(URI uri) {
+    public void addCssFile(Path uri) {
         if (resources.contains(uri)) {
             return;
         }
@@ -68,14 +69,14 @@ public class CssParser {
 
     }
 
-    private void addResource(URI uri) {
-        if (resources.contains(uri)) {
+    private void addResource(Path path) {
+        if (resources.contains(path)) {
             return;
         }
-        if (uri.getRawPath().endsWith(".css")) {
-            addCssFile(uri);
+        if (path.endsWith(".css")) {
+            addCssFile(path);
         } else {
-            resources.add(uri);
+            resources.add(path);
         }
     }
 
@@ -95,9 +96,9 @@ public class CssParser {
         return url.trim();
     }
 
-    final Set<URI> resources = new TreeSet<>(Comparator.comparing(URI::getPath));
+    final Set<Path> resources = new TreeSet<>();
 
-    public Set<URI> getResources() {
+    public Set<Path> getResources() {
         return resources;
     }
 

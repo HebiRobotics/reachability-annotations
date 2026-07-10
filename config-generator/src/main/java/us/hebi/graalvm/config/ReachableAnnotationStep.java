@@ -21,6 +21,8 @@
 package us.hebi.graalvm.config;
 
 import com.google.common.collect.ImmutableSetMultimap;
+import us.hebi.graalvm.config.metadata.ReachabilityMetadata.ReflectionEntry;
+import us.hebi.graalvm.config.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
@@ -30,13 +32,14 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypesException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
  * @author Florian Enner
  * @since 27 Nov 2025
  */
-public class ReachableAnnotationStep extends AbstractConfigStep {
+public class ReachableAnnotationStep extends AbstractMetadataStep {
 
     @Override
     public Set<String> annotations() {
@@ -79,88 +82,71 @@ public class ReachableAnnotationStep extends AbstractConfigStep {
 
     private final Set<String> tmpLocales = new HashSet<>();
 
-    private void processConfigAnnotation(TypeElement type, Reachable annotation, AnnotationMirror mirror) {
-        final var config = getConfig(type, mirror);
+    private void processConfigAnnotation(TypeElement annotatedType, Reachable annotation, AnnotationMirror mirror) {
+        final var metadata = getConditionalMetadata(getConditionName(annotatedType, mirror));
         boolean fieldsEmpty = true;
 
         // Absolute resources
         for (var pattern : annotation.resources()) {
             fieldsEmpty = false;
-            config.addResourceGlob(pattern);
+            metadata.addResourceGlob(pattern);
         }
 
         // Resource bundles
         for (var bundle : annotation.bundles()) {
             fieldsEmpty = false;
-            var id = config.getBundleIdentifier(bundle.name());
-
-            // Save the previous locales in case we have multiple-definitions
-            tmpLocales.clear();
-            id.getMutableLocales().forEach(tmpLocales::add);
-
-            // Add the locally defined ones
-            for (String locale : bundle.locales()) {
-                if (!tmpLocales.contains(locale)) {
-                    id.addLocales(locale);
-                }
+            var entry = metadata.addBundle(bundle.name());
+            for (var locale : bundle.locales()) {
+                entry.getLocales().add(locale);
             }
         }
 
         // Resources (relative to the specified condition)
-        var sourceDir = getSourceDirectory(type); // TODO: condition class or annotated type?
-        for (String pattern : annotation.relativeResources()) {
+        if (annotation.relativeResources().length > 0) {
             fieldsEmpty = false;
-            config.addResourceGlob(sourceDir + pattern);
+            var baseDir = ProcessorUtil.getSourceDirectory(env, annotatedType);
+            for (String pattern : annotation.relativeResources()) {
+                metadata.addResourceGlob(baseDir + pattern);
+            }
         }
 
         // Explicitly added proxy interface names
         for (var proxy : annotation.proxies()) {
             fieldsEmpty = false;
-            config.addProxyInterfaces(proxy.interfaceNames());
+            metadata.addProxyInterfaces(proxy.interfaceNames());
         }
 
-        // Reflectively accessible classes
+        // JNI and reflectively accessible classes
+        final Consumer<ReflectionEntry> updateReflectEntry = entry -> {
+            entry.allDeclaredConstructors |= annotation.allDeclaredConstructors();
+            entry.allDeclaredMethods |= annotation.allDeclaredMethods();
+            entry.allDeclaredFields |= annotation.allDeclaredFields();
+            entry.jniAccessible |= annotation.jniAccessible();
+        };
         for (String name : annotation.classNames()) {
             fieldsEmpty = false;
-            config.addReflectedType(name);
+            addReflectedType(metadata, name, updateReflectEntry);
         }
         try {
+            // Processing classes immediately hit a MirroredTypeException,
+            // so this code doesn't actually run.
             for (var clazz : annotation.classes()) {
                 fieldsEmpty = false;
-                config.addReflectedType(clazz.getName());
+                addReflectedType(metadata, clazz.getName(), updateReflectEntry);
             }
         } catch (MirroredTypesException e) {
+            // Add all target classes and their parents
             for (var typeMirror : e.getTypeMirrors()) {
                 fieldsEmpty = false;
-                Element classElement = processingEnv.getTypeUtils().asElement(typeMirror);
-                if (classElement instanceof TypeElement typeElement) {
-                    config.addReflectedType(typeElement);
-                }
-            }
-        }
-
-        // JNI-accessible types
-        if (annotation.jniAccessible()) {
-            for (String name : annotation.classNames()) {
-                config.addJniType(name);
-            }
-            try {
-                for (var clazz : annotation.classes()) {
-                    config.addJniType(clazz.getName());
-                }
-            } catch (MirroredTypesException e) {
-                for (var typeMirror : e.getTypeMirrors()) {
-                    Element classElement = processingEnv.getTypeUtils().asElement(typeMirror);
-                    if (classElement instanceof TypeElement typeElement) {
-                        config.addJniType(typeElement);
-                    }
+                if (env.getTypeUtils().asElement(typeMirror) instanceof TypeElement typeElement) {
+                    addReflectedType(metadata, typeElement, updateReflectEntry);
                 }
             }
         }
 
         // Nothing else defined -> enable reflection of the annotated type itself
         if (fieldsEmpty) {
-            config.addReflectedType(type);
+            addReflectedType(metadata, annotatedType, updateReflectEntry);
         }
 
     }

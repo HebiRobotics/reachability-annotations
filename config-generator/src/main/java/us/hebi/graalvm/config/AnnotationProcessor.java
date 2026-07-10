@@ -59,7 +59,7 @@ public class AnnotationProcessor extends BasicAnnotationProcessor {
 
     protected void postRound(RoundEnvironment roundEnv) {
         if (roundEnv.processingOver()) {
-            steps.forEach(AbstractConfigStep::finish);
+            steps.forEach(AbstractMetadataStep::finish);
         }
     }
 
@@ -70,7 +70,7 @@ public class AnnotationProcessor extends BasicAnnotationProcessor {
         return processingEnv;
     }
 
-    final List<AbstractConfigStep> steps = Arrays.asList(
+    final List<AbstractMetadataStep> steps = Arrays.asList(
             new ReachableAnnotationStep(this::getEnv),
             new AfterburnerStep(this::getEnv),
             new DependencyInjectionStep(this::getEnv)

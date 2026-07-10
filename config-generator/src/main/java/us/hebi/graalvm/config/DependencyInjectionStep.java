@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,6 +21,8 @@
 package us.hebi.graalvm.config;
 
 import com.google.common.collect.ImmutableSetMultimap;
+import us.hebi.graalvm.config.metadata.ReachabilityMetadata.ReflectionEntry;
+import us.hebi.graalvm.config.util.ElementUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -33,7 +35,7 @@ import java.util.function.Supplier;
  * @author Florian Enner
  * @since 27 Nov 2025
  */
-public class DependencyInjectionStep extends AbstractConfigStep {
+public class DependencyInjectionStep extends AbstractMetadataStep {
 
     @Override
     public Set<String> annotations() {
@@ -51,23 +53,27 @@ public class DependencyInjectionStep extends AbstractConfigStep {
 
     public void process0(ImmutableSetMultimap<String, Element> elementMap) {
         // Handle @FXML & DI annotations on nested fields and methods
-        for (var entry : elementMap.entries()) {
-            var element = entry.getValue();
+        for (var element : elementMap.values()) {
+
+            // ignore type annotations
             if (element instanceof TypeElement typeElement) {
-                continue; // ignore type annotations
+                continue;
             }
 
+            // allow all reflection
             if (element.getEnclosingElement() instanceof TypeElement typeElement) {
-                var config = configWriter.getConfigByType(typeElement);
+                var metadata = getConditionalMetadata(ElementUtil.getBinaryName(typeElement));
 
                 // 1) add the containing class
-                config.addReflectedType(typeElement);
+                addReflectedType(metadata, typeElement, ReflectionEntry::enableFullReflection);
 
                 // 2) add the field type in case it needs to be created via reflection
                 if (element instanceof VariableElement variable) {
-                    Element mirror = processingEnv.getTypeUtils().asElement(variable.asType());
+                    Element mirror = env.getTypeUtils().asElement(variable.asType());
                     if (mirror instanceof TypeElement varType) {
-                        config.addReflectedType(varType);
+                        addReflectedType(metadata, ElementUtil.getBinaryName(varType), entry -> {
+                            entry.setAllDeclaredConstructors(true);
+                        });
                     }
                 }
 
