@@ -65,6 +65,7 @@ public class DependencyInjectionStep extends AbstractMetadataStep {
                 var metadata = getConditionalMetadata(ElementUtil.getBinaryName(typeElement));
 
                 // 1) add the containing class
+                // TODO: limit to only the annotated fields and methods?
                 addReflectedType(metadata, typeElement, ReflectionEntry::enableFullReflection);
 
                 // 2) add the field type in case it needs to be created via reflection

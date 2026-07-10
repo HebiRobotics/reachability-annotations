@@ -158,6 +158,9 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
     }
 
     protected void addResourceGlob(ConditionalMetadata metadata, String glob) {
+        if (glob.startsWith("/")) {
+            printError("globs must not start with a slash '/'.");
+        }
         metadata.addResourceGlob(glob);
     }
 

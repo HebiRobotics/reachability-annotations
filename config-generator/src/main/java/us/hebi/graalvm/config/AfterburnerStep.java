@@ -47,58 +47,59 @@ public class AfterburnerStep extends AbstractMetadataStep {
     }
 
     public void process0(ImmutableSetMultimap<String, Element> elementMap) {
-        var rootDir = getClassOutputDir();
+        var views = elementMap.get(ReachableAfterburnerView.class.getName());
+        if (views.isEmpty()) {
+            return;
+        }
 
         // Handle Afterburner.fx conventions
-        var views = elementMap.get(ReachableAfterburnerView.class.getName());
-        if (!views.isEmpty()) {
-            for (Element viewClass : views) {
-                if (viewClass instanceof TypeElement type) {
-                    ReachableAfterburnerView annotation = type.getAnnotation(ReachableAfterburnerView.class);
-                    final var metadata = getConditionalMetadata(getConditionName(type, ReachableAfterburnerView.class));
+        var rootDir = getClassOutputDir();
+        for (Element viewClass : views) {
+            if (viewClass instanceof TypeElement type) {
+                ReachableAfterburnerView annotation = type.getAnnotation(ReachableAfterburnerView.class);
+                final var metadata = getConditionalMetadata(getConditionName(type, ReachableAfterburnerView.class));
 
-                    // Use Afterburner convention for the name
-                    var baseDir = ProcessorUtil.getSourceDirectory(env, type);
-                    var conventionalName = Optional.of(annotation.value())
-                            .filter(s -> !s.isEmpty())
-                            .orElseGet(() -> stripEnding(type.getSimpleName().toString()).toLowerCase());
+                // Use Afterburner convention for the name
+                var baseDir = ProcessorUtil.getSourceDirectory(env, type);
+                var conventionalName = Optional.of(annotation.value())
+                        .filter(s -> !s.isEmpty())
+                        .orElseGet(() -> stripEnding(type.getSimpleName().toString()).toLowerCase());
 
-                    // Parse FXML and CSS contents
-                    var fxmlParser = new FxmlParser();
-                    fxmlParser.addFxmlFile(rootDir.resolve(baseDir + conventionalName + ".fxml"));
-                    var cssParser = new CssParser();
-                    cssParser.addCssFile(rootDir.resolve(baseDir + conventionalName + ".css"));
+                // Parse FXML and CSS contents
+                var fxmlParser = new FxmlParser();
+                fxmlParser.addFxmlFile(rootDir.resolve(baseDir + conventionalName + ".fxml"));
+                var cssParser = new CssParser();
+                cssParser.addCssFile(rootDir.resolve(baseDir + conventionalName + ".css"));
 
-                    // Sanity check that we don't have wildcards
-                    for (String clazz : fxmlParser.getImports()) {
-                        if (clazz.endsWith("*")) {
-                            printWarning("Ignoring unsupported wildcard import: " + clazz);
-                            continue;
-                        }
+                // Sanity check that we don't have wildcards
+                for (String clazz : fxmlParser.getImports()) {
+                    if (clazz.endsWith("*")) {
+                        printWarning("Ignoring unsupported wildcard import: " + clazz);
+                        continue;
                     }
-
-                    // Add annotated class so Afterburner can figure out the conventional name via reflection
-                    addReflectedType(metadata, type, ReflectionEntry::enableFullReflection);
-
-                    // Add FXML files and all includes
-                    for (var name : fxmlParser.getImports()) {
-                        addReflectedType(metadata, name, ReflectionEntry::enableFullReflection);
-                    }
-                    for (var name : fxmlParser.getControllers()) {
-                        addReflectedType(metadata, name, ReflectionEntry::enableFullReflection);
-                    }
-                    for (var resource : fxmlParser.getResources()) {
-                        addResourceFile(metadata, resource);
-                    }
-
-                    // Add CSS files and all includes
-                    for (var resource : cssParser.getResources()) {
-                        addResourceFile(metadata, resource);
-                    }
-
-                    // Add wildcard for language files (NOTE: use property bundles instead?)
-                    addResourceGlob(metadata, baseDir + conventionalName + "*.properties");
                 }
+
+                // Add annotated class so Afterburner can figure out the conventional name via reflection
+                addReflectedType(metadata, type, ReflectionEntry::enableFullReflection);
+
+                // Add FXML files and all includes
+                for (var name : fxmlParser.getImports()) {
+                    addReflectedType(metadata, name, ReflectionEntry::enableFullReflection);
+                }
+                for (var name : fxmlParser.getControllers()) {
+                    addReflectedType(metadata, name, ReflectionEntry::enableFullReflection);
+                }
+                for (var resource : fxmlParser.getResources()) {
+                    addResourceFile(metadata, resource);
+                }
+
+                // Add CSS files and all includes
+                for (var resource : cssParser.getResources()) {
+                    addResourceFile(metadata, resource);
+                }
+
+                // Add wildcard for language files (NOTE: use property bundles instead?)
+                addResourceGlob(metadata, baseDir + conventionalName + "*.properties");
             }
 
         }

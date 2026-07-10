@@ -29,6 +29,10 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class GlobUtil {
 
+    public static boolean hasWildcards(String glob) {
+        return glob.contains("*") | glob.contains("?");
+    }
+
     public static String convertGlobToRegex(String glob) {
         if (glob == null || glob.isEmpty()) {
             return "";
