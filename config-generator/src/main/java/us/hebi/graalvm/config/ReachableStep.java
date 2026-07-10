@@ -86,10 +86,17 @@ public class ReachableStep extends AbstractMetadataStep {
         final var metadata = getConditionalMetadata(getConditionName(annotatedType, mirror));
         boolean fieldsEmpty = true;
 
-        // Absolute resources
-        for (var pattern : annotation.resources()) {
+        // Absolute & relative resource paths
+        if (annotation.resources().length > 0) {
             fieldsEmpty = false;
-            metadata.addResourceGlob(pattern);
+            var baseDir = ProcessorUtil.getSourceDirectory(env, annotatedType);
+            for (var pattern : annotation.resources()) {
+                if (pattern.startsWith("/")) {
+                    metadata.addResourceGlob(pattern.substring(1));
+                } else {
+                    metadata.addResourceGlob(baseDir + pattern);
+                }
+            }
         }
 
         // Resource bundles
@@ -98,15 +105,6 @@ public class ReachableStep extends AbstractMetadataStep {
             var entry = metadata.addBundle(bundle.name());
             for (var locale : bundle.locales()) {
                 entry.getLocales().add(locale);
-            }
-        }
-
-        // Resources (relative to the specified condition)
-        if (annotation.relativeResources().length > 0) {
-            fieldsEmpty = false;
-            var baseDir = ProcessorUtil.getSourceDirectory(env, annotatedType);
-            for (String pattern : annotation.relativeResources()) {
-                metadata.addResourceGlob(baseDir + pattern);
             }
         }
 

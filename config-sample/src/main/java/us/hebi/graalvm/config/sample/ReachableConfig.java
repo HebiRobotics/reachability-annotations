@@ -69,13 +69,13 @@ public class ReachableConfig {
     public static class KeepPublicClass {
     }
 
-    @Reachable(relativeResources = {
+    @Reachable(resources = {
             "images/*.png",
             "images/*.jpg",
     })
     @Reachable(resources = {
-            "assets/*.png",
-            "assets/*.jpg",
+            "/assets/*.png",
+            "/assets/*.jpg",
     })
     public static class AddResources {
     }

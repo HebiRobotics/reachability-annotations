@@ -93,15 +93,9 @@ public @interface Reachable {
 
     /**
      * Unified routing path using glob syntax (e.g. "assets/**.png" or "META-INF/services/*").
-     * Do not add '/' to specify root.
+     * Leading '/' are relative to the root, otherwise relative to the annotated type.
      */
     String[] resources() default {};
-
-    /**
-     * Unified routing path using glob syntax (e.g. "assets/**.png" or "META-INF/services/*"),
-     * relative to the annotated type, e.g., ${typePath}/${glob}.
-     */
-    String[] relativeResources() default {};
 
     /**
      * @return Dynamic proxy interface groups to register under this condition.
