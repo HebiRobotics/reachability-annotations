@@ -21,14 +21,13 @@
 package us.hebi.graalvm.config;
 
 import com.google.common.collect.ImmutableSetMultimap;
-import us.hebi.graalvm.config.parsers.CssParser;
-import us.hebi.graalvm.config.parsers.FxmlParser;
 import us.hebi.graalvm.config.metadata.ReachabilityMetadata.ReflectionEntry;
 import us.hebi.graalvm.config.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import java.nio.file.Files;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -41,9 +40,7 @@ public class AfterburnerStep extends AbstractMetadataStep {
 
     @Override
     public Set<String> annotations() {
-        return Set.of(
-                ReachableAfterburnerView.class.getName()
-        );
+        return Set.of(ReachableAfterburnerView.class.getName());
     }
 
     public void process0(ImmutableSetMultimap<String, Element> elementMap) {
@@ -65,37 +62,21 @@ public class AfterburnerStep extends AbstractMetadataStep {
                         .filter(s -> !s.isEmpty())
                         .orElseGet(() -> stripEnding(type.getSimpleName().toString()).toLowerCase());
 
-                // Parse FXML and CSS contents
-                var fxmlParser = new FxmlParser();
-                fxmlParser.addFxmlFile(rootDir.resolve(baseDir + conventionalName + ".fxml"));
-                var cssParser = new CssParser();
-                cssParser.addCssFile(rootDir.resolve(baseDir + conventionalName + ".css"));
-
-                // Sanity check that we don't have wildcards
-                for (String clazz : fxmlParser.getImports()) {
-                    if (clazz.endsWith("*")) {
-                        printWarning("Ignoring unsupported wildcard import: " + clazz);
-                        continue;
-                    }
-                }
-
                 // Add annotated class so Afterburner can figure out the conventional name via reflection
                 addReflectedType(metadata, type, ReflectionEntry::enableFullReflection);
 
-                // Add FXML files and all includes
-                for (var name : fxmlParser.getImports()) {
-                    addReflectedType(metadata, name, ReflectionEntry::enableFullReflection);
-                }
-                for (var name : fxmlParser.getControllers()) {
-                    addReflectedType(metadata, name, ReflectionEntry::enableFullReflection);
-                }
-                for (var resource : fxmlParser.getResources()) {
-                    addResourceFile(metadata, resource);
+                // Parse FXML contents
+                var fxmlFile = rootDir.resolve(baseDir + conventionalName + ".fxml");
+                addResourceFile(metadata, fxmlFile);
+                if (Files.isRegularFile(fxmlFile)) {
+                    addMetadataFromParsedFileContents(metadata, fxmlFile);
                 }
 
-                // Add CSS files and all includes
-                for (var resource : cssParser.getResources()) {
-                    addResourceFile(metadata, resource);
+                // Parse CSS contents
+                var cssFile = rootDir.resolve(baseDir + conventionalName + ".css");
+                addResourceFile(metadata, cssFile);
+                if (Files.isRegularFile(cssFile)) {
+                    addMetadataFromParsedFileContents(metadata, cssFile);
                 }
 
                 // Add wildcard for language files (NOTE: use property bundles instead?)

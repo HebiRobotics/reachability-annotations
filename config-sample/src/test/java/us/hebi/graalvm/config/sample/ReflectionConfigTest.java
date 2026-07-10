@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Florian Enner
  * @since 09 Jul 2026
  */
-class ReflectionConfigTest {
+public class ReflectionConfigTest {
 
     private static String reflectionConfig = readJsonContent("META-INF/native-image/reachable-generated/us.hebi.graalvm/config-sample/reflect-config.json");
     private static String jniConfig =  readJsonContent("META-INF/native-image/reachable-generated/us.hebi.graalvm/config-sample/jni-config.json");
@@ -239,14 +239,14 @@ class ReflectionConfigTest {
                 """);
     }
 
-    private void assertContains(String json, String expected) {
+    public static void assertContains(String json, String expected) {
         expected = expected.strip();
         if (json.contains(expected)) {
             return;
         }
         String minimizedJson = json.replaceAll("\\s", "");
         String minimizedExpected = expected.replaceAll("\\s", "");
-        if (!minimizedExpected.contains(minimizedExpected)) {
+        if (!minimizedJson.contains(minimizedExpected)) {
             fail("The json source does not contain expected content:\n" + expected);
         }
     }

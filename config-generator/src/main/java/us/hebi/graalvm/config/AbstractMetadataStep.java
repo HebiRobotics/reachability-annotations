@@ -26,6 +26,8 @@ import us.hebi.graalvm.config.metadata.MarshallerV100;
 import us.hebi.graalvm.config.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.config.metadata.ReachabilityMetadata.ConditionalMetadata;
 import us.hebi.graalvm.config.metadata.ReachabilityMetadata.ReflectionEntry;
+import us.hebi.graalvm.config.parsers.CssParser;
+import us.hebi.graalvm.config.parsers.FxmlParser;
 import us.hebi.graalvm.config.util.ElementUtil;
 import us.hebi.graalvm.config.util.ExceptionUtil;
 import us.hebi.graalvm.config.util.ProcessorUtil;
@@ -37,6 +39,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
@@ -165,7 +168,43 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
     }
 
     protected void addResourceFile(ConditionalMetadata metadata, Path path) {
-        addResourceGlob(metadata, getClassOutputDir().relativize(path).toString());
+        String glob = getClassOutputDir().relativize(path).toString();
+        addResourceGlob(metadata, glob.replace('\\', '/'));
+    }
+
+    protected void addMetadataFromParsedFileContents(ConditionalMetadata metadata, Path file) {
+        if (!Files.isRegularFile(file)) {
+            printError(file + " is not a regular file.");
+        }
+
+        String lowercaseFile = file.getFileName().toString().toLowerCase();
+
+        if (lowercaseFile.endsWith(".fxml")) {
+            var fxmlParser = new FxmlParser();
+            fxmlParser.addFxmlFile(file);
+            for (var name : fxmlParser.getImports()) {
+                if (name.contains("*")) {
+                    printWarning("Ignoring unsupported wildcard import: " + name);
+                    continue;
+                }
+                addReflectedType(metadata, name, ReachabilityMetadata.ReflectionEntry::enableFullReflection);
+
+            }
+            for (var name : fxmlParser.getControllers()) {
+                addReflectedType(metadata, name, ReachabilityMetadata.ReflectionEntry::enableFullReflection);
+            }
+            for (var resource : fxmlParser.getResources()) {
+                addResourceFile(metadata, resource);
+            }
+        }
+
+        if (lowercaseFile.endsWith(".css")) {
+            var cssParser = new CssParser();
+            cssParser.addCssFile(file);
+            for (var resource : cssParser.getResources()) {
+                addResourceFile(metadata, resource);
+            }
+        }
     }
 
     protected Path getClassOutputDir() {

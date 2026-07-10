@@ -47,7 +47,6 @@ public class FxmlParser {
     }
 
     public void addFxmlFile(Path path) {
-
         // Ignore files that we already looked at (e.g. via includes)
         if (resources.contains(path)) {
             return;
@@ -100,7 +99,7 @@ public class FxmlParser {
             // @../path are relative to the file while ../path are relative to the
             // working directory, i.e., outside of the jar.
             if (url.startsWith("@")) {
-                resources.add(path.resolve(url.substring(1)));
+                resources.add(path.resolveSibling(url.substring(1)));
             }
         };
 
@@ -109,7 +108,7 @@ public class FxmlParser {
 
         // Nested files
         onAttribute(content, "fx:include", "source", source -> {
-            addFxmlFile(path.resolve(source));
+            addFxmlFile(path.resolveSibling(source));
         });
 
         return;

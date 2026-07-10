@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,6 +21,14 @@
 package us.hebi.graalvm.config.util;
 
 import lombok.experimental.UtilityClass;
+
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * @author Florian Enner
@@ -80,6 +88,31 @@ public class GlobUtil {
             }
         }
         return regex.toString();
+    }
+
+    public static void forEachFile(Path searchBaseDir, String glob, Consumer<Path> onFile) throws IOException {
+
+        // Case 1 -> we have a fixed path without wildcards
+        Path absPath = searchBaseDir.resolve(glob);
+        if (Files.isRegularFile(absPath)) {
+            onFile.accept(absPath);
+            return;
+        }
+
+        // Case 2 -> walk file tree with wildcards
+        if (GlobUtil.hasWildcards(glob) && Files.isDirectory(searchBaseDir)) {
+
+            String absGlob = absPath.toString().replace('\\', '/');
+            PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + absGlob);
+
+            try (Stream<Path> stream = Files.walk(searchBaseDir)) {
+                stream.filter(Files::isRegularFile)
+                        .filter(matcher::matches)
+                        .forEach(onFile);
+            }
+
+        }
+
     }
 
 }
