@@ -39,7 +39,7 @@ import java.util.function.Supplier;
  * @author Florian Enner
  * @since 27 Nov 2025
  */
-public class ReachableAnnotationStep extends AbstractMetadataStep {
+public class ReachableStep extends AbstractMetadataStep {
 
     @Override
     public Set<String> annotations() {
@@ -174,7 +174,7 @@ public class ReachableAnnotationStep extends AbstractMetadataStep {
         return java.util.Collections.emptyList();
     }
 
-    public ReachableAnnotationStep(Supplier<ProcessingEnvironment> env) {
+    public ReachableStep(Supplier<ProcessingEnvironment> env) {
         super("reachable-generated", env);
     }
 

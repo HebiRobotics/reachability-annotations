@@ -71,7 +71,7 @@ public class AnnotationProcessor extends BasicAnnotationProcessor {
     }
 
     final List<AbstractMetadataStep> steps = Arrays.asList(
-            new ReachableAnnotationStep(this::getEnv),
+            new ReachableStep(this::getEnv),
             new AfterburnerStep(this::getEnv),
             new DependencyInjectionStep(this::getEnv)
     );

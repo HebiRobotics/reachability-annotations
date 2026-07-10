@@ -18,13 +18,11 @@
  * #L%
  */
 
-package us.hebi.graalvm.config;
+package us.hebi.graalvm.config.parsers;
 
 import com.google.mu.util.Substring;
 
-import java.net.URI;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 

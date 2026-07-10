@@ -18,7 +18,7 @@
  * #L%
  */
 
-package us.hebi.graalvm.config;
+package us.hebi.graalvm.config.parsers;
 
 import com.google.mu.util.Substring;
 

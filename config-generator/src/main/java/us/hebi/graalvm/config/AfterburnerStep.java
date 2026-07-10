@@ -21,6 +21,8 @@
 package us.hebi.graalvm.config;
 
 import com.google.common.collect.ImmutableSetMultimap;
+import us.hebi.graalvm.config.parsers.CssParser;
+import us.hebi.graalvm.config.parsers.FxmlParser;
 import us.hebi.graalvm.config.metadata.ReachabilityMetadata.ReflectionEntry;
 import us.hebi.graalvm.config.util.ProcessorUtil;
 
@@ -113,7 +115,7 @@ public class AfterburnerStep extends AbstractMetadataStep {
     }
 
     public AfterburnerStep(Supplier<ProcessingEnvironment> env) {
-        super("generated-fxml", env);
+        super("afterburner-generated", env);
     }
 
 }

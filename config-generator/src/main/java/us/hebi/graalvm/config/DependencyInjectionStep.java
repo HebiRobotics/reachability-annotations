@@ -85,7 +85,7 @@ public class DependencyInjectionStep extends AbstractMetadataStep {
     }
 
     public DependencyInjectionStep(Supplier<ProcessingEnvironment> env) {
-        super("generated-di", env);
+        super("di-generated", env);
     }
 
 }
