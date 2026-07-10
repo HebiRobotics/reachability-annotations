@@ -116,7 +116,7 @@ public @interface Reachable {
         /**
          * @return The fully qualified names of the interfaces that must be available for proxying.
          */
-        String[] interfaceNames();
+        String[] value();
     }
 
     /**

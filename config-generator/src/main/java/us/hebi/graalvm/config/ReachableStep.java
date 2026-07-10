@@ -111,7 +111,7 @@ public class ReachableStep extends AbstractMetadataStep {
         // Explicitly added proxy interface names
         for (var proxy : annotation.proxies()) {
             fieldsEmpty = false;
-            metadata.addProxyInterfaces(proxy.interfaceNames());
+            metadata.addProxyInterfaces(proxy.value());
         }
 
         // JNI and reflectively accessible classes

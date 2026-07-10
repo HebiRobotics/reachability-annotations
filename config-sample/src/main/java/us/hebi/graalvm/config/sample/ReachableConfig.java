@@ -81,8 +81,8 @@ public class ReachableConfig {
     }
 
     @Reachable(proxies = {
-            @Proxy(interfaceNames = {"name1", "name2"}),
-            @Proxy(interfaceNames = {"name3", "name4"}),
+            @Proxy({"name1", "name2"}),
+            @Proxy({"name3", "name4"}),
     })
     public static class AddProxies {
     }
