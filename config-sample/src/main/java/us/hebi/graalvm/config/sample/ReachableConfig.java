@@ -22,6 +22,7 @@ package us.hebi.graalvm.config.sample;
 
 import us.hebi.graalvm.config.Reachable;
 import us.hebi.graalvm.config.Reachable.Proxy;
+import us.hebi.graalvm.config.ReachableFxResources;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -85,6 +86,38 @@ public class ReachableConfig {
             @Proxy({"name3", "name4"}),
     })
     public static class AddProxies {
+    }
+
+    @ReachableFxResources({
+            "/us/hebi/graalvm/config/**.css",
+            "/us/hebi/graalvm/config/**.fxml"
+    })
+    public static class AddAbsoluteWildcardResources {
+    }
+
+    @ReachableFxResources({"**.css", "**.fxml"})
+    public static class AddRelativeWildcardResources {
+    }
+
+    @ReachableFxResources({
+            "javafx/javafx.fxml",
+            "javafx/javafx.css",
+    })
+    public static class AddRelativeResources {
+    }
+
+    @ReachableFxResources(value = {
+            "javafx/javafx.fxml",
+            "javafx/javafx.css",
+    }, parseContents = false)
+    public static class AddRelativeResourcesNonParsing {
+    }
+
+    @ReachableFxResources({
+            "hello.fxml",
+            "hello.css",
+    })
+    public static class AddNonexistingResources {
     }
 
 }

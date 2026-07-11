@@ -18,7 +18,7 @@
  * #L%
  */
 
-package us.hebi.graalvm.config.sample.javafx;
+package us.hebi.graalvm.config.sample;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,18 +36,9 @@ import static us.hebi.graalvm.config.sample.ReachableConfigTest.*;
  */
 class AfterburnerConfigTest {
 
-    private static String reflectionConfig = readJsonContent("META-INF/native-image/afterburner-generated/us.hebi.graalvm/config-sample/reflect-config.json");
-    private static String resourceConfig = readJsonContent("META-INF/native-image/afterburner-generated/us.hebi.graalvm/config-sample/resource-config.json");
-
-    public static String readJsonContent(String resourcePath) {
-        URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(resourcePath);
-        assertNotNull(resourceUrl, "The processor failed to generate the metadata file at: " + resourcePath);
-        try {
-            return Files.readString(Paths.get(resourceUrl.toURI()), StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private final static String base = "META-INF/native-image/afterburner-generated/us.hebi.graalvm/config-sample/";
+    private static String reflectionConfig = readJsonContent(base + "reflect-config.json");
+    private static String resourceConfig = readJsonContent(base + "resource-config.json");
 
     @Test
     void testCss() {

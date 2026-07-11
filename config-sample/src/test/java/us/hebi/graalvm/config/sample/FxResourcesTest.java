@@ -1,0 +1,175 @@
+/*-
+ * #%L
+ * config-sample
+ * %%
+ * Copyright (C) 2026 HEBI Robotics
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+package us.hebi.graalvm.config.sample;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+
+import static us.hebi.graalvm.config.sample.ReachableConfigTest.*;
+
+/**
+ * @author Florian Enner
+ * @since 11 Jul 2026
+ */
+public class FxResourcesTest {
+
+    private final static String base = "META-INF/native-image/jfx-generated/us.hebi.graalvm/config-sample/";
+    private static String reflectionConfig = readJsonContent(base + "reflect-config.json");
+    private static String resourceConfig = readJsonContent(base + "resource-config.json");
+
+    @Test
+    void absoluteWildcardResources() throws IOException {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddAbsoluteWildcardResources"
+                  },
+                  "pattern": "us/hebi/graalvm/config/.*\\\\.css"
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddAbsoluteWildcardResources"
+                  },
+                  "pattern": "us/hebi/graalvm/config/.*\\\\.fxml"
+                }
+                """);
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddAbsoluteWildcardResources"
+                  },
+                  "name": "javafx.scene.image.ImageView",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
+    void relativeWildcardResources() throws IOException {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddRelativeWildcardResources"
+                  },
+                  "pattern": "us/hebi/graalvm/config/sample/.*\\\\.css"
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddRelativeWildcardResources"
+                  },
+                  "pattern": "us/hebi/graalvm/config/sample/.*\\\\.fxml"
+                }
+                """);
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddRelativeWildcardResources"
+                  },
+                  "name": "javafx.scene.control.Button",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
+    void relativeResources() throws IOException {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddRelativeResources"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/config/sample/javafx/javafx.css\\\\E"
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddRelativeResources"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/config/sample/javafx/javafx.fxml\\\\E"
+                }
+                """);
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddRelativeResources"
+                  },
+                  "name": "javafx.scene.control.Button",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
+    void relativeResourcesNonParsing() throws IOException {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddRelativeResourcesNonParsing"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/config/sample/javafx/javafx.css\\\\E"
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddRelativeResourcesNonParsing"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/config/sample/javafx/javafx.fxml\\\\E"
+                }
+                """);
+        Assertions.assertFalse(reflectionConfig.contains("us.hebi.graalvm.config.sample.ReachableConfig$AddRelativeResourcesNonParsing"));
+    }
+
+    @Test
+    void nonExistingResources() throws IOException {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddNonexistingResources"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/config/sample/hello.css\\\\E"
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$AddNonexistingResources"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/config/sample/hello.fxml\\\\E"
+                }
+                """);
+        Assertions.assertFalse(reflectionConfig.contains("us.hebi.graalvm.config.sample.ReachableConfig$AddNonexistingResources"));
+    }
+
+}

@@ -30,12 +30,31 @@ import java.nio.file.PathMatcher;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static us.hebi.quickbuf.ProtoUtil.*;
+
 /**
  * @author Florian Enner
  * @since 09 Jul 2026
  */
 @UtilityClass
 public class GlobUtil {
+
+    public static String convertPathToGlob(Path rootDir, Path file) {
+        return ensureForwardSlashPath(rootDir.relativize(file));
+    }
+
+    private static String ensureForwardSlashPath(Path path) {
+        var string = path.toString();
+        if (string.contains("\\")) {
+            string = string.replace('\\', '/');
+        }
+        return string;
+    }
+
+    private static String ensureForwardSlashDir(Path path) {
+        var string = ensureForwardSlashPath(path);
+        return string.endsWith("/") ? string : string + "/";
+    }
 
     public static boolean hasWildcards(String glob) {
         return glob.contains("*") | glob.contains("?");
@@ -58,6 +77,12 @@ public class GlobUtil {
         while (i < len) {
             char c = glob.charAt(i++);
             switch (c) {
+                case '\\':
+                    // Handle escape characters
+                    checkArgument(i < len, "'\\' is only allowed as an escape character");
+                    char next = glob.charAt(i++);
+                    regex.append('\\').append(next);
+                    break;
                 case '*':
                     // Handle double-star recursive wildcard (**) vs single-star (*)
                     if (i < len && glob.charAt(i) == '*') {
@@ -91,18 +116,22 @@ public class GlobUtil {
     }
 
     public static void forEachFile(Path searchBaseDir, String glob, Consumer<Path> onFile) throws IOException {
-
-        // Case 1 -> we have a fixed path without wildcards
-        Path absPath = searchBaseDir.resolve(glob);
-        if (Files.isRegularFile(absPath)) {
-            onFile.accept(absPath);
-            return;
+        if (!Files.isDirectory(searchBaseDir)) {
+            return; // nothing to do
         }
 
-        // Case 2 -> walk file tree with wildcards
-        if (GlobUtil.hasWildcards(glob) && Files.isDirectory(searchBaseDir)) {
+        if (!GlobUtil.hasWildcards(glob)) {
 
-            String absGlob = absPath.toString().replace('\\', '/');
+            // Case 1 -> directly resolve file path
+            Path fullPath = searchBaseDir.resolve(glob);
+            if (Files.isRegularFile(fullPath)) {
+                onFile.accept(fullPath);
+            }
+
+        } else {
+
+            // Case 2 -> walk file tree with wildcards
+            String absGlob = ensureForwardSlashDir(searchBaseDir) + glob;
             PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + absGlob);
 
             try (Stream<Path> stream = Files.walk(searchBaseDir)) {

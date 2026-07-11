@@ -26,6 +26,6 @@ import us.hebi.graalvm.config.ReachableAfterburnerView;
  * @author Florian Enner
  * @since 10 Jul 2026
  */
-@ReachableAfterburnerView()
+@ReachableAfterburnerView
 public class JavaFxView {
 }

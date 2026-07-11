@@ -67,14 +67,14 @@ public class AfterburnerStep extends AbstractMetadataStep {
 
                 // Parse FXML contents
                 var fxmlFile = rootDir.resolve(baseDir + conventionalName + ".fxml");
-                addResourceFile(metadata, fxmlFile);
+                addAbsFileResource(metadata, fxmlFile);
                 if (Files.isRegularFile(fxmlFile)) {
                     addMetadataFromParsedFileContents(metadata, fxmlFile);
                 }
 
                 // Parse CSS contents
                 var cssFile = rootDir.resolve(baseDir + conventionalName + ".css");
-                addResourceFile(metadata, cssFile);
+                addAbsFileResource(metadata, cssFile);
                 if (Files.isRegularFile(cssFile)) {
                     addMetadataFromParsedFileContents(metadata, cssFile);
                 }

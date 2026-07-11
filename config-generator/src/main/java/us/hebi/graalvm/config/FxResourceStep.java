@@ -56,19 +56,19 @@ public class FxResourceStep extends AbstractMetadataStep {
             if (viewClass instanceof TypeElement type) {
                 ReachableFxResources annotation = type.getAnnotation(ReachableFxResources.class);
                 final var metadata = getConditionalMetadata(getConditionName(type, ReachableFxResources.class));
-                var typeDir = rootDir.resolve(ProcessorUtil.getSourceDirectory(env, type));
+                var sourceDir = ProcessorUtil.getSourceDirectory(env, type);
 
                 for (var glob : annotation.value()) {
 
-                    Path searchBaseDir = typeDir;
+                    final Path searchBaseDir;
                     if (glob.startsWith("/")) {
                         glob = glob.substring(1);
                         searchBaseDir = rootDir;
+                        addResourceGlob(metadata, glob);
+                    } else {
+                        searchBaseDir = rootDir.resolve(sourceDir);
+                        addResourceGlob(metadata, sourceDir + glob);
                     }
-
-                    // Always add the raw glob
-                    Path absPath = searchBaseDir.resolve(glob);
-                    addResourceFile(metadata, absPath);
 
                     if (annotation.parseContents()) {
                         try {

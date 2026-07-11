@@ -30,6 +30,7 @@ import us.hebi.graalvm.config.parsers.CssParser;
 import us.hebi.graalvm.config.parsers.FxmlParser;
 import us.hebi.graalvm.config.util.ElementUtil;
 import us.hebi.graalvm.config.util.ExceptionUtil;
+import us.hebi.graalvm.config.util.GlobUtil;
 import us.hebi.graalvm.config.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -167,11 +168,6 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         metadata.addResourceGlob(glob);
     }
 
-    protected void addResourceFile(ConditionalMetadata metadata, Path path) {
-        String glob = getClassOutputDir().relativize(path).toString();
-        addResourceGlob(metadata, glob.replace('\\', '/'));
-    }
-
     protected void addMetadataFromParsedFileContents(ConditionalMetadata metadata, Path file) {
         if (!Files.isRegularFile(file)) {
             printError(file + " is not a regular file.");
@@ -194,7 +190,7 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
                 addReflectedType(metadata, name, ReachabilityMetadata.ReflectionEntry::enableFullReflection);
             }
             for (var resource : fxmlParser.getResources()) {
-                addResourceFile(metadata, resource);
+                addAbsFileResource(metadata, resource);
             }
         }
 
@@ -202,9 +198,13 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
             var cssParser = new CssParser();
             cssParser.addCssFile(file);
             for (var resource : cssParser.getResources()) {
-                addResourceFile(metadata, resource);
+                addAbsFileResource(metadata, resource);
             }
         }
+    }
+
+    protected void addAbsFileResource(ConditionalMetadata metadata, Path path) {
+        addResourceGlob(metadata, GlobUtil.convertPathToGlob(getClassOutputDir(), path));
     }
 
     protected Path getClassOutputDir() {
