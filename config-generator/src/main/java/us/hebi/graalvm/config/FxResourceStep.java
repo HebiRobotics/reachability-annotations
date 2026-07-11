@@ -25,6 +25,7 @@ import us.hebi.graalvm.config.util.GlobUtil;
 import us.hebi.graalvm.config.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
@@ -40,47 +41,68 @@ public class FxResourceStep extends AbstractMetadataStep {
 
     @Override
     public Set<String> annotations() {
-        return Set.of(ReachableFxResources.class.getName());
+        return Set.of(
+                ReachableFxResources.class.getCanonicalName(),
+                ReachableFxResources.List.class.getCanonicalName()
+        );
     }
 
     @Override
     public void process0(ImmutableSetMultimap<String, Element> elementMap) {
-        var annotatedElements = elementMap.get(ReachableFxResources.class.getName());
-        if (annotatedElements.isEmpty()) {
-            return;
-        }
-
-        var rootDir = getClassOutputDir();
-        for (Element viewClass : annotatedElements) {
-
-            if (viewClass instanceof TypeElement type) {
-                ReachableFxResources annotation = type.getAnnotation(ReachableFxResources.class);
-                final var metadata = getConditionalMetadata(getConditionName(type, ReachableFxResources.class));
-                var sourceDir = ProcessorUtil.getSourceDirectory(env, type);
-
-                for (var glob : annotation.value()) {
-
-                    final Path searchBaseDir;
-                    if (glob.startsWith("/")) {
-                        glob = glob.substring(1);
-                        searchBaseDir = rootDir;
-                        addResourceGlob(metadata, glob);
-                    } else {
-                        searchBaseDir = rootDir.resolve(sourceDir);
-                        addResourceGlob(metadata, sourceDir + glob);
-                    }
-
-                    if (annotation.parseContents()) {
-                        try {
-                            GlobUtil.forEachFile(searchBaseDir, glob, file -> addMetadataFromParsedFileContents(metadata, file, annotation.includeClassHierarchy()));
-                        } catch (IOException e) {
-                            printWarning("Failed to execute glob scanning for resource target: " + glob + " -> " + e.getMessage());
-                        }
-                    }
-
+        // Single annotation
+        for (Element element : elementMap.get(ReachableFxResources.class.getCanonicalName())) {
+            if (element instanceof TypeElement type) {
+                var mirror = getAnnotationMirror(type, ReachableFxResources.class);
+                if (mirror != null) {
+                    var annotation = type.getAnnotation(ReachableFxResources.class);
+                    processAnnotation(type, annotation, mirror);
                 }
             }
         }
+
+        // Multiple annotations
+        for (Element element : elementMap.get(ReachableFxResources.List.class.getCanonicalName())) {
+            if (element instanceof TypeElement type) {
+                var listMirror = getAnnotationMirror(type, ReachableFxResources.List.class);
+                if (listMirror != null) {
+                    var listAnnotation = type.getAnnotation(ReachableFxResources.List.class);
+                    var mirrors = getAnnotationArrayValue(listMirror, "value");
+                    var annotations = listAnnotation.value();
+                    for (int i = 0; i < annotations.length; i++) {
+                        processAnnotation(type, annotations[i], mirrors.get(i));
+                    }
+                }
+            }
+        }
+    }
+
+    private void processAnnotation(TypeElement type, ReachableFxResources annotation, AnnotationMirror mirror) {
+        final var metadata = getConditionalMetadata(getConditionName(type, mirror));
+        var sourceDir = ProcessorUtil.getSourceDirectory(env, type);
+
+        var rootDir = getClassOutputDir();
+        for (var glob : annotation.value()) {
+
+            final Path searchBaseDir;
+            if (glob.startsWith("/")) {
+                glob = glob.substring(1);
+                searchBaseDir = rootDir;
+                addResourceGlob(metadata, glob);
+            } else {
+                searchBaseDir = rootDir.resolve(sourceDir);
+                addResourceGlob(metadata, sourceDir + glob);
+            }
+
+            if (annotation.parseContents()) {
+                try {
+                    GlobUtil.forEachFile(searchBaseDir, glob, file -> addMetadataFromParsedFileContents(metadata, file, annotation.includeClassHierarchy()));
+                } catch (IOException e) {
+                    printWarning("Failed to execute glob scanning for resource target: " + glob + " -> " + e.getMessage());
+                }
+            }
+
+        }
+
     }
 
     protected FxResourceStep(Supplier<ProcessingEnvironment> env) {

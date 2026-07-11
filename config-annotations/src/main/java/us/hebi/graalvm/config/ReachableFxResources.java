@@ -20,10 +20,7 @@
 
 package us.hebi.graalvm.config;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Creates reachability metadata for JavaFX resources where added FXML and CSS
@@ -32,6 +29,9 @@ import java.lang.annotation.Target;
  * @author Florian Enner
  * @since 10 Jul 2026
  */
+@Repeatable(ReachableFxResources.List.class)
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.SOURCE)
 public @interface ReachableFxResources {
 
     @Target(ElementType.TYPE)

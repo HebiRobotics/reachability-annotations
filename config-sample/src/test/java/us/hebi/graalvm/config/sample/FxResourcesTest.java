@@ -172,4 +172,25 @@ public class FxResourcesTest {
         Assertions.assertFalse(reflectionConfig.contains("us.hebi.graalvm.config.sample.ReachableConfig$AddNonexistingResources"));
     }
 
+    @Test
+    void multipleResourceAnnotations() throws IOException {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$MultipleResourceAnnotations"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/config/sample/hello.css\\\\E"
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$MultipleResourceAnnotations"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/config/sample/hello.fxml\\\\E"
+                }
+                """);
+        Assertions.assertFalse(reflectionConfig.contains("us.hebi.graalvm.config.sample.ReachableConfig$MultipleResourceAnnotations"));
+    }
+
 }

@@ -42,12 +42,10 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * @author Florian Enner
@@ -96,6 +94,29 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         } catch (IOException e) {
             printError(ExceptionUtil.getStackTrace(e));
         }
+    }
+
+    protected AnnotationMirror getAnnotationMirror(TypeElement type, Class<?> annotationClass) {
+        String annotationName = annotationClass.getCanonicalName();
+        for (AnnotationMirror mirror : type.getAnnotationMirrors()) {
+            if (mirror.getAnnotationType().toString().equals(annotationName)) {
+                return mirror;
+            }
+        }
+        return null;
+    }
+
+    protected List<AnnotationMirror> getAnnotationArrayValue(AnnotationMirror mirror, String key) {
+        for (var entry : mirror.getElementValues().entrySet()) {
+            if (entry.getKey().getSimpleName().toString().equals(key)) {
+                @SuppressWarnings("unchecked")
+                var values = (List<? extends AnnotationValue>) entry.getValue().getValue();
+                return values.stream()
+                        .map(av -> (AnnotationMirror) av.getValue())
+                        .collect(Collectors.toList());
+            }
+        }
+        return Collections.emptyList();
     }
 
     protected String getConditionName(TypeElement element, Class<? extends Annotation> annotation) {

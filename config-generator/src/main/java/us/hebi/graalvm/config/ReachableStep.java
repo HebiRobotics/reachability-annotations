@@ -26,7 +26,6 @@ import us.hebi.graalvm.config.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypesException;
@@ -51,38 +50,36 @@ public class ReachableStep extends AbstractMetadataStep {
 
     @Override
     public void process0(ImmutableSetMultimap<String, Element> elementMap) {
-
-        // Add manually specified resources
+        // Single annotation
         for (Element element : elementMap.get(Reachable.class.getCanonicalName())) {
             if (element instanceof TypeElement type) {
                 var mirror = getAnnotationMirror(type, Reachable.class);
                 if (mirror != null) {
                     Reachable annotation = type.getAnnotation(Reachable.class);
-                    processConfigAnnotation(type, annotation, mirror);
+                    processAnnotation(type, annotation, mirror);
                 }
             }
         }
 
-        // Add manually specified resources from List annotations
+        // Multiple annotations
         for (Element element : elementMap.get(Reachable.List.class.getCanonicalName())) {
             if (element instanceof TypeElement type) {
                 var listMirror = getAnnotationMirror(type, Reachable.List.class);
                 if (listMirror != null) {
-                    Reachable.List listAnnotation = type.getAnnotation(Reachable.List.class);
+                    var listAnnotation = type.getAnnotation(Reachable.List.class);
                     var mirrors = getAnnotationArrayValue(listMirror, "value");
                     var annotations = listAnnotation.value();
                     for (int i = 0; i < annotations.length; i++) {
-                        processConfigAnnotation(type, annotations[i], mirrors.get(i));
+                        processAnnotation(type, annotations[i], mirrors.get(i));
                     }
                 }
             }
         }
-
     }
 
     private final Set<String> tmpLocales = new HashSet<>();
 
-    private void processConfigAnnotation(TypeElement annotatedType, Reachable annotation, AnnotationMirror mirror) {
+    private void processAnnotation(TypeElement annotatedType, Reachable annotation, AnnotationMirror mirror) {
         final var metadata = getConditionalMetadata(getConditionName(annotatedType, mirror));
         boolean fieldsEmpty = true;
 
@@ -147,29 +144,6 @@ public class ReachableStep extends AbstractMetadataStep {
             addReflectedType(metadata, annotatedType, annotation.includeClassHierarchy(), updateReflectEntry);
         }
 
-    }
-
-    private AnnotationMirror getAnnotationMirror(TypeElement type, Class<?> annotationClass) {
-        String annotationName = annotationClass.getCanonicalName();
-        for (AnnotationMirror mirror : type.getAnnotationMirrors()) {
-            if (mirror.getAnnotationType().toString().equals(annotationName)) {
-                return mirror;
-            }
-        }
-        return null;
-    }
-
-    private java.util.List<AnnotationMirror> getAnnotationArrayValue(AnnotationMirror mirror, String key) {
-        for (var entry : mirror.getElementValues().entrySet()) {
-            if (entry.getKey().getSimpleName().toString().equals(key)) {
-                @SuppressWarnings("unchecked")
-                var values = (java.util.List<? extends AnnotationValue>) entry.getValue().getValue();
-                return values.stream()
-                        .map(av -> (AnnotationMirror) av.getValue())
-                        .collect(java.util.stream.Collectors.toList());
-            }
-        }
-        return java.util.Collections.emptyList();
     }
 
     public ReachableStep(Supplier<ProcessingEnvironment> env) {

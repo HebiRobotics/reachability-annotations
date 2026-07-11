@@ -128,4 +128,9 @@ public class ReachableConfig {
     public static class AddNonexistingResources {
     }
 
+    @ReachableFxResources("hello.fxml")
+    @ReachableFxResources("hello.css")
+    public static class MultipleResourceAnnotations {
+    }
+
 }
