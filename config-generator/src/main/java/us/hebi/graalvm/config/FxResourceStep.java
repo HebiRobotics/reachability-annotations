@@ -72,7 +72,7 @@ public class FxResourceStep extends AbstractMetadataStep {
 
                     if (annotation.parseContents()) {
                         try {
-                            GlobUtil.forEachFile(searchBaseDir, glob, file -> addMetadataFromParsedFileContents(metadata, file));
+                            GlobUtil.forEachFile(searchBaseDir, glob, file -> addMetadataFromParsedFileContents(metadata, file, annotation.includeClassHierarchy()));
                         } catch (IOException e) {
                             printWarning("Failed to execute glob scanning for resource target: " + glob + " -> " + e.getMessage());
                         }

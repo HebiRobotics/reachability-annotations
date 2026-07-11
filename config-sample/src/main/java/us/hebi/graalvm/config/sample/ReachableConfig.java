@@ -33,7 +33,7 @@ import java.net.InetSocketAddress;
  */
 public class ReachableConfig {
 
-    @Reachable
+    @Reachable(includeClassHierarchy = true)
     public enum ReflectEnum {
         Field1;
     }
@@ -46,7 +46,7 @@ public class ReachableConfig {
     public static class NestedChildClass extends NestedParentClass {
     }
 
-    @Reachable(classes = NestedChildClass.class, jniAccessible = true)
+    @Reachable(classes = NestedChildClass.class, jniAccessible = true, includeClassHierarchy = true)
     public static class ReferencingChildClass {
     }
 
@@ -60,7 +60,7 @@ public class ReachableConfig {
     }, classNames = {
             "some.random.class$Nested",
             "other.random.class",
-    })
+    }, includeClassHierarchy = true)
     public static class ReferencingMultipleClasses {
     }
 

@@ -108,8 +108,6 @@ class AfterburnerConfigTest {
                     "typeReachable": "us.hebi.graalvm.config.sample.javafx.JavaFxView"
                   },
                   "name": "us.hebi.graalvm.config.sample.javafx.JavaFxView",
-                  "allDeclaredMethods": true,
-                  "allDeclaredFields": true,
                   "allDeclaredConstructors": true
                 }
                 """);

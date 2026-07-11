@@ -45,11 +45,6 @@ public @interface ReachableAfterburnerView {
     String value() default "";
 
     /**
-     * Found classes automatically add their whole parent hierarchy
-     */
-    boolean includeClassHierarchy() default true;
-
-    /**
      * Specifies the condition, i.e., the class that must be reachable,
      * such that the rules take effect. Object.class removes any condition.
      *
@@ -65,5 +60,10 @@ public @interface ReachableAfterburnerView {
      * @return name of the conditional class, e.g., package.Class$Nested
      */
     String conditionName() default "";
+
+    /**
+     * Found classes automatically add their whole parent hierarchy
+     */
+    boolean includeClassHierarchy() default true;
 
 }

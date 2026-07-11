@@ -72,7 +72,7 @@ public class DependencyInjectionStep extends AbstractMetadataStep {
                 if (element instanceof VariableElement variable) {
                     Element mirror = env.getTypeUtils().asElement(variable.asType());
                     if (mirror instanceof TypeElement varType) {
-                        addReflectedType(metadata, ElementUtil.getBinaryName(varType), entry -> {
+                        addReflectedType(metadata, ElementUtil.getBinaryName(varType), false, entry -> {
                             entry.setAllDeclaredConstructors(true);
                         });
                     }

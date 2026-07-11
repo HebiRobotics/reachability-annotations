@@ -123,14 +123,14 @@ public class ReachableStep extends AbstractMetadataStep {
         };
         for (String name : annotation.classNames()) {
             fieldsEmpty = false;
-            addReflectedType(metadata, name, updateReflectEntry);
+            addReflectedType(metadata, name, annotation.includeClassHierarchy(), updateReflectEntry);
         }
         try {
             // Processing classes immediately hit a MirroredTypeException,
             // so this code doesn't actually run.
             for (var clazz : annotation.classes()) {
                 fieldsEmpty = false;
-                addReflectedType(metadata, clazz.getName(), updateReflectEntry);
+                addReflectedType(metadata, clazz.getName(), annotation.includeClassHierarchy(), updateReflectEntry);
             }
         } catch (MirroredTypesException e) {
             // Add all target classes and their parents

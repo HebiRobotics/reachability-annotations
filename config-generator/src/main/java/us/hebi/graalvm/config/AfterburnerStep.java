@@ -21,7 +21,6 @@
 package us.hebi.graalvm.config;
 
 import com.google.common.collect.ImmutableSetMultimap;
-import us.hebi.graalvm.config.metadata.ReachabilityMetadata.ReflectionEntry;
 import us.hebi.graalvm.config.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -63,20 +62,22 @@ public class AfterburnerStep extends AbstractMetadataStep {
                         .orElseGet(() -> stripEnding(type.getSimpleName().toString()).toLowerCase());
 
                 // Add annotated class so Afterburner can figure out the conventional name via reflection
-                addReflectedType(metadata, type, annotation.includeClassHierarchy(), ReflectionEntry::enableFullReflection);
+                addReflectedType(metadata, type, false, entry -> {
+                    entry.setAllDeclaredConstructors(true);
+                });
 
                 // Parse FXML contents
                 var fxmlFile = rootDir.resolve(baseDir + conventionalName + ".fxml");
                 addAbsFileResource(metadata, fxmlFile);
                 if (Files.isRegularFile(fxmlFile)) {
-                    addMetadataFromParsedFileContents(metadata, fxmlFile);
+                    addMetadataFromParsedFileContents(metadata, fxmlFile, annotation.includeClassHierarchy());
                 }
 
                 // Parse CSS contents
                 var cssFile = rootDir.resolve(baseDir + conventionalName + ".css");
                 addAbsFileResource(metadata, cssFile);
                 if (Files.isRegularFile(cssFile)) {
-                    addMetadataFromParsedFileContents(metadata, cssFile);
+                    addMetadataFromParsedFileContents(metadata, cssFile, annotation.includeClassHierarchy());
                 }
 
                 // Add wildcard for language files (NOTE: use property bundles instead?)

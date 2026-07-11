@@ -66,14 +66,14 @@ public @interface Reachable {
     Class<?>[] classes() default {};
 
     /**
-     * Specified classes automatically add their parent chain with the same options.
-     */
-    boolean includeClassHierarchy() default true;
-
-    /**
      * @return fully qualified names of classes that must be available for reflection, e.g., package.Class$Nested
      */
     String[] classNames() default {};
+
+    /**
+     * Specified classes automatically add their parent chain with the same options.
+     */
+    boolean includeClassHierarchy() default true;
 
     /**
      * @return whether the reflected classes should also be available through JNI

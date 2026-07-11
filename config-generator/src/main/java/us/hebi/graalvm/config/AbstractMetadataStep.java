@@ -151,16 +151,24 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         return annotatedType == null ? "" : ElementUtil.getBinaryName(annotatedType);
     }
 
-    protected void addReflectedType(ConditionalMetadata metadata, String typeName, Consumer<ReflectionEntry> onEntry) {
-        onEntry.accept(metadata.addReflectedType(typeName));
-    }
-
     protected void addReflectedType(ConditionalMetadata metadata, TypeElement type, boolean includeHierarchy, Consumer<ReflectionEntry> onEntry) {
         if (!includeHierarchy) {
             addReflectedType(metadata, ElementUtil.getBinaryName(type), onEntry);
         } else {
             ElementUtil.forEachHierarchicalBinaryName(env, type, name -> addReflectedType(metadata, name, onEntry));
         }
+    }
+
+    protected void addReflectedType(ConditionalMetadata metadata, String fullyQualifiedName, boolean includeHierarchy, Consumer<ReflectionEntry> onEntry) {
+        if (includeHierarchy && env.getElementUtils().getTypeElement(fullyQualifiedName) instanceof TypeElement type) {
+            addReflectedType(metadata, type, includeHierarchy, onEntry);
+            return;
+        }
+        addReflectedType(metadata, fullyQualifiedName, onEntry);
+    }
+
+    private void addReflectedType(ConditionalMetadata metadata, String typeName, Consumer<ReflectionEntry> onEntry) {
+        onEntry.accept(metadata.addReflectedType(typeName));
     }
 
     protected void addResourceGlob(ConditionalMetadata metadata, String glob) {
@@ -170,7 +178,7 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         metadata.addResourceGlob(glob);
     }
 
-    protected void addMetadataFromParsedFileContents(ConditionalMetadata metadata, Path file) {
+    protected void addMetadataFromParsedFileContents(ConditionalMetadata metadata, Path file, boolean includeHierarchy) {
         if (!Files.isRegularFile(file)) {
             printError(file + " is not a regular file.");
         }
@@ -185,11 +193,11 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
                     printWarning("Ignoring unsupported wildcard import: " + name);
                     continue;
                 }
-                addReflectedType(metadata, name, ReachabilityMetadata.ReflectionEntry::enableFullReflection);
+                addReflectedType(metadata, name, includeHierarchy, ReachabilityMetadata.ReflectionEntry::enableFullReflection);
 
             }
             for (var name : fxmlParser.getControllers()) {
-                addReflectedType(metadata, name, ReachabilityMetadata.ReflectionEntry::enableFullReflection);
+                addReflectedType(metadata, name, includeHierarchy, ReachabilityMetadata.ReflectionEntry::enableFullReflection);
             }
             for (var resource : fxmlParser.getResources()) {
                 addAbsFileResource(metadata, resource);
