@@ -1,0 +1,17 @@
+[{
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingChildClass"
+  },
+  "name": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedChildClass",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$ReferencingChildClass"
+  },
+  "name": "us.hebi.graalvm.config.sample.ReflectionConfigOptions$NestedParentClass",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}]
