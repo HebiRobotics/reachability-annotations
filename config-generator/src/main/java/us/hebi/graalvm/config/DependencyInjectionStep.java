@@ -21,7 +21,6 @@
 package us.hebi.graalvm.config;
 
 import com.google.common.collect.ImmutableSetMultimap;
-import us.hebi.graalvm.config.metadata.ReachabilityMetadata.ReflectionEntry;
 import us.hebi.graalvm.config.util.ElementUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -66,11 +65,24 @@ public class DependencyInjectionStep extends AbstractMetadataStep {
 
                 // 1) add the containing class
                 // TODO: limit to only the annotated fields and methods?
-                addReflectedType(metadata, typeElement, false, ReflectionEntry::enableFullReflection);
+                addReflectedType(metadata, typeElement, false, entry -> {
+                    switch (element.getKind()) {
+                        case CONSTRUCTOR -> {
+                            entry.setAllDeclaredConstructors(true);
+                        }
+                        case METHOD -> {
+                            entry.setAllDeclaredMethods(true);
+                        }
+                        case FIELD -> {
+                            entry.setAllDeclaredFields(true);
+                        }
+                    }
+                });
 
                 // 2) add the field type in case it needs to be created via reflection
                 if (element instanceof VariableElement variable) {
-                    Element mirror = env.getTypeUtils().asElement(variable.asType());
+                    var erasedType = env.getTypeUtils().erasure(variable.asType());
+                    var mirror = env.getTypeUtils().asElement(erasedType);
                     if (mirror instanceof TypeElement varType) {
                         addReflectedType(metadata, ElementUtil.getBinaryName(varType), false, entry -> {
                             entry.setAllDeclaredConstructors(true);

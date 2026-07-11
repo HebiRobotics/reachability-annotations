@@ -42,16 +42,6 @@ public class ReachableConfigTest {
     private static String resourceConfig = readJsonContent(base + "resource-config.json");
     private static String proxyConfig = readJsonContent(base + "proxy-config.json");
 
-    public static String readJsonContent(String resourcePath) {
-        URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(resourcePath);
-        assertNotNull(resourceUrl, "The processor failed to generate the metadata file at: " + resourcePath);
-        try {
-            return Files.readString(Paths.get(resourceUrl.toURI()), StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Test
     void testDefaultEnum() throws IOException {
         // Specified enum
@@ -436,6 +426,16 @@ public class ReachableConfigTest {
         String minimizedExpected = expected.replaceAll("\\s", "");
         if (!minimizedJson.contains(minimizedExpected)) {
             fail("The json source does not contain expected content:\n" + expected);
+        }
+    }
+
+    public static String readJsonContent(String resourcePath) {
+        URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(resourcePath);
+        assertNotNull(resourceUrl, "The processor failed to generate the metadata file at: " + resourcePath);
+        try {
+            return Files.readString(Paths.get(resourceUrl.toURI()), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
