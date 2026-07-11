@@ -62,8 +62,8 @@ public @interface ReachableAfterburnerView {
     String conditionName() default "";
 
     /**
-     * Found classes automatically add their whole parent hierarchy
+     * Reflectively accessed classes automatically add their parent hierarchy
      */
-    boolean includeClassHierarchy() default true;
+    boolean includeClassHierarchy() default false;
 
 }

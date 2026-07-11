@@ -257,6 +257,43 @@ public class ReachableConfigTest {
     }
 
     @Test
+    void testPrivateClassHierarchy() throws IOException {
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$PrivateClassHierarchy"
+                  },
+                  "name": "sun.net.www.protocol.jar.JarURLConnection",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$PrivateClassHierarchy"
+                  },
+                  "name": "java.net.JarURLConnection",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$PrivateClassHierarchy"
+                  },
+                  "name": "java.net.URLConnection",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
     void testKeepPrivateClass() throws IOException {
         assertContains(reflectionConfig, """
                 {

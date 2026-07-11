@@ -65,9 +65,9 @@ public @interface ReachableFxResources {
     String[] value() default {};
 
     /**
-     * Found classes automatically add their whole parent hierarchy
+     * Reflectively accessed classes automatically add their parent hierarchy
      */
-    boolean includeClassHierarchy() default true;
+    boolean includeClassHierarchy() default false;
 
     /**
      * Automatically parses known file extensions like .css and .fxml and automatically

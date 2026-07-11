@@ -42,7 +42,7 @@ public class ReachableConfig {
     public static class NestedParentClass {
     }
 
-    @Reachable
+    @Reachable(includeClassHierarchy = true)
     public static class NestedChildClass extends NestedParentClass {
     }
 
@@ -62,6 +62,10 @@ public class ReachableConfig {
             "other.random.class",
     }, includeClassHierarchy = true)
     public static class ReferencingMultipleClasses {
+    }
+
+    @Reachable(classNames = "sun.net.www.protocol.jar.JarURLConnection", includeClassHierarchy = true)
+    public static class PrivateClassHierarchy {
     }
 
     @Reachable(condition = Object.class, classNames = "jdk.internal.vm.annotation.Stable")

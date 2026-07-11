@@ -71,9 +71,9 @@ public @interface Reachable {
     String[] classNames() default {};
 
     /**
-     * Specified classes automatically add their parent chain with the same options.
+     * Specified classes automatically add their whole class hierarchy with the same options.
      */
-    boolean includeClassHierarchy() default true;
+    boolean includeClassHierarchy() default false;
 
     /**
      * @return whether the reflected classes should also be available through JNI
