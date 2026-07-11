@@ -60,7 +60,7 @@ public @interface ReachableFxResources {
 
     /**
      * Unified routing path using glob syntax (e.g. "assets/**.png" or "META-INF/services/*")
-     * relative to the annotated type. Prefix '/' for absolute paths relative to the root.
+     * relative to the annotated type. Prefix '/' for absolute paths relative to the classpath root.
      */
     String[] value() default {};
 

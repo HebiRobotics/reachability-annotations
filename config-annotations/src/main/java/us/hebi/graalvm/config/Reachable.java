@@ -97,7 +97,7 @@ public @interface Reachable {
 
     /**
      * Unified routing path using glob syntax (e.g. "assets/**.png" or "META-INF/services/*").
-     * Leading '/' are relative to the root, otherwise relative to the annotated type.
+     * Leading '/' are relative to the classpath root, otherwise relative to the annotated type.
      */
     String[] resources() default {};
 
