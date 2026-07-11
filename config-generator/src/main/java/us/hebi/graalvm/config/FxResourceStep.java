@@ -84,7 +84,7 @@ public class FxResourceStep extends AbstractMetadataStep {
     }
 
     protected FxResourceStep(Supplier<ProcessingEnvironment> env) {
-        super("jfx-generated", env);
+        super("fxresources-generated", env);
     }
 
 }

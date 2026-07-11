@@ -33,7 +33,7 @@ import static us.hebi.graalvm.config.sample.ReachableConfigTest.*;
  */
 public class FxResourcesTest {
 
-    private final static String base = "META-INF/native-image/jfx-generated/us.hebi.graalvm/config-sample/";
+    private final static String base = "META-INF/native-image/fxresources-generated/us.hebi.graalvm/config-sample/";
     private static String reflectionConfig = readJsonContent(base + "reflect-config.json");
     private static String resourceConfig = readJsonContent(base + "resource-config.json");
 
