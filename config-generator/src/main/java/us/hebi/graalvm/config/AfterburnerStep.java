@@ -39,11 +39,11 @@ public class AfterburnerStep extends AbstractMetadataStep {
 
     @Override
     public Set<String> annotations() {
-        return Set.of(ReachableAfterburnerView.class.getName());
+        return Set.of(ReachableAfterburnerView.class.getCanonicalName());
     }
 
     public void process0(ImmutableSetMultimap<String, Element> elementMap) {
-        var views = elementMap.get(ReachableAfterburnerView.class.getName());
+        var views = elementMap.get(ReachableAfterburnerView.class.getCanonicalName());
         if (views.isEmpty()) {
             return;
         }
