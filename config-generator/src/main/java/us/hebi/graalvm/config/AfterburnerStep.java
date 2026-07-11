@@ -63,7 +63,7 @@ public class AfterburnerStep extends AbstractMetadataStep {
                         .orElseGet(() -> stripEnding(type.getSimpleName().toString()).toLowerCase());
 
                 // Add annotated class so Afterburner can figure out the conventional name via reflection
-                addReflectedType(metadata, type, ReflectionEntry::enableFullReflection);
+                addReflectedType(metadata, type, annotation.includeClassHierarchy(), ReflectionEntry::enableFullReflection);
 
                 // Parse FXML contents
                 var fxmlFile = rootDir.resolve(baseDir + conventionalName + ".fxml");

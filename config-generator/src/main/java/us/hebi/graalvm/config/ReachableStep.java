@@ -137,14 +137,14 @@ public class ReachableStep extends AbstractMetadataStep {
             for (var typeMirror : e.getTypeMirrors()) {
                 fieldsEmpty = false;
                 if (env.getTypeUtils().asElement(typeMirror) instanceof TypeElement typeElement) {
-                    addReflectedType(metadata, typeElement, updateReflectEntry);
+                    addReflectedType(metadata, typeElement, annotation.includeClassHierarchy(), updateReflectEntry);
                 }
             }
         }
 
         // Nothing else defined -> enable reflection of the annotated type itself
         if (fieldsEmpty) {
-            addReflectedType(metadata, annotatedType, updateReflectEntry);
+            addReflectedType(metadata, annotatedType, annotation.includeClassHierarchy(), updateReflectEntry);
         }
 
     }

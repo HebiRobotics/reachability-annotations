@@ -50,6 +50,10 @@ public class ReachableConfig {
     public static class ReferencingChildClass {
     }
 
+    @Reachable(classes = NestedChildClass.class, includeClassHierarchy = false)
+    public static class ReferencingChildClassWithoutParent {
+    }
+
     @Reachable(classes = {
             InetAddress.class,
             InetSocketAddress.class,

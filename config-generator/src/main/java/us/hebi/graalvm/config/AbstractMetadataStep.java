@@ -155,10 +155,12 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         onEntry.accept(metadata.addReflectedType(typeName));
     }
 
-    protected void addReflectedType(ConditionalMetadata metadata, TypeElement type, Consumer<ReflectionEntry> onEntry) {
-        ElementUtil.forEachHierarchicalBinaryName(env, type, name -> {
-            addReflectedType(metadata, name, onEntry);
-        });
+    protected void addReflectedType(ConditionalMetadata metadata, TypeElement type, boolean includeHierarchy, Consumer<ReflectionEntry> onEntry) {
+        if (!includeHierarchy) {
+            addReflectedType(metadata, ElementUtil.getBinaryName(type), onEntry);
+        } else {
+            ElementUtil.forEachHierarchicalBinaryName(env, type, name -> addReflectedType(metadata, name, onEntry));
+        }
     }
 
     protected void addResourceGlob(ConditionalMetadata metadata, String glob) {

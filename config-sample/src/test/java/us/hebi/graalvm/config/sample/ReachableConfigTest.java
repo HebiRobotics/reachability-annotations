@@ -126,7 +126,7 @@ public class ReachableConfigTest {
     }
 
     @Test
-    void testSpecifiedChildClass() throws IOException {
+    void testReferencedChildClass() throws IOException {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
@@ -149,6 +149,22 @@ public class ReachableConfigTest {
                   "allDeclaredConstructors": true
                 }
                 """);
+    }
+
+    @Test
+    void testReferencedChildClassWithoutHierarchy() throws IOException {
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.config.sample.ReachableConfig$ReferencingChildClassWithoutParent"
+                  },
+                  "name": "us.hebi.graalvm.config.sample.ReachableConfig$NestedChildClass",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+        assertMaxOccurences(reflectionConfig, "$ReferencingChildClassWithoutParent", 1);
     }
 
     @Test
@@ -355,6 +371,23 @@ public class ReachableConfigTest {
                   "interfaces": ["name3", "name4"]
                 }
                 """);
+    }
+
+    public static void assertMaxOccurences(String json, String searchString, int maxCount) {
+        int count = 0;
+        int index = 0;
+
+        // Fast index traversal to avoid generating heavy garbage strings
+        while ((index = json.indexOf(searchString, index)) != -1) {
+            count++;
+
+            // Fail early if we exceed the limit without wasting time scanning the rest of the file
+            if (count > maxCount) {
+                fail(String.format("Assertion failed: String '%s' occurred more than %d occurrences.", searchString, maxCount));
+            }
+
+            index += searchString.length();
+        }
     }
 
     public static void assertContains(String json, String expected) {

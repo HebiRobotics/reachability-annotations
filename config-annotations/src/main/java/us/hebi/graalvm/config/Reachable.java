@@ -59,12 +59,16 @@ public @interface Reachable {
 
     /**
      * Classes that should be available for reflection. Defaults to the annotated class if
-     * no other items (classes, resources, proxies, bundles, ...) are specified. Parent classes
-     * are automatically added with the same options.
+     * no other items (classes, resources, proxies, bundles, ...) are specified.
      *
      * @return classes that should be available for reflection
      */
     Class<?>[] classes() default {};
+
+    /**
+     * Specified classes automatically add their parent chain with the same options.
+     */
+    boolean includeClassHierarchy() default true;
 
     /**
      * @return fully qualified names of classes that must be available for reflection, e.g., package.Class$Nested
