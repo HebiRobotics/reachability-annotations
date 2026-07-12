@@ -99,7 +99,7 @@ public class AfterburnerStep extends AbstractMetadataStep {
     }
 
     public AfterburnerStep(Supplier<ProcessingEnvironment> env) {
-        super("afterburner-generated", env);
+        super("afterburner", env);
     }
 
 }

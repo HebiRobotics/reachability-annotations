@@ -33,9 +33,9 @@ import static us.hebi.graalvm.reachability.sample.ReachableConfigTest.*;
  */
 public class FxResourcesTest {
 
-    private final static String base = "META-INF/native-image/fxresources-generated/us.hebi.graalvm/reachability-sample/";
-    private static String reflectionConfig = readJsonContent(base + "reflect-config.json");
-    private static String resourceConfig = readJsonContent(base + "resource-config.json");
+    private static String stepId = "fxresources";
+    private static String reflectionConfig = readJsonContent(stepId, "reflect-config.json");
+    private static String resourceConfig = readJsonContent(stepId,  "resource-config.json");
 
     @Test
     void absoluteWildcardResources() throws IOException {

@@ -60,7 +60,10 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
             // Merge any existing files in case we do a partial compilation
             if (metadataDirectory == null) {
                 String coordinates = env.getOptions().getOrDefault("project", "");
-                metadataDirectory = getClassOutputDir().resolve("META-INF/native-image/" + name + "/" + coordinates);
+                if (!coordinates.endsWith("/")) {
+                    coordinates += "/";
+                }
+                metadataDirectory = getClassOutputDir().resolve("META-INF/native-image/reachability-generated/" + coordinates + stepId);
                 MarshallerV100.mergeMetadataFrom(metadataDirectory, reachabilityMetadata);
             }
 
@@ -249,13 +252,13 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         return reachabilityMetadata.getMetadata(condition);
     }
 
-    protected AbstractMetadataStep(String name, Supplier<ProcessingEnvironment> env) {
-        this.name = name;
+    protected AbstractMetadataStep(String stepId, Supplier<ProcessingEnvironment> env) {
+        this.stepId = stepId;
         this.environmentSupplier = env;
     }
 
     private Path classOutputDir;
-    private final String name;
+    private final String stepId;
     private final Supplier<ProcessingEnvironment> environmentSupplier;
     protected ProcessingEnvironment env;
     protected final ReachabilityMetadata reachabilityMetadata = new ReachabilityMetadata();

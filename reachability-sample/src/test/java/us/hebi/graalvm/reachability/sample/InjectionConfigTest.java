@@ -30,8 +30,7 @@ import static us.hebi.graalvm.reachability.sample.ReachableConfigTest.*;
  */
 class InjectionConfigTest {
 
-    private final static String base = "META-INF/native-image/di-generated/us.hebi.graalvm/reachability-sample/";
-    private static String reflectionConfig = readJsonContent(base + "reflect-config.json");
+    private static String reflectionConfig = readJsonContent("di", "reflect-config.json");
 
     @Test
     void testConstructorInjection() {

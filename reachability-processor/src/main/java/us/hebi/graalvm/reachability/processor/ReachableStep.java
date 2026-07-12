@@ -148,7 +148,7 @@ public class ReachableStep extends AbstractMetadataStep {
     }
 
     public ReachableStep(Supplier<ProcessingEnvironment> env) {
-        super("reachable-generated", env);
+        super("reachable", env);
     }
 
 }

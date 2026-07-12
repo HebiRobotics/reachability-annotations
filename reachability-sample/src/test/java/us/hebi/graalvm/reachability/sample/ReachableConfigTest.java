@@ -36,11 +36,11 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class ReachableConfigTest {
 
-    private final static String base = "META-INF/native-image/reachable-generated/us.hebi.graalvm/reachability-sample/";
-    private static String reflectionConfig = readJsonContent(base + "reflect-config.json");
-    private static String jniConfig = readJsonContent(base + "jni-config.json");
-    private static String resourceConfig = readJsonContent(base + "resource-config.json");
-    private static String proxyConfig = readJsonContent(base + "proxy-config.json");
+    private static String stepId = "reachable";
+    private static String reflectionConfig = readJsonContent(stepId, "reflect-config.json");
+    private static String jniConfig = readJsonContent(stepId,  "jni-config.json");
+    private static String resourceConfig = readJsonContent(stepId,  "resource-config.json");
+    private static String proxyConfig = readJsonContent(stepId,  "proxy-config.json");
 
     @Test
     void testDefaultEnum() throws IOException {
@@ -429,7 +429,9 @@ public class ReachableConfigTest {
         }
     }
 
-    public static String readJsonContent(String resourcePath) {
+    public static String readJsonContent(String stepId, String fileName) {
+        String base = "META-INF/native-image/reachability-generated/us.hebi.graalvm/reachability-sample/";
+        String resourcePath = base + stepId + "/" + fileName;
         URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(resourcePath);
         assertNotNull(resourceUrl, "The processor failed to generate the metadata file at: " + resourcePath);
         try {
