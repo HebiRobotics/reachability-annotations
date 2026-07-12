@@ -38,7 +38,7 @@
 
     </properties>
 
-    <name>Native Image Configuration</name>
+    <name>Reachability Annotations</name>
     <url>https://github.com/HebiRobotics/native-config-generator</url>
 
     <organization>

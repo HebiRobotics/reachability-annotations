@@ -1,6 +1,6 @@
 /*-
  * #%L
- * config-sample
+ * reachability-sample
  * %%
  * Copyright (C) 2026 HEBI Robotics
  * %%
