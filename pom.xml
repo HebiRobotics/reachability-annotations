@@ -5,14 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>us.hebi.graalvm</groupId>
-    <artifactId>config-parent</artifactId>
+    <artifactId>reachability-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>config-annotations</module>
-        <module>config-generator</module>
-        <module>config-sample</module>
+        <module>reachability-annotations</module>
+        <module>reachability-processor</module>
+        <module>reachability-sample</module>
     </modules>
 
     <properties>
