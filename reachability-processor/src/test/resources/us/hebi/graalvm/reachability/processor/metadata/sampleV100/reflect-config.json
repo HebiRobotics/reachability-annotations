@@ -1,0 +1,97 @@
+[{
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$NestedChildClass"
+  },
+  "name": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$NestedChildClass",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$NestedChildClass"
+  },
+  "name": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$NestedParentClass",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$NestedParentClass"
+  },
+  "name": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$NestedParentClass",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$ReferencingChildClass"
+  },
+  "name": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$NestedChildClass",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$ReferencingChildClass"
+  },
+  "name": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$NestedParentClass",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$ReferencingMultipleClasses"
+  },
+  "name": "java.net.InetAddress",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$ReferencingMultipleClasses"
+  },
+  "name": "java.net.InetSocketAddress",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$ReferencingMultipleClasses"
+  },
+  "name": "java.net.SocketAddress",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$ReferencingMultipleClasses"
+  },
+  "name": "other.random.class",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$ReferencingMultipleClasses"
+  },
+  "name": "some.random.class$Nested",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$ReflectEnum"
+  },
+  "name": "java.lang.Enum",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$ReflectEnum"
+  },
+  "name": "us.hebi.graalvm.reachability.sample.ReflectionConfigOptions$ReflectEnum",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}]
