@@ -25,6 +25,7 @@
         <maven.compiler.proc>full</maven.compiler.proc>
 
         <!-- gpg info set via settings.xml to sign release artifacts-->
+        <javaModuleName/>
         <gpg.keyname/>
 
         <!-- License Headers (http://www.mojohaus.org/license-maven-plugin/update-file-header-mojo.html) -->
@@ -96,6 +97,12 @@
                 <version>5.13.0-M3</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>3.27.7</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -121,6 +128,24 @@
                         <phase>process-sources</phase>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- ensure the manifest contains artifact version information -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
             </plugin>
 
         </plugins>

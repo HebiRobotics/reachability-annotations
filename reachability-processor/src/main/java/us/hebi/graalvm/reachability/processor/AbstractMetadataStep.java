@@ -210,7 +210,7 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         String lowercaseFile = file.getFileName().toString().toLowerCase();
 
         if (lowercaseFile.endsWith(".fxml")) {
-            var fxmlParser = new FxmlParser();
+            var fxmlParser = new FxmlParser(getClassOutputDir());
             fxmlParser.addFxmlFile(file);
             for (var name : fxmlParser.getImports()) {
                 if (name.contains("*")) {
@@ -229,7 +229,7 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         }
 
         if (lowercaseFile.endsWith(".css")) {
-            var cssParser = new CssParser();
+            var cssParser = new CssParser(getClassOutputDir());
             cssParser.addCssFile(file);
             for (var resource : cssParser.getResources()) {
                 addAbsFileResource(metadata, resource);

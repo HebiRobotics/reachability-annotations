@@ -65,9 +65,11 @@ public @interface ReachableFxResources {
     String[] value() default {};
 
     /**
-     * Reflectively accessed classes automatically add their parent hierarchy
+     * Reflectively accessed classes automatically add their parent hierarchy. UI
+     * classes often need it (e.g. access VBox properties from a subclass), so it's
+     * enabled by default.
      */
-    boolean includeClassHierarchy() default false;
+    boolean includeClassHierarchy() default true;
 
     /**
      * Automatically parses known file extensions like .css and .fxml and automatically

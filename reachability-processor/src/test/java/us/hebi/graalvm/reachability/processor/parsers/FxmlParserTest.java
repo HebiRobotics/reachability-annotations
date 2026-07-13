@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * @author Florian Enner
@@ -35,12 +35,30 @@ class FxmlParserTest {
 
     @Test
     void addFxmlFile() throws URISyntaxException {
-        var resource = Path.of(FxmlParserTest.class.getResource("tests/javafx.fxml").toURI());
-        var parser = new FxmlParser();
-        parser.addFxmlFile(resource);
-        assertEquals(3, parser.getResources().size());
-        assertEquals(2, parser.getControllers().size());
-        assertEquals(4, parser.getImports().size());
+        var rootDir = Path.of(FxmlParserTest.class.getResource("/").toURI());
+        var testDir = Path.of(FxmlParserTest.class.getResource("tests").toURI());
+
+        var parser = new FxmlParser(rootDir);
+        parser.addFxmlFile(testDir.resolve("javafx.fxml"));
+
+        assertThat(parser.getControllers()).containsExactlyInAnyOrder(
+                "nonexisting.Controller",
+                "us.hebi.graalvm.reachability.sample.javafx.IncludedFxController"
+        );
+
+        assertThat(parser.getImports()).containsExactlyInAnyOrder(
+                "javafx.scene.control.Button",
+                "javafx.scene.image.Image",
+                "javafx.scene.image.ImageView",
+                "javafx.scene.layout.AnchorPane"
+        );
+
+        assertThat(parser.getResources()).containsExactlyInAnyOrder(
+                testDir.resolve("javafx.fxml"),
+                testDir.resolve("included.fxml"),
+                testDir.resolve("image.jpg")
+        );
+
     }
 
 }
