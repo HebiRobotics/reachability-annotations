@@ -90,17 +90,45 @@ public class MarshallerV100 {
     }
 
     private static void copyMemberAccessFromProto(ReflectConfigEntry proto, ReachabilityMetadata.ReflectionEntry entry) {
-        if (proto.getAllDeclaredConstructors()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_CONSTRUCTORS);
+        if (proto.getAllDeclaredClasses()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_CLASSES);
         if (proto.getAllDeclaredMethods()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_METHODS);
         if (proto.getAllDeclaredFields()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_FIELDS);
+        if (proto.getAllDeclaredConstructors()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_CONSTRUCTORS);
+        if (proto.getAllPublicClasses()) entry.addMemberAccess(MemberAccess.ALL_PUBLIC_CLASSES);
+        if (proto.getAllPublicMethods()) entry.addMemberAccess(MemberAccess.ALL_PUBLIC_METHODS);
+        if (proto.getAllPublicFields()) entry.addMemberAccess(MemberAccess.ALL_PUBLIC_FIELDS);
+        if (proto.getAllPublicConstructors()) entry.addMemberAccess(MemberAccess.ALL_PUBLIC_CONSTRUCTORS);
+        if (proto.getAllRecordComponents()) entry.addMemberAccess(MemberAccess.ALL_RECORD_COMPONENTS);
+        if (proto.getAllPermittedSubclasses()) entry.addMemberAccess(MemberAccess.ALL_PERMITTED_SUBCLASSES);
+        if (proto.getAllNestMembers()) entry.addMemberAccess(MemberAccess.ALL_NEST_MEMBERS);
+        if (proto.getAllSigners()) entry.addMemberAccess(MemberAccess.ALL_SIGNERS);
+        if (proto.getQueryAllDeclaredMethods()) entry.addMemberAccess(MemberAccess.QUERY_ALL_DECLARED_METHODS);
+        if (proto.getQueryAllDeclaredConstructors()) entry.addMemberAccess(MemberAccess.QUERY_ALL_DECLARED_CONSTRUCTORS);
+        if (proto.getQueryAllPublicMethods()) entry.addMemberAccess(MemberAccess.QUERY_ALL_PUBLIC_METHODS);
+        if (proto.getQueryAllPublicConstructors()) entry.addMemberAccess(MemberAccess.QUERY_ALL_PUBLIC_CONSTRUCTORS);
+        if (proto.getUnsafeAllocated()) entry.addMemberAccess(MemberAccess.UNSAFE_ALLOCATED);
     }
 
     private static void copyMemberAccessToProto(ReachabilityMetadata.ReflectionEntry entry, ReflectConfigEntry proto) {
         for (MemberAccess memberAccess : entry.memberAccess) {
             switch (memberAccess) {
-                case ALL_DECLARED_CONSTRUCTORS -> proto.setAllDeclaredConstructors(true);
+                case ALL_DECLARED_CLASSES -> proto.setAllDeclaredClasses(true);
                 case ALL_DECLARED_METHODS -> proto.setAllDeclaredMethods(true);
                 case ALL_DECLARED_FIELDS -> proto.setAllDeclaredFields(true);
+                case ALL_DECLARED_CONSTRUCTORS -> proto.setAllDeclaredConstructors(true);
+                case ALL_PUBLIC_CLASSES -> proto.setAllPublicClasses(true);
+                case ALL_PUBLIC_METHODS -> proto.setAllPublicMethods(true);
+                case ALL_PUBLIC_FIELDS -> proto.setAllPublicFields(true);
+                case ALL_PUBLIC_CONSTRUCTORS -> proto.setAllPublicConstructors(true);
+                case ALL_RECORD_COMPONENTS -> proto.setAllRecordComponents(true);
+                case ALL_PERMITTED_SUBCLASSES -> proto.setAllPermittedSubclasses(true);
+                case ALL_NEST_MEMBERS -> proto.setAllNestMembers(true);
+                case ALL_SIGNERS -> proto.setAllSigners(true);
+                case QUERY_ALL_DECLARED_METHODS -> proto.setQueryAllDeclaredMethods(true);
+                case QUERY_ALL_DECLARED_CONSTRUCTORS -> proto.setQueryAllDeclaredConstructors(true);
+                case QUERY_ALL_PUBLIC_METHODS -> proto.setQueryAllPublicMethods(true);
+                case QUERY_ALL_PUBLIC_CONSTRUCTORS -> proto.setQueryAllPublicConstructors(true);
+                case UNSAFE_ALLOCATED -> proto.setUnsafeAllocated(true);
             }
         }
     }

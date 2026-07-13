@@ -26,6 +26,7 @@ import us.hebi.graalvm.reachability.annotations.Reachable.MemberAccess;
 import us.hebi.graalvm.reachability.annotations.Reachable.Proxy;
 import us.hebi.graalvm.reachability.annotations.ReachableFxResources;
 
+import java.lang.reflect.Member;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
@@ -72,6 +73,28 @@ public class ReachableConfig {
 
     @Reachable(memberAccess = {})
     public static class NoMemberAccess {
+    }
+
+    @Reachable(memberAccess = {
+            MemberAccess.ALL_DECLARED_CLASSES,
+            MemberAccess.ALL_DECLARED_METHODS,
+            MemberAccess.ALL_DECLARED_FIELDS,
+            MemberAccess.ALL_DECLARED_CONSTRUCTORS,
+            MemberAccess.ALL_PUBLIC_CLASSES,
+            MemberAccess.ALL_PUBLIC_METHODS,
+            MemberAccess.ALL_PUBLIC_FIELDS,
+            MemberAccess.ALL_PUBLIC_CONSTRUCTORS,
+            MemberAccess.ALL_RECORD_COMPONENTS,
+            MemberAccess.ALL_PERMITTED_SUBCLASSES,
+            MemberAccess.ALL_NEST_MEMBERS,
+            MemberAccess.ALL_SIGNERS,
+            MemberAccess.QUERY_ALL_DECLARED_METHODS,
+            MemberAccess.QUERY_ALL_DECLARED_CONSTRUCTORS,
+            MemberAccess.QUERY_ALL_PUBLIC_METHODS,
+            MemberAccess.QUERY_ALL_PUBLIC_CONSTRUCTORS,
+            MemberAccess.UNSAFE_ALLOCATED
+    })
+    public static class FullMemberAccess {
     }
 
     @Reachable(condition = Object.class, classNames = "jdk.internal.vm.annotation.Stable")

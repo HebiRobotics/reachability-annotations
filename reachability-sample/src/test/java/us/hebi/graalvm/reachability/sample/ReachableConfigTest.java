@@ -38,9 +38,9 @@ public class ReachableConfigTest {
 
     private static String stepId = "reachable";
     private static String reflectionConfig = readJsonContent(stepId, "reflect-config.json");
-    private static String jniConfig = readJsonContent(stepId,  "jni-config.json");
-    private static String resourceConfig = readJsonContent(stepId,  "resource-config.json");
-    private static String proxyConfig = readJsonContent(stepId,  "proxy-config.json");
+    private static String jniConfig = readJsonContent(stepId, "jni-config.json");
+    private static String resourceConfig = readJsonContent(stepId, "resource-config.json");
+    private static String proxyConfig = readJsonContent(stepId, "proxy-config.json");
 
     @Test
     void testDefaultEnum() throws IOException {
@@ -254,6 +254,35 @@ public class ReachableConfigTest {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$NoMemberAccess"
                   },
                   "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$NoMemberAccess"
+                }
+                """);
+    }
+
+    @Test
+    void testFullMemberAccess() throws IOException {
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$FullMemberAccess"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$FullMemberAccess",
+                  "allDeclaredClasses": true,
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true,
+                  "allPublicClasses": true,
+                  "allPublicMethods": true,
+                  "allPublicFields": true,
+                  "allPublicConstructors": true,
+                  "allRecordComponents": true,
+                  "allPermittedSubclasses": true,
+                  "allNestMembers": true,
+                  "allSigners": true,
+                  "queryAllDeclaredMethods": true,
+                  "queryAllDeclaredConstructors": true,
+                  "queryAllPublicMethods": true,
+                  "queryAllPublicConstructors": true,
+                  "unsafeAllocated": true
                 }
                 """);
     }
