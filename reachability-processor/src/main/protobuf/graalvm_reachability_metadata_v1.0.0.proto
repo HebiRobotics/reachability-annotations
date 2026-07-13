@@ -42,7 +42,7 @@ message ReflectConfigEntry {
   // List of methods to register for this class that are only looked up but not invoked
   repeated MethodIdentifier queriedMethods = 4;
 
-  // List of class fields that can be looked up, read, or modified for the class declared in <name>
+  // List of class fields that can be looked up, read, or modified
   repeated FieldIdentifier fields = 5;
 
   // Register classes which would be returned by the java.lang.Class#getDeclaredClasses call
@@ -128,8 +128,8 @@ message ResourceConfig {
 
   /*
   Native Image will iterate over all resources and match their relative paths against the Java Regex specified in
-  <includes>. If the path matches the Regex, the resource is included. The <excludes> statement instructs Native Image
-  to omit certain included resources that match the given <pattern>
+  includes. If the path matches the Regex, the resource is included. The excludes statement instructs Native Image
+  to omit certain included resources that match the given pattern
    */
   message ResourceList {
 

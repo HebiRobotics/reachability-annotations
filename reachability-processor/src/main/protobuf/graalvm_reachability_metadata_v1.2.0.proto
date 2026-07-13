@@ -115,7 +115,7 @@ message ReflectionEntry {
 
   message MethodIdentifier {
     optional Condition condition = 1;
-    // Name of the method or constructor (use "<init>" for constructors).
+    // Name of the method or constructor (use "init" for constructors).
     optional string name = 2;
     // Parameter types array, e.g. ["java.lang.String", "int[]"].
     repeated string parameterTypes = 3;
