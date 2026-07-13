@@ -17,10 +17,20 @@
  * limitations under the License.
  * #L%
  */
-
 package us.hebi.graalvm.reachability.processor.parsers;
 
 import com.google.mu.util.Substring;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+
+import com.google.mu.util.Substring;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -36,6 +46,7 @@ import java.util.function.Consumer;
  * @author Florian Enner
  * @since 25 Nov 2025
  */
+@RequiredArgsConstructor
 public class FxmlParser {
 
     public static Optional<String> tryReadContent(Path path) {
@@ -99,7 +110,7 @@ public class FxmlParser {
             // @../path are relative to the file while ../path are relative to the
             // working directory, i.e., outside of the jar.
             if (url.startsWith("@")) {
-                resources.add(path.resolveSibling(url.substring(1)));
+                resources.add(resolve(path, url.substring(1)));
             }
         };
 
@@ -107,9 +118,7 @@ public class FxmlParser {
         onAttribute(content, "URL", "value", addResourceUrl);
 
         // Nested files
-        onAttribute(content, "fx:include", "source", source -> {
-            addFxmlFile(path.resolveSibling(source));
-        });
+        onAttribute(content, "fx:include", "source", source -> addFxmlFile(resolve(path, source)));
 
         return;
     }
@@ -160,5 +169,11 @@ public class FxmlParser {
     final Set<String> imports = new TreeSet<>();
     final Set<String> controllers = new TreeSet<>();
     final Set<Path> resources = new TreeSet<>();
+
+    private Path resolve(Path origin, String path) {
+        return path.startsWith("/") ? rootDir.resolve(path.substring(1)) : origin.resolveSibling(path);
+    }
+
+    private final Path rootDir;
 
 }

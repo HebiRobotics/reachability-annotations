@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * @author Florian Enner
@@ -35,10 +35,17 @@ class CssParserTest {
 
     @Test
     void addCssFile() throws URISyntaxException {
-        var resource = Path.of(FxmlParserTest.class.getResource("tests/javafx.css").toURI());
-        var parser = new CssParser();
-        parser.addCssFile(resource);
-        assertEquals(2, parser.getResources().size());
+        var rootDir = Path.of(FxmlParserTest.class.getResource("/").toURI());
+        var testDir = Path.of(FxmlParserTest.class.getResource("tests").toURI());
+        var parser = new CssParser(rootDir);
+
+        parser.addCssFile(testDir.resolve("javafx.css"));
+        assertThat(parser.getResources()).containsExactlyInAnyOrder(
+                testDir.resolve("javafx.css"),
+                testDir.resolve("theme-base.css"),
+                rootDir.resolve("root/path/custom.css")
+        );
+
     }
 
 }

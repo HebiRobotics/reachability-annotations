@@ -59,6 +59,18 @@ class AfterburnerConfigTest {
     }
 
     @Test
+    void testAbsIncludedCss() {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+                  },
+                  "pattern": "\\\\Qroot/path/custom.css\\\\E"
+                }
+                """);
+    }
+
+    @Test
     void testPropertyFiles() {
         assertContains(resourceConfig, """
                 {

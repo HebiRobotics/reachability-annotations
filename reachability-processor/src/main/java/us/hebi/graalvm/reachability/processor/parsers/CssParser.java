@@ -21,6 +21,7 @@
 package us.hebi.graalvm.reachability.processor.parsers;
 
 import com.google.mu.util.Substring;
+import lombok.RequiredArgsConstructor;
 
 import java.nio.file.Path;
 import java.util.Set;
@@ -30,19 +31,20 @@ import java.util.TreeSet;
  * @author Florian Enner
  * @since 25 Nov 2025
  */
+@RequiredArgsConstructor
 public class CssParser {
 
     public void addCssFile(Path path) {
         if (resources.contains(path)) {
             return;
         }
+        resources.add(path);
 
         var contentOpt = FxmlParser.tryReadContent(path);
         if (contentOpt.isEmpty()) {
             return; // TODO: warn if a file does not exist?
         }
         var content = contentOpt.get();
-        resources.add(path);
 
         // Parse import statements
         Substring.between("@import", ";")
@@ -52,7 +54,7 @@ public class CssParser {
                 .map(String::trim)
                 .map(CssParser::removeUrlAndQuotes)
                 .filter(s -> !s.isEmpty())
-                .map(path::resolveSibling)
+                .map(file -> resolve(path, file))
                 .forEach(this::addCssFile);
 
         // Parse other url() resources, e.g., in @font-face rules or background images
@@ -62,7 +64,7 @@ public class CssParser {
                 .map(Object::toString)
                 .map(CssParser::removeUrlAndQuotes)
                 .filter(s -> !s.isEmpty())
-                .map(path::resolveSibling)
+                .map(file -> resolve(path, file))
                 .forEach(this::addResource);
 
     }
@@ -109,5 +111,19 @@ public class CssParser {
     public Set<Path> getResources() {
         return resources;
     }
+
+    public Set<Path> getRelativeResources() {
+        Set<Path> set = new TreeSet<>();
+        for (Path resource : resources) {
+            set.add(rootDir.relativize(resource));
+        }
+        return set;
+    }
+
+    private Path resolve(Path origin, String path) {
+        return path.startsWith("/") ? rootDir.resolve(path.substring(1)) : origin.resolveSibling(path);
+    }
+
+    private final Path rootDir;
 
 }
