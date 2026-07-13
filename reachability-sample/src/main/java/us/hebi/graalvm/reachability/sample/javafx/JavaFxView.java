@@ -20,12 +20,12 @@
 
 package us.hebi.graalvm.reachability.sample.javafx;
 
-import us.hebi.graalvm.reachability.annotations.ReachableAfterburnerView;
+import us.hebi.graalvm.reachability.annotations.ReachableFxView;
 
 /**
  * @author Florian Enner
  * @since 10 Jul 2026
  */
-@ReachableAfterburnerView
+@ReachableFxView
 public class JavaFxView {
 }

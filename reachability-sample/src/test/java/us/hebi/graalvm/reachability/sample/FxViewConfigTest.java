@@ -28,9 +28,9 @@ import static us.hebi.graalvm.reachability.sample.ReachableConfigTest.*;
  * @author Florian Enner
  * @since 09 Jul 2026
  */
-class AfterburnerConfigTest {
+class FxViewConfigTest {
 
-    private static String stepId = "afterburner";
+    private static String stepId = "fx-view";
     private static String reflectionConfig = readJsonContent(stepId, "reflect-config.json");
     private static String resourceConfig = readJsonContent(stepId,  "resource-config.json");
 

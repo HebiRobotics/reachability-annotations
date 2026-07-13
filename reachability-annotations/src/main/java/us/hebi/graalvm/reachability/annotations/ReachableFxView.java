@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,21 +26,31 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Creates a native image config based on afterburner.fx conventions,
- * including FXML, CSS, and property files.
+ * Creates reachability configuration based on common conventions
+ * (e.g. Afterburner.fx or FXMLKit) where resource files have the
+ * same name as the lowercased view. For example,
+ * <p>
+ * - ${Name}View.java
+ * - ${name}.fxml
+ * - ${name}.css
+ * - ${name}*.properties
+ * <p>
+ * The ${name} can also be applied by setting a custom value. Files
+ * that are found in the class output are automatically parsed and
+ * add rules for FXML includes, CSS imports, and reflective controllers.
  *
  * @author Florian Enner
  * @since 25 Nov 2025
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface ReachableAfterburnerView {
+public @interface ReachableFxView {
 
     /**
      * The value specifies the name of the fxml and optional css
-     * files. Defaults to the conventional Afterburner name.
+     * files. Defaults to the conventional lowercase view name.
      *
-     * @return fxml and css file names
+     * @return fxml, css, and property file names
      */
     String value() default "";
 

@@ -21,8 +21,8 @@
 package us.hebi.graalvm.reachability.processor;
 
 import com.google.common.collect.ImmutableSetMultimap;
-import us.hebi.graalvm.reachability.annotations.Reachable.MemberAccess;
-import us.hebi.graalvm.reachability.annotations.ReachableAfterburnerView;
+import us.hebi.graalvm.reachability.annotations.MemberAccess;
+import us.hebi.graalvm.reachability.annotations.ReachableFxView;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -37,15 +37,15 @@ import java.util.function.Supplier;
  * @author Florian Enner
  * @since 25 Nov 2025
  */
-public class AfterburnerStep extends AbstractMetadataStep {
+public class FxViewStep extends AbstractMetadataStep {
 
     @Override
     public Set<String> annotations() {
-        return Set.of(ReachableAfterburnerView.class.getCanonicalName());
+        return Set.of(ReachableFxView.class.getCanonicalName());
     }
 
     public void process0(ImmutableSetMultimap<String, Element> elementMap) {
-        var views = elementMap.get(ReachableAfterburnerView.class.getCanonicalName());
+        var views = elementMap.get(ReachableFxView.class.getCanonicalName());
         if (views.isEmpty()) {
             return;
         }
@@ -54,8 +54,8 @@ public class AfterburnerStep extends AbstractMetadataStep {
         var rootDir = getClassOutputDir();
         for (Element viewClass : views) {
             if (viewClass instanceof TypeElement type) {
-                ReachableAfterburnerView annotation = type.getAnnotation(ReachableAfterburnerView.class);
-                final var metadata = getConditionalMetadata(getConditionName(type, ReachableAfterburnerView.class));
+                ReachableFxView annotation = type.getAnnotation(ReachableFxView.class);
+                final var metadata = getConditionalMetadata(getConditionName(type, ReachableFxView.class));
 
                 // Use Afterburner convention for the name
                 var baseDir = ProcessorUtil.getSourceDirectory(env, type);
@@ -99,8 +99,8 @@ public class AfterburnerStep extends AbstractMetadataStep {
         return className.substring(0, viewIndex);
     }
 
-    public AfterburnerStep(Supplier<ProcessingEnvironment> env) {
-        super("afterburner", env);
+    public FxViewStep(Supplier<ProcessingEnvironment> env) {
+        super("fx-view", env);
     }
 
 }

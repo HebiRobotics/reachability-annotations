@@ -33,7 +33,7 @@ import static us.hebi.graalvm.reachability.sample.ReachableConfigTest.*;
  */
 public class FxResourcesTest {
 
-    private static String stepId = "fxresources";
+    private static String stepId = "fx-resources";
     private static String reflectionConfig = readJsonContent(stepId, "reflect-config.json");
     private static String resourceConfig = readJsonContent(stepId,  "resource-config.json");
 
