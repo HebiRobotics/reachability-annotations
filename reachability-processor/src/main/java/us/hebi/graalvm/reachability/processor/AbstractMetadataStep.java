@@ -217,11 +217,11 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
                     printWarning("Ignoring unsupported wildcard import: " + name);
                     continue;
                 }
-                addReflectedType(metadata, name, includeHierarchy, ReachabilityMetadata.ReflectionEntry::enableFullReflection);
+                addReflectedType(metadata, name, includeHierarchy, ReflectionEntry::enableFullReflection);
 
             }
             for (var name : fxmlParser.getControllers()) {
-                addReflectedType(metadata, name, includeHierarchy, ReachabilityMetadata.ReflectionEntry::enableFullReflection);
+                addReflectedType(metadata, name, includeHierarchy, ReflectionEntry::enableFullReflection);
             }
             for (var resource : fxmlParser.getResources()) {
                 addAbsFileResource(metadata, resource);

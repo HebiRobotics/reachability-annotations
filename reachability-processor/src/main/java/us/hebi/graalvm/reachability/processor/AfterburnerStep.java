@@ -21,6 +21,7 @@
 package us.hebi.graalvm.reachability.processor;
 
 import com.google.common.collect.ImmutableSetMultimap;
+import us.hebi.graalvm.reachability.annotations.Reachable.MemberAccess;
 import us.hebi.graalvm.reachability.annotations.ReachableAfterburnerView;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
@@ -64,7 +65,7 @@ public class AfterburnerStep extends AbstractMetadataStep {
 
                 // Add annotated class so Afterburner can figure out the conventional name via reflection
                 addReflectedType(metadata, type, false, entry -> {
-                    entry.setAllDeclaredConstructors(true);
+                    entry.addMemberAccess(MemberAccess.ALL_DECLARED_CONSTRUCTORS);
                 });
 
                 // Parse FXML contents

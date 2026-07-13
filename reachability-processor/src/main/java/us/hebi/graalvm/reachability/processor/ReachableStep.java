@@ -114,9 +114,7 @@ public class ReachableStep extends AbstractMetadataStep {
 
         // JNI and reflectively accessible classes
         final Consumer<ReflectionEntry> updateReflectEntry = entry -> {
-            entry.allDeclaredConstructors |= annotation.allDeclaredConstructors();
-            entry.allDeclaredMethods |= annotation.allDeclaredMethods();
-            entry.allDeclaredFields |= annotation.allDeclaredFields();
+            entry.addMemberAccess(annotation.memberAccess());
             entry.jniAccessible |= annotation.jniAccessible();
         };
         for (String name : annotation.classNames()) {

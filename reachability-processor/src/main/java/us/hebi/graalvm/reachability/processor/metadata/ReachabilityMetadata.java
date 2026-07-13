@@ -21,6 +21,7 @@
 package us.hebi.graalvm.reachability.processor.metadata;
 
 import lombok.*;
+import us.hebi.graalvm.reachability.annotations.Reachable.MemberAccess;
 import us.hebi.graalvm.reachability.processor.util.GlobUtil;
 import us.hebi.graalvm.reachability.processor.util.StringArrayComparator;
 
@@ -44,15 +45,19 @@ public class ReachabilityMetadata {
     @RequiredArgsConstructor
     public static class ReflectionEntry {
         final String name;
-        public boolean allDeclaredFields = false;
-        public boolean allDeclaredMethods = false;
-        public boolean allDeclaredConstructors = false;
+        final EnumSet<MemberAccess> memberAccess = EnumSet.noneOf(MemberAccess.class);
         public boolean jniAccessible = false;
 
+        public void addMemberAccess(MemberAccess... flags) {
+            for (MemberAccess flag : flags) {
+                memberAccess.add(flag);
+            }
+        }
+
         public void enableFullReflection() {
-            allDeclaredFields = true;
-            allDeclaredMethods = true;
-            allDeclaredConstructors = true;
+            memberAccess.add(MemberAccess.ALL_DECLARED_CONSTRUCTORS);
+            memberAccess.add(MemberAccess.ALL_DECLARED_METHODS);
+            memberAccess.add(MemberAccess.ALL_DECLARED_FIELDS);
         }
 
     }
@@ -68,19 +73,6 @@ public class ReachabilityMetadata {
     @EqualsAndHashCode
     @RequiredArgsConstructor
     public static class ConditionalMetadata {
-
-        public ReflectionEntry addReflectedType(String typeName,
-                                                boolean allDeclaredConstructors,
-                                                boolean allDeclaredFields,
-                                                boolean allDeclaredMethods,
-                                                boolean jni) {
-            var entry = reflectedTypes.computeIfAbsent(typeName, ReflectionEntry::new);
-            entry.allDeclaredConstructors |= allDeclaredConstructors;
-            entry.allDeclaredFields |= allDeclaredFields;
-            entry.allDeclaredMethods |= allDeclaredMethods;
-            entry.jniAccessible |= jni;
-            return entry;
-        }
 
         public ReflectionEntry addReflectedType(String typeName) {
             return reflectedTypes.computeIfAbsent(typeName, ReflectionEntry::new);

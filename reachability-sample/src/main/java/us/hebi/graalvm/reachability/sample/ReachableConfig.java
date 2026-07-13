@@ -22,6 +22,7 @@ package us.hebi.graalvm.reachability.sample;
 
 
 import us.hebi.graalvm.reachability.annotations.Reachable;
+import us.hebi.graalvm.reachability.annotations.Reachable.MemberAccess;
 import us.hebi.graalvm.reachability.annotations.Reachable.Proxy;
 import us.hebi.graalvm.reachability.annotations.ReachableFxResources;
 
@@ -69,8 +70,12 @@ public class ReachableConfig {
     public static class PrivateClassHierarchy {
     }
 
+    @Reachable(memberAccess = {})
+    public static class NoMemberAccess {
+    }
+
     @Reachable(condition = Object.class, classNames = "jdk.internal.vm.annotation.Stable")
-    @Reachable(conditionName = "sun.misc.Unsafe", classNames = "sun.misc.Unsafe", allDeclaredConstructors = false, allDeclaredMethods = false, jniAccessible = true)
+    @Reachable(conditionName = "sun.misc.Unsafe", classNames = "sun.misc.Unsafe", memberAccess = MemberAccess.ALL_DECLARED_FIELDS, jniAccessible = true)
     public static class KeepPrivateClass {
     }
 

@@ -20,6 +20,7 @@
 
 package us.hebi.graalvm.reachability.processor.metadata;
 
+import us.hebi.graalvm.reachability.annotations.Reachable.MemberAccess;
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_0_0.*;
 import us.hebi.graalvm.reachability.processor.util.ProtoUtil;
 import us.hebi.quickbuf.JsonSource;
@@ -47,9 +48,7 @@ public class MarshallerV100 {
         for (var proto : parseJsonList(sourceDir.resolve("reflect-config.json"), ReflectConfigEntry.getFactory())) {
             var condition = proto.tryGetCondition().map(Condition::getTypeReachable).orElse(null);
             var reflectedType = metadata.getMetadata(condition).addReflectedType(proto.getName());
-            if (proto.getAllDeclaredFields()) reflectedType.setAllDeclaredFields(true);
-            if (proto.getAllDeclaredMethods()) reflectedType.setAllDeclaredMethods(true);
-            if (proto.getAllDeclaredConstructors()) reflectedType.setAllDeclaredConstructors(true);
+            copyMemberAccessFromProto(proto, reflectedType);
         }
 
         // JNI config (separate file in v1.0.0)
@@ -57,9 +56,7 @@ public class MarshallerV100 {
             var condition = proto.tryGetCondition().map(Condition::getTypeReachable).orElse(null);
             var reflectedType = metadata.getMetadata(condition).addReflectedType(proto.getName());
             reflectedType.setJniAccessible(true);
-            if (proto.getAllDeclaredFields()) reflectedType.setAllDeclaredFields(true);
-            if (proto.getAllDeclaredMethods()) reflectedType.setAllDeclaredMethods(true);
-            if (proto.getAllDeclaredConstructors()) reflectedType.setAllDeclaredConstructors(true);
+            copyMemberAccessFromProto(proto, reflectedType);
         }
 
         // Resources & Bundles
@@ -92,6 +89,22 @@ public class MarshallerV100 {
         return Optional.of(JsonSource.newInstance(Files.readAllBytes(file)));
     }
 
+    private static void copyMemberAccessFromProto(ReflectConfigEntry proto, ReachabilityMetadata.ReflectionEntry entry) {
+        if (proto.getAllDeclaredConstructors()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_CONSTRUCTORS);
+        if (proto.getAllDeclaredMethods()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_METHODS);
+        if (proto.getAllDeclaredFields()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_FIELDS);
+    }
+
+    private static void copyMemberAccessToProto(ReachabilityMetadata.ReflectionEntry entry, ReflectConfigEntry proto) {
+        for (MemberAccess memberAccess : entry.memberAccess) {
+            switch (memberAccess) {
+                case ALL_DECLARED_CONSTRUCTORS -> proto.setAllDeclaredConstructors(true);
+                case ALL_DECLARED_METHODS -> proto.setAllDeclaredMethods(true);
+                case ALL_DECLARED_FIELDS -> proto.setAllDeclaredFields(true);
+            }
+        }
+    }
+
     public static void saveMetadataTo(ReachabilityMetadata source, Path destDir) throws IOException {
         ReflectConfig reflectConfig = ReflectConfig.newInstance();
         ReflectConfig jniConfig = ReflectConfig.newInstance();
@@ -109,9 +122,8 @@ public class MarshallerV100 {
 
                 var entry = reflectConfig.getMutableEntries().next()
                         .setName(type.name);
-                if (type.allDeclaredFields) entry.setAllDeclaredFields(true);
-                if (type.allDeclaredMethods) entry.setAllDeclaredMethods(true);
-                if (type.allDeclaredConstructors) entry.setAllDeclaredConstructors(true);
+
+                copyMemberAccessToProto(type, entry);
                 condition.ifPresent(entry::setCondition);
 
                 if (type.jniAccessible) {

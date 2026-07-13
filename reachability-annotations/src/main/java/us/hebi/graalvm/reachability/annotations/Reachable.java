@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -80,20 +80,22 @@ public @interface Reachable {
      */
     boolean jniAccessible() default false;
 
-    /**
-     * Register fields which would be returned by the java.lang.Class#getDeclaredFields call
-     */
-    boolean allDeclaredFields() default true;
+    enum MemberAccess {
+        ALL_DECLARED_CONSTRUCTORS, // Register constructors which would be returned by the java.lang.Class#getDeclaredConstructors call
+        ALL_DECLARED_METHODS, // Register methods which would be returned by the java.lang.Class#getDeclaredMethods call
+        ALL_DECLARED_FIELDS; // Register fields which would be returned by the java.lang.Class#getDeclaredFields call
+    }
 
     /**
-     * Register methods which would be returned by the java.lang.Class#getDeclaredMethods call
+     * Specifies which class members should be opened up for reflection.
+     * Defaults to open everything. This configuration does not apply to
+     * resources, proxies, or bundles.
      */
-    boolean allDeclaredMethods() default true;
-
-    /**
-     * Register constructors which would be returned by the java.lang.Class#getDeclaredConstructors call
-     */
-    boolean allDeclaredConstructors() default true;
+    MemberAccess[] memberAccess() default {
+            MemberAccess.ALL_DECLARED_CONSTRUCTORS,
+            MemberAccess.ALL_DECLARED_METHODS,
+            MemberAccess.ALL_DECLARED_FIELDS,
+    };
 
     /**
      * Unified routing path using glob syntax (e.g. "assets/**.png" or "META-INF/services/*").

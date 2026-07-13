@@ -21,6 +21,7 @@
 package us.hebi.graalvm.reachability.processor;
 
 import com.google.common.collect.ImmutableSetMultimap;
+import us.hebi.graalvm.reachability.annotations.Reachable.MemberAccess;
 import us.hebi.graalvm.reachability.processor.util.ElementUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -68,13 +69,13 @@ public class DependencyInjectionStep extends AbstractMetadataStep {
                 addReflectedType(metadata, typeElement, false, entry -> {
                     switch (element.getKind()) {
                         case CONSTRUCTOR -> {
-                            entry.setAllDeclaredConstructors(true);
+                            entry.addMemberAccess(MemberAccess.ALL_DECLARED_CONSTRUCTORS);
                         }
                         case METHOD -> {
-                            entry.setAllDeclaredMethods(true);
+                            entry.addMemberAccess(MemberAccess.ALL_DECLARED_METHODS);
                         }
                         case FIELD -> {
-                            entry.setAllDeclaredFields(true);
+                            entry.addMemberAccess(MemberAccess.ALL_DECLARED_FIELDS);
                         }
                     }
                 });
@@ -85,7 +86,7 @@ public class DependencyInjectionStep extends AbstractMetadataStep {
                     var mirror = env.getTypeUtils().asElement(erasedType);
                     if (mirror instanceof TypeElement varType) {
                         addReflectedType(metadata, ElementUtil.getBinaryName(varType), false, entry -> {
-                            entry.setAllDeclaredConstructors(true);
+                            entry.addMemberAccess(MemberAccess.ALL_DECLARED_CONSTRUCTORS);
                         });
                     }
                 }

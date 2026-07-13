@@ -247,6 +247,18 @@ public class ReachableConfigTest {
     }
 
     @Test
+    void testNoMemberAccess() throws IOException {
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$NoMemberAccess"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$NoMemberAccess"
+                }
+                """);
+    }
+
+    @Test
     void testPrivateClassHierarchy() throws IOException {
         assertContains(reflectionConfig, """
                 {
