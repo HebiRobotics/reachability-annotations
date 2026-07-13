@@ -20,7 +20,7 @@
 
 package us.hebi.graalvm.reachability.processor.metadata;
 
-import us.hebi.graalvm.reachability.annotations.Reachable.MemberAccess;
+import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_0_0.*;
 import us.hebi.graalvm.reachability.processor.util.ProtoUtil;
 import us.hebi.quickbuf.JsonSource;

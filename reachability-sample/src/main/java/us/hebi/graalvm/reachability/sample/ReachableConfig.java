@@ -22,11 +22,10 @@ package us.hebi.graalvm.reachability.sample;
 
 
 import us.hebi.graalvm.reachability.annotations.Reachable;
-import us.hebi.graalvm.reachability.annotations.Reachable.MemberAccess;
+import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.annotations.Reachable.Proxy;
 import us.hebi.graalvm.reachability.annotations.ReachableFxResources;
 
-import java.lang.reflect.Member;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 

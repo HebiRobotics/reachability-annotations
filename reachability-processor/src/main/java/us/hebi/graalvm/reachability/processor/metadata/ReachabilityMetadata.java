@@ -21,7 +21,7 @@
 package us.hebi.graalvm.reachability.processor.metadata;
 
 import lombok.*;
-import us.hebi.graalvm.reachability.annotations.Reachable.MemberAccess;
+import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.processor.util.GlobUtil;
 import us.hebi.graalvm.reachability.processor.util.StringArrayComparator;
 

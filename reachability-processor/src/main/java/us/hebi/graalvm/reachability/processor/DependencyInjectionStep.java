@@ -21,7 +21,7 @@
 package us.hebi.graalvm.reachability.processor;
 
 import com.google.common.collect.ImmutableSetMultimap;
-import us.hebi.graalvm.reachability.annotations.Reachable.MemberAccess;
+import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.processor.util.ElementUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
