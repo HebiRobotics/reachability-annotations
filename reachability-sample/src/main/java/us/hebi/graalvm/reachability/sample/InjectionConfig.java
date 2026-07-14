@@ -65,7 +65,7 @@ public class InjectionConfig {
         }
 
         @Inject
-        FieldInjection injectedField;
+        ReachableConfig.NoMemberAccess injectedField;
 
     }
 

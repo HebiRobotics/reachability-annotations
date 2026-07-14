@@ -262,11 +262,13 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
                 case FIELD -> {
                     entry.addField(fieldOrMethod.getSimpleName().toString());
 
-                    // Also add the default constructor for the field type in case it needs
-                    // to be created via reflection
+                    // We also add the default constructor for the field type in case it needs to be created via
+                    // reflection. Note that we add the reachable condition on the target type due to an issue we
+                    // encountered when using the 1.2.0 output format.
                     if (addDefaultConstructorForFields) {
                         ElementUtil.getFieldType(env, fieldOrMethod).ifPresent(fqdn ->
-                                addReflectedType(metadata, fqdn, false, ReflectionEntry::addConstructor));
+                                addReflectedType(getConditionalMetadata(fqdn), fqdn, false, ReflectionEntry::addConstructor)
+                        );
                     }
                 }
             }
