@@ -60,7 +60,11 @@ public class MarshallerV100 {
             copyEntryFromProto(proto, reflectedType);
         }
 
-        // TODO: serialization config
+        // Serialization config
+        for (var proto : parseJsonObject(sourceDir.resolve("serialization-config.json"), SerializationConfig.getFactory()).getTypes()) {
+            var condition = proto.tryGetCondition().map(Condition::getTypeReachable).orElse(null);
+            metadata.getMetadata(condition).addReflectedType(proto.getName()).setJniAccessible(true);
+        }
 
         // Resources & Bundles
         ResourceConfig resourceConfig = ProtoUtil.parseJsonObject(sourceDir.resolve("resource-config.json"), ResourceConfig.getFactory());
@@ -134,6 +138,7 @@ public class MarshallerV100 {
         ReflectConfig jniConfig = ReflectConfig.newInstance();
         ResourceConfig resourceConfig = ResourceConfig.newInstance();
         ProxyConfig proxyConfig = ProxyConfig.newInstance();
+        SerializationConfig serializationConfig = SerializationConfig.newInstance();
 
         // Merge all conditional data into a single config file
         for (var metadata : source.getAll()) {
@@ -152,6 +157,12 @@ public class MarshallerV100 {
 
                 if (type.jniAccessible) {
                     jniConfig.getMutableEntries().next().copyFrom(entry);
+                }
+
+                if (type.isSerializable()) {
+                    var serialized = serializationConfig.getMutableTypes().next()
+                            .setName(type.name);
+                    condition.ifPresent(serialized::setCondition);
                 }
 
             }
@@ -184,11 +195,19 @@ public class MarshallerV100 {
 
         }
 
+        // Serialization configs always need all three empty lists
+        if(!serializationConfig.isEmpty()) {
+            serializationConfig.getMutableTypes();
+            serializationConfig.getMutableProxies();
+            serializationConfig.getMutableLambdaCapturingTypes();
+        }
+
         // Save combined metadata to corresponding files
         writeBytes(destDir.resolve("reflect-config.json"), ProtoUtil.toJson(reflectConfig.getEntries()));
         writeBytes(destDir.resolve("jni-config.json"), ProtoUtil.toJson(jniConfig.getEntries()));
         writeBytes(destDir.resolve("resource-config.json"), ProtoUtil.toJson(resourceConfig));
         writeBytes(destDir.resolve("proxy-config.json"), ProtoUtil.toJson(proxyConfig.getEntries()));
+        writeBytes(destDir.resolve("serialization-config.json"), ProtoUtil.toJson(serializationConfig));
     }
 
     private static void deleteExistingFile(Path target) throws IOException {

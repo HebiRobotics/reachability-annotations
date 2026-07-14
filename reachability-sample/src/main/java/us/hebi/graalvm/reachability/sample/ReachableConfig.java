@@ -48,7 +48,7 @@ public class ReachableConfig {
     public static class NestedChildClass extends NestedParentClass {
     }
 
-    @Reachable(classes = NestedChildClass.class, jniAccessible = true, includeClassHierarchy = true)
+    @Reachable(classes = NestedChildClass.class, jniAccessible = true, serializable = true, includeClassHierarchy = true)
     public static class ReferencingChildClass {
     }
 

@@ -88,6 +88,7 @@ public class MarshallerV120 {
         if (proto.getUnsafeAllocated()) entry.addMemberAccess(MemberAccess.UNSAFE_ALLOCATED);
 
         if (proto.getJniAccessible()) entry.setJniAccessible(true);
+        if (proto.getSerializable()) entry.setSerializable(true);
 
         for (var method : proto.getMethods()) {
             entry.addMethod(method.getName(), ProtoUtil.toStringArray(method.getParameterTypes()));
@@ -111,6 +112,7 @@ public class MarshallerV120 {
         }
 
         if (entry.isJniAccessible()) proto.setJniAccessible(true);
+        if (entry.isSerializable()) proto.setSerializable(true);
 
         for (var method : entry.getMethods()) {
             proto.getMutableMethods().next()

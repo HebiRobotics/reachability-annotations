@@ -71,10 +71,12 @@ public class FxViewStep extends AbstractMetadataStep {
                 addAndTryParseResource(metadata, baseDir.resolve(conventionalName + ".fxml"), annotation.includeClassHierarchy());
                 addAndTryParseResource(metadata, baseDir.resolve(conventionalName + ".css"), annotation.includeClassHierarchy());
 
-                // Add language bundles
+                // Add language bundle
                 metadata.addBundle(ResourceEntry.fromString(sourceDir, conventionalName));
 
-                // TODO: also add resource entry for the langeuage bundles until confirmed working
+                // TODO:
+                //  initial tests of the bundle worked, but we haven't had a chance to actually try switching
+                //  languages at runtime. Until that is confirmed, we also add a matching resource glob.
                 metadata.addGlob(ResourceEntry.fromString(sourceDir, conventionalName + "*.properties"));
             }
 

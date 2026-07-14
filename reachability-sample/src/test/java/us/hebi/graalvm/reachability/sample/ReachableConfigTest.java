@@ -39,6 +39,7 @@ public class ReachableConfigTest {
     private static String stepId = "reachable";
     private static String reflectionConfig = readJsonContent(stepId, "reflect-config.json");
     private static String jniConfig = readJsonContent(stepId, "jni-config.json");
+    private static String serializationConfig = readJsonContent(stepId, "serialization-config.json");
     private static String resourceConfig = readJsonContent(stepId, "resource-config.json");
     private static String proxyConfig = readJsonContent(stepId, "proxy-config.json");
 
@@ -182,6 +183,35 @@ public class ReachableConfigTest {
                 }
                 """);
     }
+
+    @Test
+    void testSerializationSpecifiedChildClass() throws IOException {
+        assertContains(serializationConfig, """
+                {
+                   "condition": {
+                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReferencingChildClass"
+                   },
+                   "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedChildClass"
+                 }
+                """);
+        assertContains(serializationConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReferencingChildClass"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedParentClass"
+                }
+                """);
+
+        // Make sure the required fields are also set
+        assertContains(serializationConfig, """
+                "lambdaCapturingTypes": []
+                """);
+        assertContains(serializationConfig, """
+                "proxies": []
+                """);
+    }
+
 
     @Test
     void testMultipleClasses() throws IOException {

@@ -109,6 +109,8 @@ public @interface Reachable {
     String[] bundles() default {};
 
     /**
+     * TODO: not working in the 1.2.0 format yet
+     *
      * @return Dynamic proxy interface groups to register under this condition.
      */
     Proxy[] proxies() default {};
