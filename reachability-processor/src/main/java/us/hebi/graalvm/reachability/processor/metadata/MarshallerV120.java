@@ -22,6 +22,7 @@ package us.hebi.graalvm.reachability.processor.metadata;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import us.hebi.graalvm.reachability.annotations.MemberAccess;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ResourceEntry;
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_2_0.Condition;
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_2_0.ReflectionEntry;
 import us.hebi.graalvm.reachability.processor.util.ProtoUtil;
@@ -59,9 +60,9 @@ public class MarshallerV120 {
             var condition = proto.tryGetCondition().map(Condition::getTypeReached).orElse(null);
 
             if (proto.hasGlob()) {
-                metadata.getMetadata(condition).addBundle(proto.getModule(), proto.getGlob());
+                metadata.getMetadata(condition).addBundle(new ResourceEntry(proto.getModule(), proto.getGlob()));
             } else if (proto.hasBundle()) {
-                metadata.getMetadata(condition).addBundle(proto.getModule(), proto.getBundle());
+                metadata.getMetadata(condition).addBundle(new ResourceEntry(proto.getModule(), proto.getBundle()));
             }
         }
 
@@ -141,7 +142,7 @@ public class MarshallerV120 {
             // glob resources
             for (var glob : metadata.resourceGlobs.values()) {
                 var entry = proto.getMutableResources().next()
-                        .setGlob(glob.getGlob());
+                        .setGlob(glob.getGlobOrName());
                 ProtoUtil.copyNonEmptyString(glob.getModule(), entry::setModule);
                 condition.ifPresent(entry::setCondition);
             }
@@ -149,7 +150,7 @@ public class MarshallerV120 {
             // bundles
             for (var bundle : metadata.bundles.values()) {
                 var entry = proto.getMutableResources().next()
-                        .setBundle(bundle.getName());
+                        .setBundle(bundle.getGlobOrName());
                 ProtoUtil.copyNonEmptyString(bundle.getModule(), entry::setModule);
                 condition.ifPresent(entry::setCondition);
             }

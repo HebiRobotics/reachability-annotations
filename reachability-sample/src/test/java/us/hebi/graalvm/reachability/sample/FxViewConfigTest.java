@@ -114,7 +114,10 @@ class FxViewConfigTest {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
                   },
                   "name": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView",
-                  "allDeclaredConstructors": true
+                  "methods": [{
+                    "name": "<init>",
+                    "parameterTypes": []
+                  }]
                 }
                 """);
     }

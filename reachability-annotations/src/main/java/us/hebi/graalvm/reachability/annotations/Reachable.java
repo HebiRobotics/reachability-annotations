@@ -81,6 +81,12 @@ public @interface Reachable {
     boolean jniAccessible() default false;
 
     /**
+     * Toggles whether the targets specified in 'classes' / 'classNames'
+     * should be registered for Java serialization.
+     */
+    boolean serializable() default false;
+
+    /**
      * Specifies which class members should be opened up for reflection.
      * Defaults to open everything. This configuration does not apply to
      * resources, proxies, or bundles.
@@ -98,14 +104,14 @@ public @interface Reachable {
     String[] resources() default {};
 
     /**
+     * @return Resource bundles to register under this condition.
+     */
+    String[] bundles() default {};
+
+    /**
      * @return Dynamic proxy interface groups to register under this condition.
      */
     Proxy[] proxies() default {};
-
-    /**
-     * @return Resource bundles to register under this condition.
-     */
-    Bundle[] bundles() default {};
 
     /**
      * Defines a single dynamic proxy definition implementing a specific combination of interfaces.
@@ -117,23 +123,6 @@ public @interface Reachable {
          * @return The fully qualified names of the interfaces that must be available for proxying.
          */
         String[] value();
-    }
-
-    /**
-     * Defines a resource bundle configuration mapping specific locales to a bundle base name.
-     */
-    @Retention(RetentionPolicy.SOURCE)
-    @Target({})
-    @interface Bundle {
-        /**
-         * @return Fully qualified name of the ResourceBundle base class (e.g., "com.example.Messages").
-         */
-        String name();
-
-        /**
-         * @return Locales to register for this specific bundle. Defaults to the default bundle locale.
-         */
-        String[] locales() default {""}; // TODO: no longer exist in 1.2.0?
     }
 
 }

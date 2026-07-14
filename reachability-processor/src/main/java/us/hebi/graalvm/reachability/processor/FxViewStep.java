@@ -21,14 +21,14 @@
 package us.hebi.graalvm.reachability.processor;
 
 import com.google.common.collect.ImmutableSetMultimap;
-import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.annotations.ReachableFxView;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ResourceEntry;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import java.nio.file.Files;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -58,32 +58,24 @@ public class FxViewStep extends AbstractMetadataStep {
                 final var metadata = getConditionalMetadata(getConditionName(type, ReachableFxView.class));
 
                 // Use Afterburner convention for the name
-                var baseDir = ProcessorUtil.getSourceDirectory(env, type);
+                var sourceDir = ProcessorUtil.getSourceDirectory(env, type);
                 var conventionalName = Optional.of(annotation.value())
                         .filter(s -> !s.isEmpty())
                         .orElseGet(() -> stripEnding(type.getSimpleName().toString()).toLowerCase());
 
                 // Add annotated class so Afterburner can figure out the conventional name via reflection
-                addReflectedType(metadata, type, false, entry -> {
-                    entry.addMemberAccess(MemberAccess.ALL_DECLARED_CONSTRUCTORS);
-                });
+                addReflectedType(metadata, type, false, ReachabilityMetadata.ReflectionEntry::addConstructor);
 
-                // Parse FXML contents
-                var fxmlFile = rootDir.resolve(baseDir + conventionalName + ".fxml");
-                addAbsFileResource(metadata, fxmlFile);
-                if (Files.isRegularFile(fxmlFile)) {
-                    addMetadataFromParsedFileContents(metadata, fxmlFile, annotation.includeClassHierarchy());
-                }
+                // Parse FXML & CSS contents
+                var baseDir = rootDir.resolve(sourceDir);
+                addAndTryParseResource(metadata, baseDir.resolve(conventionalName + ".fxml"), annotation.includeClassHierarchy());
+                addAndTryParseResource(metadata, baseDir.resolve(conventionalName + ".css"), annotation.includeClassHierarchy());
 
-                // Parse CSS contents
-                var cssFile = rootDir.resolve(baseDir + conventionalName + ".css");
-                addAbsFileResource(metadata, cssFile);
-                if (Files.isRegularFile(cssFile)) {
-                    addMetadataFromParsedFileContents(metadata, cssFile, annotation.includeClassHierarchy());
-                }
+                // Add language bundles
+                metadata.addBundle(ResourceEntry.fromString(sourceDir, conventionalName));
 
-                // Add wildcard for language files (NOTE: use property bundles instead?)
-                addResourceGlob(metadata, baseDir + conventionalName + "*.properties");
+                // TODO: also add resource entry for the langeuage bundles until confirmed working
+                metadata.addGlob(ResourceEntry.fromString(sourceDir, conventionalName + "*.properties"));
             }
 
         }

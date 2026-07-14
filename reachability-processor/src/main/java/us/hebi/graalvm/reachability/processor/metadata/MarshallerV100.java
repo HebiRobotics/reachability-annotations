@@ -21,6 +21,7 @@
 package us.hebi.graalvm.reachability.processor.metadata;
 
 import us.hebi.graalvm.reachability.annotations.MemberAccess;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ResourceEntry;
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_0_0.*;
 import us.hebi.graalvm.reachability.processor.util.ProtoUtil;
 import us.hebi.quickbuf.JsonSource;
@@ -69,13 +70,7 @@ public class MarshallerV100 {
         }
         for (var proto : resourceConfig.getBundles()) {
             var condition = proto.tryGetCondition().map(Condition::getTypeReachable).orElse(null);
-            var module = ReachabilityMetadata.getModulePrefix(proto.getName()).orElse("");
-            var name = ReachabilityMetadata.removeModulePrefix(proto.getName());
-
-            var bundle = metadata.getMetadata(condition).addBundle(module, name);
-            for (String locale : proto.getLocales()) {
-                bundle.getLocales().add(locale); // TODO: what about locales? no longer exist in 1.2.0?
-            }
+            metadata.getMetadata(condition).addBundle(ResourceEntry.fromString("", proto.getName()));
         }
 
         // Proxies
@@ -173,8 +168,8 @@ public class MarshallerV100 {
             // resource-config (2)
             for (var bundle : metadata.bundles.values()) {
                 var entry = resourceConfig.getMutableBundles().next()
-                        .setName(bundle.getName())
-                        .addAllLocales(bundle.getLocales().toArray(String[]::new));
+                        .setName(bundle.getGlobOrName())
+                        .clearLocales(); // Note: cleared locales should include everything and match 1.2.0 behavior
                 condition.ifPresent(entry::setCondition);
             }
 
