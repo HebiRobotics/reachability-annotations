@@ -94,8 +94,8 @@ Another JavaFX related annotation that provides more resource control and can pa
 // Enables full reflection of all found classes and their parent hierarchy
 @ReachableFxResources({
         "/assets/images/*.png", // relative to classpath root
-        "views/**.fxml", // relative to annotated type
-        "views/**.css", // relative to annotated type
+        "views/**/*.fxml", // relative to annotated type
+        "views/**/*.css", // relative to annotated type
 })
 public class MyApp extends Application {
 }

@@ -115,13 +115,13 @@ public class ReachableConfig {
     }
 
     @ReachableFxResources({
-            "/us/hebi/graalvm/reachability/**.css",
-            "/us/hebi/graalvm/reachability/**.fxml"
+            "/us/hebi/graalvm/reachability/**/*.css",
+            "/us/hebi/graalvm/reachability/**/*.fxml"
     })
     public static class AddAbsoluteWildcardResources {
     }
 
-    @ReachableFxResources({"**.css", "**.fxml"})
+    @ReachableFxResources({"**/*.css", "**/*.fxml"})
     public static class AddRelativeWildcardResources {
     }
 
