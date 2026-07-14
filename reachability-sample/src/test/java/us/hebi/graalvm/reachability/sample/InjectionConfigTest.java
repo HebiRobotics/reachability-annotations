@@ -85,7 +85,7 @@ class InjectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig$FieldInjection"
+                    "typeReachable": "java.lang.String"
                   },
                   "name": "java.lang.String",
                   "methods": [{
@@ -97,7 +97,7 @@ class InjectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig$FieldInjection"
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig"
                   },
                   "name": "us.hebi.graalvm.reachability.sample.InjectionConfig",
                   "methods": [{
@@ -137,9 +137,9 @@ class InjectionConfigTest {
         assertContains(reflectionConfig, """
                 {
                   "condition": {
-                    "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig$InjectionSample"
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$NoMemberAccess"
                   },
-                  "name": "us.hebi.graalvm.reachability.sample.InjectionConfig$FieldInjection",
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$NoMemberAccess",
                   "methods": [{
                     "name": "<init>",
                     "parameterTypes": []

@@ -44,7 +44,7 @@ public class FxResourcesTest {
                   "condition": {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
                   },
-                  "pattern": "us/hebi/graalvm/reachability/.*\\\\.css"
+                  "pattern": "us/hebi/graalvm/reachability/.*/[^/]*\\\\.css"
                 }
                 """);
         assertContains(resourceConfig, """
@@ -52,7 +52,7 @@ public class FxResourcesTest {
                   "condition": {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
                   },
-                  "pattern": "us/hebi/graalvm/reachability/.*\\\\.fxml"
+                  "pattern": "us/hebi/graalvm/reachability/.*/[^/]*\\\\.fxml"
                 }
                 """);
         assertContains(reflectionConfig, """
@@ -75,7 +75,7 @@ public class FxResourcesTest {
                   "condition": {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
                   },
-                  "pattern": "us/hebi/graalvm/reachability/sample/.*\\\\.css"
+                  "pattern": "us/hebi/graalvm/reachability/sample/.*/[^/]*\\\\.css"
                 }
                 """);
         assertContains(resourceConfig, """
@@ -83,7 +83,7 @@ public class FxResourcesTest {
                   "condition": {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
                   },
-                  "pattern": "us/hebi/graalvm/reachability/sample/.*\\\\.fxml"
+                  "pattern": "us/hebi/graalvm/reachability/sample/.*/[^/]*\\\\.fxml"
                 }
                 """);
         assertContains(reflectionConfig, """
