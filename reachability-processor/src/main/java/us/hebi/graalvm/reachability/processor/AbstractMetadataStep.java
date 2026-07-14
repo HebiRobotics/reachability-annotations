@@ -99,7 +99,7 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         }
     }
 
-    protected AnnotationMirror getAnnotationMirror(TypeElement type, Class<?> annotationClass) {
+    protected AnnotationMirror getAnnotationMirror(Element type, Class<?> annotationClass) {
         String annotationName = annotationClass.getCanonicalName();
         for (AnnotationMirror mirror : type.getAnnotationMirrors()) {
             if (mirror.getAnnotationType().toString().equals(annotationName)) {
@@ -132,47 +132,45 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         throw new IllegalStateException("No annotation found for " + annotation);
     }
 
-    protected String getConditionName(TypeElement annotatedType, AnnotationMirror mirror) {
-        TypeElement specifiedClass = null;
-        String className = null;
+    protected String getConditionName(TypeElement fallbackType, AnnotationMirror mirror) {
+        return tryGetDefinedCondition(mirror).orElseGet(() -> ElementUtil.getBinaryName(fallbackType));
+    }
+
+    protected Optional<String> tryGetDefinedCondition(AnnotationMirror mirror) {
+        if (mirror == null) {
+            return Optional.empty();
+        }
+
+        String conditionType = null;
+        String conditionName = null;
 
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : mirror.getElementValues().entrySet()) {
             switch (entry.getKey().getSimpleName().toString()) {
                 case "condition" -> {
-                    // May be a type element or a type mirror, depending on whether it's a list or not
+                    // May be a type element or a type mirror, depending on whether it's a list
                     Object value = entry.getValue().getValue();
                     if (value instanceof TypeElement type) {
-                        specifiedClass = type;
+                        conditionType = ElementUtil.getBinaryName(type);
                     } else if (value instanceof TypeMirror typeMirror) {
                         Element element = env.getTypeUtils().asElement(typeMirror);
-                        if (element instanceof TypeElement typeElement) {
-                            specifiedClass = typeElement;
+                        if (element instanceof TypeElement type) {
+                            conditionType = ElementUtil.getBinaryName(type);
                         }
                     } else {
                         throw new IllegalStateException("Invalid annotation value for " + value.getClass().getSimpleName());
                     }
                 }
-                case "conditionName" -> className = (String) entry.getValue().getValue();
+                case "conditionName" -> conditionName = (String) entry.getValue().getValue();
             }
         }
-        return getConditionName(specifiedClass, className, annotatedType);
-    }
 
-    protected String getConditionName(TypeElement conditionType, String conditionName, TypeElement annotatedType) {
-        // Try to get the class type from the annotation using TypeMirror
-        try {
-            // This will throw MirroredTypeException, but we catch it to get the TypeMirror
-            if (conditionType != null && !Objects.equals(conditionType, ElementUtil.asTypeElement(env, void.class))) {
-                return ElementUtil.getBinaryName(conditionType);
-            }
-        } catch (MirroredTypeException ignored) {
-            // Expected when accessing Class<?> during annotation processing
+        if (conditionType != null && !"void".equals(conditionType)) {
+            return Optional.of(conditionType);
         }
-
         if (conditionName != null && !conditionName.isBlank()) {
-            return conditionName;
+            return Optional.of(conditionName);
         }
-        return annotatedType == null ? "" : ElementUtil.getBinaryName(annotatedType);
+        return Optional.empty();
     }
 
     protected void addReflectedType(ConditionalMetadata metadata, TypeElement type, boolean includeHierarchy, Consumer<ReflectionEntry> onEntry) {
@@ -235,6 +233,29 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
                 addAbsFileResource(metadata, resource);
             }
         }
+    }
+
+    protected void addReflectedFieldOrMethod(ConditionalMetadata metadata, TypeElement type, Element fieldOrMethod, boolean addDefaultConstructorForFields) {
+        addReflectedType(metadata, type, false, entry -> {
+            switch (fieldOrMethod.getKind()) {
+                case CONSTRUCTOR -> {
+                    entry.addConstructor(ElementUtil.getParameterTypes(env, fieldOrMethod));
+                }
+                case METHOD -> {
+                    entry.addMethod(fieldOrMethod.getSimpleName().toString(), ElementUtil.getParameterTypes(env, fieldOrMethod));
+                }
+                case FIELD -> {
+                    entry.addField(fieldOrMethod.getSimpleName().toString());
+
+                    // Also add the default constructor for the field type in case it needs
+                    // to be created via reflection
+                    if (addDefaultConstructorForFields) {
+                        ElementUtil.getFieldType(env, fieldOrMethod).ifPresent(fqdn ->
+                                addReflectedType(metadata, fqdn, false, ReflectionEntry::addConstructor));
+                    }
+                }
+            }
+        });
     }
 
     protected void addAbsFileResource(ConditionalMetadata metadata, Path path) {

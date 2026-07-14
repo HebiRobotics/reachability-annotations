@@ -72,6 +72,7 @@ public class ReachabilityAnnotationProcessor extends BasicAnnotationProcessor {
 
     final List<AbstractMetadataStep> steps = Arrays.asList(
             new ReachableStep(this::getEnv),
+            new ReachableMemberStep(this::getEnv),
             new FxResourceStep(this::getEnv),
             new FxViewStep(this::getEnv),
             new DependencyInjectionStep(this::getEnv)

@@ -50,6 +50,23 @@ public static class FineGrainedAccess {
 }
 ```
 
+## @ReachableMember, @FXML
+
+The `@ReachableMember` annotation provides more fine-grained access for configuring access to individual fields and methods. The JavaFX annotation `@FXML` gets picked up as well with the same behavior.
+
+```java
+public static class IndividualFieldsAndMethods {
+    
+    @ReachableMember
+    void doNothing(String input, Object output) {
+    }
+
+    @ReachableMember
+    String field1;
+
+}
+```
+
 ## @ReachableFxView
 
 This is a special annotation for working with JavaFX FXML - a markup language for GUI layouts that makes extensive use of reflection.
@@ -84,9 +101,10 @@ public class MyApp extends Application {
 }
 ```
 
-## @Inject, @PostConstruct, @PreDestroy, @FXML
 
-This processor also includes an opt-in feature that looks at common dependency injection annotations (both `javafx.*` and `jakarta.*`), and generates reflection configurations that cover the usage in most JavaFX frameworks. It is opt-in to avoid interfering with static code generators of other frameworks.
+## @Inject, @PostConstruct, @PreDestroy
+
+This processor also includes an opt-in feature that looks at common dependency injection annotations (both `javafx.*` and `jakarta.*`), and generates reflection configurations that covers most standard usage. It is opt-in to avoid interfering with static code generators of other frameworks.
 
 You can enable it using the compiler argument `-Areachability.processDependencyInjection=true`. See below for more details.
 

@@ -21,7 +21,8 @@
 package us.hebi.graalvm.reachability.processor;
 
 import com.google.common.collect.ImmutableSetMultimap;
-import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ReflectionEntry;
+import us.hebi.graalvm.reachability.annotations.Reachable;
+import us.hebi.graalvm.reachability.annotations.ReachableMember;
 import us.hebi.graalvm.reachability.processor.util.ElementUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -33,19 +34,15 @@ import java.util.function.Supplier;
 
 /**
  * @author Florian Enner
- * @since 27 Nov 2025
+ * @since 14 July 2026
  */
-public class DependencyInjectionStep extends AbstractMetadataStep {
+public class ReachableMemberStep extends AbstractMetadataStep {
 
     @Override
     public Set<String> annotations() {
         return Set.of(
-                "jakarta.inject.Inject",
-                "jakarta.annotation.PostConstruct",
-                "jakarta.annotation.PreDestroy",
-                "javax.inject.Inject",
-                "javax.annotation.PreDestroy",
-                "javax.annotation.PostConstruct"
+                ReachableMember.class.getCanonicalName(),
+                "javafx.fxml.FXML"
         );
     }
 
@@ -57,8 +54,12 @@ public class DependencyInjectionStep extends AbstractMetadataStep {
 
             // fine-grained reflection
             if (element.getEnclosingElement() instanceof TypeElement typeElement) {
-                var metadata = getConditionalMetadata(ElementUtil.getBinaryName(typeElement));
-                addReflectedFieldOrMethod(metadata, typeElement, element, true);
+                var condition = tryGetDefinedCondition(getAnnotationMirror(element, ReachableMember.class))
+                        .or(() -> tryGetDefinedCondition(getAnnotationMirror(typeElement, Reachable.class)))
+                        .orElse(ElementUtil.getBinaryName(typeElement));
+                var metadata = getConditionalMetadata(condition);
+                addReflectedFieldOrMethod(metadata, typeElement, element, false);
+
             } else {
                 printWarning("Parent is not a TypeElement: " + element);
             }
@@ -66,20 +67,8 @@ public class DependencyInjectionStep extends AbstractMetadataStep {
         }
     }
 
-    @Override
-    public void finish() {
-        boolean processDI = Optional.ofNullable(env)
-                .map(ProcessingEnvironment::getOptions)
-                .map(options -> options.get("reachability.processDependencyInjection"))
-                .map(Boolean::parseBoolean)
-                .orElse(false);
-        if (processDI) {
-            super.finish();
-        }
-    }
-
-    public DependencyInjectionStep(Supplier<ProcessingEnvironment> env) {
-        super("di", env);
+    public ReachableMemberStep(Supplier<ProcessingEnvironment> env) {
+        super("reachable-member", env);
     }
 
 }
