@@ -86,19 +86,62 @@ public class MyApp extends Application {
 
 ## @Inject, @PostConstruct, @PreDestroy, @FXML
 
-The processor also looks at annotations commonly used for dependency injection and adds the corresponding fields, methods, or constructors. Both `javafx.*` and `jakarta.*` namespaces are supported.
+This processor also includes an opt-in feature that looks at common dependency injection annotations (both `javafx.*` and `jakarta.*`), and generates reflection configurations that cover the usage in most JavaFX frameworks. It is opt-in to avoid interfering with static code generators of other frameworks.
+
+You can enable it using the compiler argument `-Areachability.processDependencyInjection=true`. See below for more details.
+
+For example,
 
 ```Java
-// Add reflection access to the field
-public class SomeClass {
+public class InjectionSample {
+
     @Inject
-    SomeOtherClass field;
+    InjectionSample(String name) {}
+
+    @PostConstruct
+    void postConstruct() {}
+
+    @PreDestroy
+    void preDestroy() {}
+
+    @Inject
+    InjectedType injectedField;
+
+}
+```
+
+generates metadata for the class
+
+```json
+{
+  "condition": { "typeReachable": "demo.InjectionSample" },
+  "name": "demo.InjectionSample",
+  "methods": [
+    { "name": "<init>", "parameterTypes": ["java.lang.String"] },
+    { "name": "postConstruct", "parameterTypes": [] },
+    { "name": "preDestroy", "parameterTypes": [] }
+  ],
+  "fields": [
+    { "name": "injectedField" }
+  ]
+}
+```
+
+as well as default constructors for the types of injected fields
+
+```json
+{
+  "condition": { "typeReachable": "demo.InjectionSample" },
+  "name": "demo.InjectedType",
+  "methods": [
+    { "name": "<init>", "parameterTypes": [] }
+  ]
 }
 ```
 
 ## Generated Metadata
 
-The metadata gets generated into the `META-INF/native-image/reachable-generated/${project}/<annotation>/` directory. The `${project}` name should be unique and needs to be set via a compiler argument.
+The metadata gets generated into the `META-INF/native-image/reachable-generated/${project}/<annotation>/` directory. The `${project}` name should be unique and needs to be set via a compiler argument. This is compatible with the [picocli-codegen](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc#224-maven) argument.
 
 For example, in Maven it should be set to `-Aproject=${project.groupId}/${project.artifactId}`:
 
@@ -149,6 +192,7 @@ Note that starting with JDK23, `javac` no longer automatically discovers or runs
                 </annotationProcessorPaths>
                 <compilerArgs> <!-- unique identifier -->
                     <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
+                    <arg>-Areachability.processDependencyInjection=true</arg>
                 </compilerArgs>
             </configuration>
         </plugin>

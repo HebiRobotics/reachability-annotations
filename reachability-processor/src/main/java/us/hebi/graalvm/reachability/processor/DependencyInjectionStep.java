@@ -21,13 +21,13 @@
 package us.hebi.graalvm.reachability.processor;
 
 import com.google.common.collect.ImmutableSetMultimap;
-import us.hebi.graalvm.reachability.annotations.MemberAccess;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ReflectionEntry;
 import us.hebi.graalvm.reachability.processor.util.ElementUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -65,36 +65,41 @@ public class DependencyInjectionStep extends AbstractMetadataStep {
                 var metadata = getConditionalMetadata(ElementUtil.getBinaryName(typeElement));
 
                 // 1) add the containing class
-                // TODO: limit to only the annotated fields and methods?
                 addReflectedType(metadata, typeElement, false, entry -> {
                     switch (element.getKind()) {
                         case CONSTRUCTOR -> {
-                            entry.addMemberAccess(MemberAccess.ALL_DECLARED_CONSTRUCTORS);
+                            entry.addConstructor(ElementUtil.getParameterTypes(env, element));
                         }
                         case METHOD -> {
-                            entry.addMemberAccess(MemberAccess.ALL_DECLARED_METHODS);
+                            entry.addMethod(element.getSimpleName().toString(), ElementUtil.getParameterTypes(env, element));
                         }
                         case FIELD -> {
-                            entry.addMemberAccess(MemberAccess.ALL_DECLARED_FIELDS);
+                            entry.addField(element.getSimpleName().toString());
+
+                            // Also add the default constructor for the field type in case it needs
+                            // to be created via reflection
+                            ElementUtil.getFieldType(env, element).ifPresent(fqdn ->
+                                    addReflectedType(metadata, fqdn, false, ReflectionEntry::addConstructor));
                         }
                     }
                 });
-
-                // 2) add the field type in case it needs to be created via reflection
-                if (element instanceof VariableElement variable) {
-                    var erasedType = env.getTypeUtils().erasure(variable.asType());
-                    var mirror = env.getTypeUtils().asElement(erasedType);
-                    if (mirror instanceof TypeElement varType) {
-                        addReflectedType(metadata, ElementUtil.getBinaryName(varType), false, entry -> {
-                            entry.addMemberAccess(MemberAccess.ALL_DECLARED_CONSTRUCTORS);
-                        });
-                    }
-                }
 
             } else {
                 printWarning("Parent is not a TypeElement: " + element);
             }
 
+        }
+    }
+
+    @Override
+    public void finish() {
+        boolean processDI = Optional.ofNullable(env)
+                .map(ProcessingEnvironment::getOptions)
+                .map(options -> options.get("reachability.processDependencyInjection"))
+                .map(Boolean::parseBoolean)
+                .orElse(false);
+        if (processDI) {
+            super.finish();
         }
     }
 

@@ -48,7 +48,7 @@ public class MarshallerV100 {
         for (var proto : parseJsonList(sourceDir.resolve("reflect-config.json"), ReflectConfigEntry.getFactory())) {
             var condition = proto.tryGetCondition().map(Condition::getTypeReachable).orElse(null);
             var reflectedType = metadata.getMetadata(condition).addReflectedType(proto.getName());
-            copyMemberAccessFromProto(proto, reflectedType);
+            copyEntryFromProto(proto, reflectedType);
         }
 
         // JNI config (separate file in v1.0.0)
@@ -56,7 +56,7 @@ public class MarshallerV100 {
             var condition = proto.tryGetCondition().map(Condition::getTypeReachable).orElse(null);
             var reflectedType = metadata.getMetadata(condition).addReflectedType(proto.getName());
             reflectedType.setJniAccessible(true);
-            copyMemberAccessFromProto(proto, reflectedType);
+            copyEntryFromProto(proto, reflectedType);
         }
 
         // Resources & Bundles
@@ -89,7 +89,7 @@ public class MarshallerV100 {
         return Optional.of(JsonSource.newInstance(Files.readAllBytes(file)));
     }
 
-    private static void copyMemberAccessFromProto(ReflectConfigEntry proto, ReachabilityMetadata.ReflectionEntry entry) {
+    private static void copyEntryFromProto(ReflectConfigEntry proto, ReachabilityMetadata.ReflectionEntry entry) {
         if (proto.getAllDeclaredClasses()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_CLASSES);
         if (proto.getAllDeclaredMethods()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_METHODS);
         if (proto.getAllDeclaredFields()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_FIELDS);
@@ -103,13 +103,21 @@ public class MarshallerV100 {
         if (proto.getAllNestMembers()) entry.addMemberAccess(MemberAccess.ALL_NEST_MEMBERS);
         if (proto.getAllSigners()) entry.addMemberAccess(MemberAccess.ALL_SIGNERS);
         if (proto.getQueryAllDeclaredMethods()) entry.addMemberAccess(MemberAccess.QUERY_ALL_DECLARED_METHODS);
-        if (proto.getQueryAllDeclaredConstructors()) entry.addMemberAccess(MemberAccess.QUERY_ALL_DECLARED_CONSTRUCTORS);
+        if (proto.getQueryAllDeclaredConstructors())
+            entry.addMemberAccess(MemberAccess.QUERY_ALL_DECLARED_CONSTRUCTORS);
         if (proto.getQueryAllPublicMethods()) entry.addMemberAccess(MemberAccess.QUERY_ALL_PUBLIC_METHODS);
         if (proto.getQueryAllPublicConstructors()) entry.addMemberAccess(MemberAccess.QUERY_ALL_PUBLIC_CONSTRUCTORS);
         if (proto.getUnsafeAllocated()) entry.addMemberAccess(MemberAccess.UNSAFE_ALLOCATED);
+
+        for (var method : proto.getMethods()) {
+            entry.addMethod(method.getName(), ProtoUtil.toStringArray(method.getParameterTypes()));
+        }
+        for (ReflectConfigEntry.FieldIdentifier field : proto.getFields()) {
+            entry.addField(field.getName());
+        }
     }
 
-    private static void copyMemberAccessToProto(ReachabilityMetadata.ReflectionEntry entry, ReflectConfigEntry proto) {
+    private static void copyEntryToProto(ReachabilityMetadata.ReflectionEntry entry, ReflectConfigEntry proto) {
         for (MemberAccess memberAccess : entry.memberAccess) {
             switch (memberAccess) {
                 case ALL_DECLARED_CLASSES -> proto.setAllDeclaredClasses(true);
@@ -131,6 +139,15 @@ public class MarshallerV100 {
                 case UNSAFE_ALLOCATED -> proto.setUnsafeAllocated(true);
             }
         }
+
+        for (var method : entry.getMethods()) {
+            proto.getMutableMethods().next()
+                    .setName(method.getName())
+                    .addAllParameterTypes(method.getParameterTypes());
+        }
+        for (var fieldName : entry.getFields()) {
+            proto.getMutableFields().next().setName(fieldName);
+        }
     }
 
     public static void saveMetadataTo(ReachabilityMetadata source, Path destDir) throws IOException {
@@ -151,7 +168,7 @@ public class MarshallerV100 {
                 var entry = reflectConfig.getMutableEntries().next()
                         .setName(type.name);
 
-                copyMemberAccessToProto(type, entry);
+                copyEntryToProto(type, entry);
                 condition.ifPresent(entry::setCondition);
 
                 if (type.jniAccessible) {

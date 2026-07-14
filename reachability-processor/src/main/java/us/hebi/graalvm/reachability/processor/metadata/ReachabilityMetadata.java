@@ -23,7 +23,6 @@ package us.hebi.graalvm.reachability.processor.metadata;
 import lombok.*;
 import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.processor.util.GlobUtil;
-import us.hebi.graalvm.reachability.processor.util.StringArrayComparator;
 
 import java.util.*;
 
@@ -41,12 +40,40 @@ public class ReachabilityMetadata {
         String typeReachable;
     }
 
+    @Value
+    @RequiredArgsConstructor
+    public static class ReflectedMethodIdentifier implements Comparable<ReflectedMethodIdentifier> {
+        String name;
+        String[] parameterTypes;
+
+        @Override
+        public int compareTo(ReachabilityMetadata.ReflectedMethodIdentifier other) {
+            int cmp = name.compareTo(other.name);
+            return cmp != 0 ? cmp : Arrays.compare(parameterTypes, other.parameterTypes);
+        }
+
+    }
+
     @Data
     @RequiredArgsConstructor
     public static class ReflectionEntry {
         final String name;
         final EnumSet<MemberAccess> memberAccess = EnumSet.noneOf(MemberAccess.class);
+        final Set<ReflectedMethodIdentifier> methods = new TreeSet<>();
+        final Set<String> fields = new TreeSet<>();
         public boolean jniAccessible = false;
+
+        public void addField(String fieldName) {
+            fields.add(fieldName);
+        }
+
+        public void addMethod(String methodName, String... argTypes) {
+            methods.add(new ReflectedMethodIdentifier(methodName, argTypes));
+        }
+
+        public void addConstructor(String... argTypes) {
+            methods.add(new ReflectedMethodIdentifier("<init>", argTypes));
+        }
 
         public void addMemberAccess(MemberAccess... flags) {
             for (MemberAccess flag : flags) {
@@ -101,7 +128,7 @@ public class ReachabilityMetadata {
         final Condition condition;
         final Map<String, ReflectionEntry> reflectedTypes = new TreeMap<>();
         final Set<String> resourcePatterns = new TreeSet<>();
-        final Set<String[]> proxyInterfaceNames = new TreeSet<>(StringArrayComparator.INSTANCE);
+        final Set<String[]> proxyInterfaceNames = new TreeSet<>(Arrays::compare);
         final Map<String, BundleEntry> bundles = new TreeMap<>();
 
     }

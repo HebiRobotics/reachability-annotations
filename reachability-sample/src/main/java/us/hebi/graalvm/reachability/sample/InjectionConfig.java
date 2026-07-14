@@ -20,6 +20,8 @@
 
 package us.hebi.graalvm.reachability.sample;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 
 /**
@@ -46,6 +48,25 @@ public class InjectionConfig {
 
         @Inject
         InjectionConfig config;
+    }
+
+    public static class InjectionSample {
+
+        @Inject
+        InjectionSample(String name) {
+        }
+
+        @PostConstruct
+        void postConstruct() {
+        }
+
+        @PreDestroy
+        void preDestroy() {
+        }
+
+        @Inject
+        FieldInjection injectedField;
+
     }
 
 }

@@ -36,12 +36,15 @@ class InjectionConfigTest {
     void testConstructorInjection() {
         assertContains(reflectionConfig, """
                 {
-                   "condition": {
-                     "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig$ConstructorInjection"
-                   },
-                   "name": "us.hebi.graalvm.reachability.sample.InjectionConfig$ConstructorInjection",
-                   "allDeclaredConstructors": true
-                 }
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig$ConstructorInjection"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.InjectionConfig$ConstructorInjection",
+                  "methods": [{
+                    "name": "<init>",
+                    "parameterTypes": ["java.lang.String"]
+                  }]
+                }
                 """);
     }
 
@@ -49,15 +52,17 @@ class InjectionConfigTest {
     void testMethodInjection() {
         assertContains(reflectionConfig, """
                 {
-                   "condition": {
-                     "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig$MethodInjection"
-                   },
-                   "name": "us.hebi.graalvm.reachability.sample.InjectionConfig$MethodInjection",
-                   "allDeclaredMethods": true
-                 }
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig$MethodInjection"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.InjectionConfig$MethodInjection",
+                  "methods": [{
+                    "name": "close",
+                    "parameterTypes": []
+                  }]
+                }
                 """);
     }
-
 
     @Test
     void testFieldInjection() {
@@ -68,18 +73,25 @@ class InjectionConfigTest {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig$FieldInjection"
                   },
                   "name": "us.hebi.graalvm.reachability.sample.InjectionConfig$FieldInjection",
-                  "allDeclaredFields": true
+                  "fields": [{
+                    "name": "config"
+                  }, {
+                    "name": "string"
+                  }]
                 }
                 """);
 
-        // Constructors of the injected types
+        // Default constructors for the injected types
         assertContains(reflectionConfig, """
                 {
                   "condition": {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig$FieldInjection"
                   },
                   "name": "java.lang.String",
-                  "allDeclaredConstructors": true
+                  "methods": [{
+                    "name": "<init>",
+                    "parameterTypes": []
+                  }]
                 }
                 """);
         assertContains(reflectionConfig, """
@@ -88,10 +100,53 @@ class InjectionConfigTest {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig$FieldInjection"
                   },
                   "name": "us.hebi.graalvm.reachability.sample.InjectionConfig",
-                  "allDeclaredConstructors": true
+                  "methods": [{
+                    "name": "<init>",
+                    "parameterTypes": []
+                  }]
                 }
                 """);
     }
 
+    @Test
+    void testInjectionSample() {
+        // class config
+        assertContains(reflectionConfig, """
+                {
+                    "condition": {
+                        "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig$InjectionSample"
+                    },
+                    "name": "us.hebi.graalvm.reachability.sample.InjectionConfig$InjectionSample",
+                            "methods": [{
+                        "name": "<init>",
+                                "parameterTypes": ["java.lang.String"]
+                    }, {
+                        "name": "postConstruct",
+                                "parameterTypes": []
+                    }, {
+                        "name": "preDestroy",
+                                "parameterTypes": []
+                    }],
+                    "fields": [{
+                        "name": "injectedField"
+                    }]
+                }
+                """);
+
+        // default constructor
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.InjectionConfig$InjectionSample"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.InjectionConfig$FieldInjection",
+                  "methods": [{
+                    "name": "<init>",
+                    "parameterTypes": []
+                  }]
+                }
+                """);
+
+    }
 
 }

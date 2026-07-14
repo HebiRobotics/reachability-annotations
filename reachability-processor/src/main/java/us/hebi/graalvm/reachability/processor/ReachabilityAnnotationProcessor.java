@@ -48,7 +48,7 @@ public class ReachabilityAnnotationProcessor extends BasicAnnotationProcessor {
     public Set<String> getSupportedOptions() {
         Set<String> options = new HashSet<>(super.getSupportedOptions());
         options.add("project");
-        options.add("nativeconfig.processInjection");
+        options.add("reachability.processDependencyInjection");
         return options;
     }
 
