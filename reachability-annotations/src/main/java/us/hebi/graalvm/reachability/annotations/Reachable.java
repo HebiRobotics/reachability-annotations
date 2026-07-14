@@ -133,7 +133,7 @@ public @interface Reachable {
         /**
          * @return Locales to register for this specific bundle. Defaults to the default bundle locale.
          */
-        String[] locales() default {""};
+        String[] locales() default {""}; // TODO: no longer exist in 1.2.0?
     }
 
 }

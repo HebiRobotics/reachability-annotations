@@ -20,6 +20,7 @@
 
 package us.hebi.graalvm.reachability.processor.metadata;
 
+import com.google.common.base.Strings;
 import lombok.*;
 import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.processor.util.GlobUtil;
@@ -89,11 +90,40 @@ public class ReachabilityMetadata {
 
     }
 
-    @Data
+    @Value
+    @RequiredArgsConstructor
+    public static class GlobEntry {
+        String module;
+        String glob;
+    }
+
+    @Value
     @RequiredArgsConstructor
     public static class BundleEntry {
-        final String name;
+        String module;
+        String name;
         Set<String> locales = new TreeSet<>();
+    }
+
+    public static String addModulePrefix(String module, String text) {
+        if (!Strings.isNullOrEmpty(module)) {
+            return module + ":" + text;
+        }
+        return text;
+    }
+
+    public static Optional<String> getModulePrefix(String input) {
+        int index = input.indexOf(":");
+        if (index >= 0) {
+            return Optional.of(input.substring(0, index));
+        }
+        return Optional.empty();
+    }
+
+    public static String removeModulePrefix(String input) {
+        int index = input.indexOf(":");
+        if (index < 0) return input;
+        return input.substring(index + 1);
     }
 
     @ToString
@@ -105,29 +135,40 @@ public class ReachabilityMetadata {
             return reflectedTypes.computeIfAbsent(typeName, ReflectionEntry::new);
         }
 
-        public BundleEntry addBundle(String name) {
-            return bundles.computeIfAbsent(name, BundleEntry::new);
+        public BundleEntry addBundle(String module, String name) {
+            String lookup = addModulePrefix(module, name);
+            return bundles.computeIfAbsent(lookup, string -> new BundleEntry(module, name));
         }
 
         /**
          * v1.0.0 used regex, but the v1.2.0 format uses globs. We want to be forwards
          * compatible with the newer format, so we limit it to blobs from the start.
          */
-        public void addResourceGlob(String glob) {
-            addResourcePattern(GlobUtil.convertGlobToRegex(glob));
-        }
-
-        void addResourcePattern(String pattern) {
-            resourcePatterns.add(pattern);
+        public void addGlob(String module, String glob) {
+            String lookup = addModulePrefix(module, glob);
+            resourceGlobs.computeIfAbsent(lookup, string -> new GlobEntry(module, glob));
         }
 
         public void addProxyInterfaces(String... fullyQualifiedNames) {
             proxyInterfaceNames.add(fullyQualifiedNames);
         }
 
+        Set<String> getAsPatterns() {
+            Set<String> patterns = new TreeSet<>(this.patterns);
+            for (var entry : resourceGlobs.values()) {
+                String pattern = GlobUtil.convertGlobToRegex(entry.glob);
+                if (!Strings.isNullOrEmpty(entry.module)) {
+                    pattern = entry.module + ":" + pattern;
+                }
+                patterns.add(pattern);
+            }
+            return patterns;
+        }
+
         final Condition condition;
         final Map<String, ReflectionEntry> reflectedTypes = new TreeMap<>();
-        final Set<String> resourcePatterns = new TreeSet<>();
+        final Map<String, GlobEntry> resourceGlobs = new TreeMap<>();
+        final Set<String> patterns = new TreeSet<>(); // internal use for supporting both formats
         final Set<String[]> proxyInterfaceNames = new TreeSet<>(Arrays::compare);
         final Map<String, BundleEntry> bundles = new TreeMap<>();
 

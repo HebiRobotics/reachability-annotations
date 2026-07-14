@@ -262,28 +262,18 @@ public class ReachableConfigTest {
     void testFullMemberAccess() throws IOException {
         assertContains(reflectionConfig, """
                 {
-                  "condition": {
-                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$FullMemberAccess"
-                  },
-                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$FullMemberAccess",
-                  "allDeclaredClasses": true,
-                  "allDeclaredMethods": true,
-                  "allDeclaredFields": true,
-                  "allDeclaredConstructors": true,
-                  "allPublicClasses": true,
-                  "allPublicMethods": true,
-                  "allPublicFields": true,
-                  "allPublicConstructors": true,
-                  "allRecordComponents": true,
-                  "allPermittedSubclasses": true,
-                  "allNestMembers": true,
-                  "allSigners": true,
-                  "queryAllDeclaredMethods": true,
-                  "queryAllDeclaredConstructors": true,
-                  "queryAllPublicMethods": true,
-                  "queryAllPublicConstructors": true,
-                  "unsafeAllocated": true
-                }
+                   "condition": {
+                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$FullMemberAccess"
+                   },
+                   "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$FullMemberAccess",
+                   "allDeclaredMethods": true,
+                   "allDeclaredFields": true,
+                   "allDeclaredConstructors": true,
+                   "allPublicMethods": true,
+                   "allPublicFields": true,
+                   "allPublicConstructors": true,
+                   "unsafeAllocated": true
+                 }
                 """);
     }
 

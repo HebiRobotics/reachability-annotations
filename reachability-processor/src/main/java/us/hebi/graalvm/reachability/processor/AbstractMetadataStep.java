@@ -35,7 +35,6 @@ import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
-import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import java.io.IOException;
@@ -197,7 +196,7 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         if (glob.startsWith("/")) {
             printError("globs must not start with a slash '/'.");
         }
-        metadata.addResourceGlob(glob);
+        metadata.addGlob("", glob);
     }
 
     protected void addMetadataFromParsedFileContents(ConditionalMetadata metadata, Path file, boolean includeHierarchy) {

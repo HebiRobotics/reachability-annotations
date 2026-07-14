@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @author Florian Enner
@@ -78,6 +79,12 @@ public class ProtoUtil {
             array[i] = list.get(i);
         }
         return array;
+    }
+
+    public static void copyNonEmptyString(String input, Consumer<String> setter) {
+        if (input != null && !input.isBlank()) {
+            setter.accept(input);
+        }
     }
 
 }

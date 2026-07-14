@@ -22,6 +22,7 @@ package us.hebi.graalvm.reachability.processor;
 
 import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.annotations.Reachable;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ReflectionEntry;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
@@ -88,11 +89,14 @@ public class ReachableStep extends AbstractMetadataStep {
         if (annotation.resources().length > 0) {
             fieldsEmpty = false;
             var baseDir = ProcessorUtil.getSourceDirectory(env, annotatedType);
-            for (var pattern : annotation.resources()) {
-                if (pattern.startsWith("/")) {
-                    metadata.addResourceGlob(pattern.substring(1));
+            for (var glob : annotation.resources()) {
+                String module = ReachabilityMetadata.getModulePrefix(glob).orElse("");
+                glob = ReachabilityMetadata.removeModulePrefix(glob);
+
+                if (glob.startsWith("/")) {
+                    metadata.addGlob(module, glob.substring(1));
                 } else {
-                    metadata.addResourceGlob(baseDir + pattern);
+                    metadata.addGlob(module, baseDir + glob);
                 }
             }
         }
@@ -100,7 +104,10 @@ public class ReachableStep extends AbstractMetadataStep {
         // Resource bundles
         for (var bundle : annotation.bundles()) {
             fieldsEmpty = false;
-            var entry = metadata.addBundle(bundle.name());
+
+            String module = ReachabilityMetadata.getModulePrefix(bundle.name()).orElse("");
+            String name = ReachabilityMetadata.removeModulePrefix(bundle.name());
+            var entry = metadata.addBundle(module, name);
             for (var locale : bundle.locales()) {
                 entry.getLocales().add(locale);
             }

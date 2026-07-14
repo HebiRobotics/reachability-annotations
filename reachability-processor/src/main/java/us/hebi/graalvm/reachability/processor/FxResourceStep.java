@@ -22,6 +22,7 @@ package us.hebi.graalvm.reachability.processor;
 
 import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.annotations.ReachableFxResources;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.util.GlobUtil;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
@@ -83,6 +84,10 @@ public class FxResourceStep extends AbstractMetadataStep {
 
         var rootDir = getClassOutputDir();
         for (var glob : annotation.value()) {
+
+            ReachabilityMetadata.getModulePrefix(glob)
+                    .ifPresent(module -> printError("Unsupported module prefix: " + module));
+            glob = ReachabilityMetadata.removeModulePrefix(glob);
 
             final Path searchBaseDir;
             if (glob.startsWith("/")) {
