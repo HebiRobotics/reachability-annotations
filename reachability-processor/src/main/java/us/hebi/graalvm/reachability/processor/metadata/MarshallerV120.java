@@ -161,9 +161,6 @@ public class MarshallerV120 {
 
         }
 
-        System.out.println(proto);
-        System.out.println("destDir = " + destDir);
-
         // Save combined metadata to corresponding files
         writeBytes(destDir.resolve("reachability-metadata.json"), ProtoUtil.toJson(proto));
     }

@@ -23,6 +23,7 @@ package us.hebi.graalvm.reachability.processor;
 import com.google.auto.common.BasicAnnotationProcessor;
 import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.processor.metadata.MarshallerV100;
+import us.hebi.graalvm.reachability.processor.metadata.MarshallerV120;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ConditionalMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ReflectionEntry;
@@ -64,7 +65,11 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
                     coordinates += "/";
                 }
                 metadataDirectory = getClassOutputDir().resolve("META-INF/native-image/reachability-generated/" + coordinates + stepId);
+
+                // Always load whatever data is already there
+                MarshallerV120.mergeMetadataFrom(metadataDirectory, reachabilityMetadata);
                 MarshallerV100.mergeMetadataFrom(metadataDirectory, reachabilityMetadata);
+
             }
 
             // Process
@@ -92,7 +97,17 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         try {
             // Save result to disk. Abort if nothing has been processed
             if (metadataDirectory != null) {
-                MarshallerV100.saveMetadataTo(reachabilityMetadata, metadataDirectory);
+                switch (env.getOptions().getOrDefault("reachability.outputFormat", "")) {
+                    case "120":
+                    case "1.2.0":
+                        MarshallerV120.saveMetadataTo(reachabilityMetadata, metadataDirectory);
+                        break;
+                    case "100":
+                    case "1.0.0":
+                    default:
+                        MarshallerV100.saveMetadataTo(reachabilityMetadata, metadataDirectory);
+                        break;
+                }
             }
         } catch (IOException e) {
             printError(ExceptionUtil.getStackTrace(e));

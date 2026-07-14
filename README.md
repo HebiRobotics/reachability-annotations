@@ -161,7 +161,9 @@ as well as default constructors for the types of injected fields
 
 The metadata gets generated into the `META-INF/native-image/reachable-generated/${project}/<annotation>/` directory. The `${project}` name should be unique and needs to be set via a compiler argument. This is compatible with the [picocli-codegen](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc#224-maven) argument.
 
-For example, in Maven it should be set to `-Aproject=${project.groupId}/${project.artifactId}`:
+Note that the default output format is currently the legacy `1.0.0` format (separate files) due to better testing, and being compatible with all versions of GraalVM. The newer `1.2.0` format (single file) is currently experimental and can be enabled with `-Areachability.outputFormat`. Note that our implementation currently does not support proxy configurations, and the condition triggering behavior seems to have changed as well.
+
+For example, a Maven configuration could look like this:
 
 ```xml
 <plugin>
@@ -171,6 +173,7 @@ For example, in Maven it should be set to `-Aproject=${project.groupId}/${projec
     <configuration>
         <compilerArgs>
             <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
+            <arg>-Areachability.outputFormat=1.0.0</arg> <!-- or 1.2.0 -->
         </compilerArgs>
     </configuration>
 </plugin>
@@ -211,6 +214,7 @@ Note that starting with JDK23, `javac` no longer automatically discovers or runs
                 <compilerArgs> <!-- unique identifier -->
                     <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
                     <arg>-Areachability.processDependencyInjection=true</arg>
+                    <arg>-Areachability.outputFormat=1.0.0</arg>
                 </compilerArgs>
             </configuration>
         </plugin>

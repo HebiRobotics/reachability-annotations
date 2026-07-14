@@ -102,14 +102,20 @@ public class ReachabilityMetadata {
     public static class ResourceEntry {
 
         public static ResourceEntry fromString(String baseDir, String resource) {
-            String module = ReachabilityMetadata.getModulePrefix(resource).orElse("");
+            var module = ReachabilityMetadata.getModulePrefix(resource);
             resource = ReachabilityMetadata.removeModulePrefix(resource);
-            if (resource.startsWith("/")) {
-                return new ResourceEntry(module, resource.substring(1));
-            } else if (!Strings.isNullOrEmpty(baseDir)) {
-                return new ResourceEntry(module, GlobUtil.ensureForwardSlash(baseDir) + resource);
+            boolean isAbs = resource.startsWith("/");
+            if (isAbs) resource = resource.substring(1);
+
+            if (module.isPresent()) {
+                // Module paths are relative to the target module root
+                return new ResourceEntry(module.get(), resource);
+            } else if (isAbs || Strings.isNullOrEmpty(baseDir)) {
+                // Paths relative to this output directory
+                return new ResourceEntry("", resource);
             } else {
-                return new ResourceEntry(module, resource);
+                // Paths relative to the
+                return new ResourceEntry("", GlobUtil.ensureForwardSlash(baseDir) + resource);
             }
         }
 
