@@ -158,6 +158,9 @@ public class MarshallerV120 {
             }
 
             // TODO: proxy-config is currently not supported
+            if (!metadata.proxyInterfaceNames.isEmpty()) {
+                throw new IllegalStateException("Reachability output format 1.2.0 does not yet support proxy interfaces. Please switch to the legacy 1.0.0 format using the compiler argument -Areachability.outputFormat=1.0.0");
+            }
 
         }
 

@@ -159,9 +159,9 @@ as well as default constructors for the types of injected fields
 
 ## Generated Metadata
 
-The metadata gets generated into the `META-INF/native-image/reachable-generated/${project}/<annotation>/` directory. The `${project}` name should be unique and needs to be set via a compiler argument. This is compatible with the [picocli-codegen](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc#224-maven) argument.
+The metadata gets generated into the `META-INF/native-image/reachable-generated/${project}/<annotation>/` directory. The `${project}` name should be unique and needs to be set via a compiler argument. This is compatible with [picocli-codegen](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc#224-maven).
 
-Note that the default output format is currently the legacy `1.0.0` format (separate files) due to better testing, and being compatible with all versions of GraalVM. The newer `1.2.0` format (single file) is currently experimental and can be enabled with `-Areachability.outputFormat`. Note that our implementation currently does not support proxy configurations, and the condition triggering behavior seems to have changed as well.
+Note that the default output format is currently the legacy `1.0.0` format (separate files) due to being compatible with all versions of GraalVM. The newer `1.2.0` format (single file) is currently experimental and can be enabled with `-Areachability.outputFormat=1.2.0`. Note that the current implementation does not yet support proxy configuration and that we have not yet switched our production deployments. The default will likely change once feature parity is reached.
 
 For example, a Maven configuration could look like this:
 
@@ -178,8 +178,6 @@ For example, a Maven configuration could look like this:
     </configuration>
 </plugin>
 ```
-
-Note that the output format is currently the legacy `1.0.0` metadata schema (separate files) to be compatible with older releases. However, the annotations are closely aligned with the `1.2.0` metadata schema (single `reachability-metadata.json` using globs instead of regex), so a future change will not break backwards compatiblity with user code.
 
 ## Maven Instructions
 
