@@ -17,115 +17,79 @@ option java_package = "us.hebi.graalvm.reachability.processor.metadata.schema.v1
 option java_generate_equals_and_hash = true;
 option java_multiple_files = true;
 
-// The root wrapper object of a v1.2.0 reachability-metadata.json file.
+// JSON schema for the reachability metadata used by GraalVM Native Image v1.2.0
 message ReachabilityMetadata {
 
-  // Types and members registered for execution via standard Java Reflection.
+  // Metadata to ensure elements are accessible via reflection
   repeated ReflectionEntry reflection = 1;
 
-  // File paths and match patterns included inside the final executable binary.
+  // Metadata to ensure resources are accessible
   repeated ResourceEntry resources = 2;
 
-  // Groups of fully qualified interfaces that dynamic proxies implement.
-  repeated ProxyEntry proxies = 3;
-
-  // Stream types registered for standard Object Serialization (java.io.Serializable).
-  repeated SerializationEntry serialization = 4;
-
-  // Fully qualified base names of Resource Bundles to embed.
-  repeated BundleEntry bundles = 5;
 }
 
-// Global activation condition block.
+// Condition used to determine if the element will be accessible at run time
 message Condition {
-  // The entry activates ONLY when this fully qualified class type is loaded and reached at runtime.
-  optional string typeReached = 1;
+  // Type descriptor of a class that must be reached in order to allow access to the element
+  // TODO: TypeDescriptor can also be a complex type (e.g. proxy or lambda), but that can't be mapped to a single field
+  required string typeReached = 1;
 }
 
-// Mapped entries inside the "reflection" array section.
+// Elements that should be registered for reflection for a specified type
 message ReflectionEntry {
+
   // Required condition targeting when this reflection registration becomes active.
   optional Condition condition = 1;
 
-  // Fully qualified name of the target class or array type.
-  optional string type = 2;
+  // Type descriptor of the class that should be registered for reflection
+  // TODO: TypeDescriptor can also be a complex type (e.g. proxy or lambda), but that can't be mapped to a single field
+  required string type = 2;
 
-  // Specific method signatures registered for programmatic reflection invocation.
-  repeated MethodIdentifier methods = 3;
-
-  // Specific method signatures registered strictly for lookup tracking without invocation.
-  repeated MethodIdentifier queriedMethods = 4;
-
-  // Specific field signatures registered for lookups, reads, or state modification.
-  repeated FieldIdentifier fields = 5;
-
-  // Register internal elements returned by java.lang.Class#getDeclaredClasses.
-  optional bool allDeclaredClasses = 6 [default = false];
-
-  // Register internal methods returned by java.lang.Class#getDeclaredMethods.
-  optional bool allDeclaredMethods = 7 [default = false];
-
-  // Register internal fields returned by java.lang.Class#getDeclaredFields.
-  optional bool allDeclaredFields = 8 [default = false];
-
-  // Register internal constructors returned by java.lang.Class#getDeclaredConstructors.
-  optional bool allDeclaredConstructors = 9 [default = false];
-
-  // Register elements returned by java.lang.Class#getClasses.
-  optional bool allPublicClasses = 10 [default = false];
-
-  // Register elements returned by java.lang.Class#getMethods.
-  optional bool allPublicMethods = 11 [default = false];
-
-  // Register elements returned by java.lang.Class#getFields.
-  optional bool allPublicFields = 12 [default = false];
-
-  // Register elements returned by java.lang.Class#getConstructors.
-  optional bool allPublicConstructors = 13 [default = false];
-
-  // Register components returned by java.lang.Class#getRecordComponents.
-  optional bool allRecordComponents = 14 [default = false];
-
-  // Register subclasses returned by java.lang.Class#getPermittedSubclasses.
-  optional bool allPermittedSubclasses = 15 [default = false];
-
-  // Register members returned by java.lang.Class#getNestMembers.
-  optional bool allNestMembers = 16 [default = false];
-
-  // Register identity arrays returned by java.lang.Class#getSigners.
-  optional bool allSigners = 17 [default = false];
-
-  // Register lookups returned by java.lang.Class#getDeclaredMethods.
-  optional bool queryAllDeclaredMethods = 18 [default = false];
-
-  // Register lookups returned by java.lang.Class#getDeclaredConstructors.
-  optional bool queryAllDeclaredConstructors = 19 [default = false];
-
-  // Register lookups returned by java.lang.Class#getMethods.
-  optional bool queryAllPublicMethods = 20 [default = false];
-
-  // Register lookups returned by java.lang.Class#getConstructors.
-  optional bool queryAllPublicConstructors = 21 [default = false];
-
-  // Explicitly allow objects of this class to be constructed via Unsafe#allocateInstance.
-  optional bool unsafeAllocated = 22 [default = false];
-
-  // Instructs GraalVM that these specific fields/methods are accessible via Native JNI Code.
-  optional bool jniAccessible = 23 [default = false];
-
-  message MethodIdentifier {
-    optional Condition condition = 1;
-    // Name of the method or constructor (use "init" for constructors).
+  message MethodDescriptor {
+    // Name of the method (use "init" for constructors)
     optional string name = 2;
-    // Parameter types array, e.g. ["java.lang.String", "int[]"].
+    // List of the method's parameter types
     repeated string parameterTypes = 3;
   }
 
-  message FieldIdentifier {
-    optional Condition condition = 1;
-    // Name of the field.
-    optional string name = 2;
+  // List of methods that should be registered for the declared type
+  repeated MethodDescriptor methods = 3;
+
+  message FieldDescriptor {
+    // Name of the field that should be registered for reflection
+    required string name = 2;
   }
+
+  // Specific field signatures registered for lookups, reads, or state modification.
+  repeated FieldDescriptor fields = 4;
+
+  // Register all declared methods from the type for reflective invocation
+  optional bool allDeclaredMethods = 5 [default = false];
+
+  // Register all declared fields from the type for reflective access
+  optional bool allDeclaredFields = 6 [default = false];
+
+  // Register all declared constructors from the type for reflective invocation
+  optional bool allDeclaredConstructors = 7 [default = false];
+
+  // Register all public methods from the type for reflective invocation
+  optional bool allPublicMethods = 8 [default = false];
+
+  // Register all public fields from the type for reflective access
+  optional bool allPublicFields = 9 [default = false];
+
+  // Register all public constructors from the type for reflective invocation
+  optional bool allPublicConstructors = 10 [default = false];
+
+  // Allow objects of this class to be instantiated with a call to jdk.internal.misc.Unsafe#allocateInstance or JNI's AllocObject
+  optional bool unsafeAllocated = 11 [default = false];
+
+  // Allow objects of this class to be serialized and deserialized
+  optional bool serializable = 12 [default = false];
+
+  // Register the type, including all registered fields and methods, for runtime JNI access
+  optional bool jniAccessible = 13 [default = false];
+
 }
 
 // Global matching entries inside the "resources" array.
@@ -133,8 +97,17 @@ message ResourceEntry {
   // Required condition tag controlling pattern application.
   optional Condition condition = 1;
 
-  // Unified routing path using glob syntax (e.g. "assets/**.png" or "META-INF/services/*").
-  optional string glob = 2;
+  // Module containing the resource
+  optional string module = 2 [default=""];
+
+  oneof globOrBundle {
+    // Resource name or pattern matching multiple resources (accepts * and ** wildcards)
+    string glob = 3;
+
+    // Resource bundle name
+    string bundle = 4;
+  }
+
 }
 
 // Multi-interface dynamic proxy declarations inside the "proxies" array.

@@ -39,12 +39,11 @@ import static us.hebi.quickbuf.ProtoUtil.*;
 @UtilityClass
 public class GlobUtil {
 
-    public static String convertPathToGlob(Path rootDir, Path file) {
-        return ensureForwardSlashPath(rootDir.relativize(file));
+    public static String ensureForwardSlashPath(Path path) {
+        return ensureForwardSlash(path.toString());
     }
 
-    private static String ensureForwardSlashPath(Path path) {
-        var string = path.toString();
+    public static String ensureForwardSlash(String string) {
         if (string.contains("\\")) {
             string = string.replace('\\', '/');
         }

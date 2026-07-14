@@ -23,6 +23,7 @@ package us.hebi.graalvm.reachability.processor;
 import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.annotations.Reachable;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ReflectionEntry;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ResourceEntry;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -85,25 +86,20 @@ public class ReachableStep extends AbstractMetadataStep {
         boolean fieldsEmpty = true;
 
         // Absolute & relative resource paths
-        if (annotation.resources().length > 0) {
+        if (annotation.resources().length > 0 || annotation.bundles().length > 0) {
             fieldsEmpty = false;
             var baseDir = ProcessorUtil.getSourceDirectory(env, annotatedType);
-            for (var pattern : annotation.resources()) {
-                if (pattern.startsWith("/")) {
-                    metadata.addResourceGlob(pattern.substring(1));
-                } else {
-                    metadata.addResourceGlob(baseDir + pattern);
-                }
-            }
-        }
 
-        // Resource bundles
-        for (var bundle : annotation.bundles()) {
-            fieldsEmpty = false;
-            var entry = metadata.addBundle(bundle.name());
-            for (var locale : bundle.locales()) {
-                entry.getLocales().add(locale);
+            // Resource globs
+            for (var resource : annotation.resources()) {
+                metadata.addGlob(ResourceEntry.fromString(baseDir, resource));
             }
+
+            // Bundles
+            for (var resource : annotation.bundles()) {
+                metadata.addBundle(ResourceEntry.fromString(baseDir, resource));
+            }
+
         }
 
         // Explicitly added proxy interface names
@@ -116,6 +112,7 @@ public class ReachableStep extends AbstractMetadataStep {
         final Consumer<ReflectionEntry> updateReflectEntry = entry -> {
             entry.addMemberAccess(annotation.memberAccess());
             entry.jniAccessible |= annotation.jniAccessible();
+            entry.serializable |= annotation.serializable();
         };
         for (String name : annotation.classNames()) {
             fieldsEmpty = false;

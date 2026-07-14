@@ -48,7 +48,7 @@ public class ReachableConfig {
     public static class NestedChildClass extends NestedParentClass {
     }
 
-    @Reachable(classes = NestedChildClass.class, jniAccessible = true, includeClassHierarchy = true)
+    @Reachable(classes = NestedChildClass.class, jniAccessible = true, serializable = true, includeClassHierarchy = true)
     public static class ReferencingChildClass {
     }
 
@@ -75,24 +75,14 @@ public class ReachableConfig {
     }
 
     @Reachable(memberAccess = {
-            MemberAccess.ALL_DECLARED_CLASSES,
             MemberAccess.ALL_DECLARED_METHODS,
             MemberAccess.ALL_DECLARED_FIELDS,
             MemberAccess.ALL_DECLARED_CONSTRUCTORS,
-            MemberAccess.ALL_PUBLIC_CLASSES,
             MemberAccess.ALL_PUBLIC_METHODS,
             MemberAccess.ALL_PUBLIC_FIELDS,
             MemberAccess.ALL_PUBLIC_CONSTRUCTORS,
-            MemberAccess.ALL_RECORD_COMPONENTS,
-            MemberAccess.ALL_PERMITTED_SUBCLASSES,
-            MemberAccess.ALL_NEST_MEMBERS,
-            MemberAccess.ALL_SIGNERS,
-            MemberAccess.QUERY_ALL_DECLARED_METHODS,
-            MemberAccess.QUERY_ALL_DECLARED_CONSTRUCTORS,
-            MemberAccess.QUERY_ALL_PUBLIC_METHODS,
-            MemberAccess.QUERY_ALL_PUBLIC_CONSTRUCTORS,
             MemberAccess.UNSAFE_ALLOCATED
-    })
+    }, jniAccessible = true)
     public static class FullMemberAccess {
     }
 

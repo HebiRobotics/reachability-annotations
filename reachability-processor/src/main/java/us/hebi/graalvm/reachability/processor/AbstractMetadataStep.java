@@ -23,9 +23,11 @@ package us.hebi.graalvm.reachability.processor;
 import com.google.auto.common.BasicAnnotationProcessor;
 import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.processor.metadata.MarshallerV100;
+import us.hebi.graalvm.reachability.processor.metadata.MarshallerV120;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ConditionalMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ReflectionEntry;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ResourceEntry;
 import us.hebi.graalvm.reachability.processor.parsers.CssParser;
 import us.hebi.graalvm.reachability.processor.parsers.FxmlParser;
 import us.hebi.graalvm.reachability.processor.util.ElementUtil;
@@ -35,7 +37,6 @@ import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
-import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import java.io.IOException;
@@ -64,7 +65,11 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
                     coordinates += "/";
                 }
                 metadataDirectory = getClassOutputDir().resolve("META-INF/native-image/reachability-generated/" + coordinates + stepId);
+
+                // Always load whatever data is already there
+                MarshallerV120.mergeMetadataFrom(metadataDirectory, reachabilityMetadata);
                 MarshallerV100.mergeMetadataFrom(metadataDirectory, reachabilityMetadata);
+
             }
 
             // Process
@@ -92,7 +97,17 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         try {
             // Save result to disk. Abort if nothing has been processed
             if (metadataDirectory != null) {
-                MarshallerV100.saveMetadataTo(reachabilityMetadata, metadataDirectory);
+                switch (env.getOptions().getOrDefault("reachability.outputFormat", "")) {
+                    case "120":
+                    case "1.2.0":
+                        MarshallerV120.saveMetadataTo(reachabilityMetadata, metadataDirectory);
+                        break;
+                    case "100":
+                    case "1.0.0":
+                    default:
+                        MarshallerV100.saveMetadataTo(reachabilityMetadata, metadataDirectory);
+                        break;
+                }
             }
         } catch (IOException e) {
             printError(ExceptionUtil.getStackTrace(e));
@@ -193,11 +208,11 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         onEntry.accept(metadata.addReflectedType(typeName));
     }
 
-    protected void addResourceGlob(ConditionalMetadata metadata, String glob) {
-        if (glob.startsWith("/")) {
-            printError("globs must not start with a slash '/'.");
+    protected void addAndTryParseResource(ConditionalMetadata metadata, Path resource, boolean includeHierarchy) {
+        addAbsFileResource(metadata, resource);
+        if (Files.isRegularFile(resource)) {
+            addMetadataFromParsedFileContents(metadata, resource, includeHierarchy);
         }
-        metadata.addResourceGlob(glob);
     }
 
     protected void addMetadataFromParsedFileContents(ConditionalMetadata metadata, Path file, boolean includeHierarchy) {
@@ -258,8 +273,10 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         });
     }
 
-    protected void addAbsFileResource(ConditionalMetadata metadata, Path path) {
-        addResourceGlob(metadata, GlobUtil.convertPathToGlob(getClassOutputDir(), path));
+    private void addAbsFileResource(ConditionalMetadata metadata, Path path) {
+        var relativeFile = getClassOutputDir().relativize(path);
+        var glob = GlobUtil.ensureForwardSlashPath(relativeFile);
+        metadata.addGlob(new ResourceEntry("", glob));
     }
 
     protected Path getClassOutputDir() {

@@ -39,6 +39,7 @@ public class ReachableConfigTest {
     private static String stepId = "reachable";
     private static String reflectionConfig = readJsonContent(stepId, "reflect-config.json");
     private static String jniConfig = readJsonContent(stepId, "jni-config.json");
+    private static String serializationConfig = readJsonContent(stepId, "serialization-config.json");
     private static String resourceConfig = readJsonContent(stepId, "resource-config.json");
     private static String proxyConfig = readJsonContent(stepId, "proxy-config.json");
 
@@ -184,6 +185,35 @@ public class ReachableConfigTest {
     }
 
     @Test
+    void testSerializationSpecifiedChildClass() throws IOException {
+        assertContains(serializationConfig, """
+                {
+                   "condition": {
+                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReferencingChildClass"
+                   },
+                   "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedChildClass"
+                 }
+                """);
+        assertContains(serializationConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReferencingChildClass"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedParentClass"
+                }
+                """);
+
+        // Make sure the required fields are also set
+        assertContains(serializationConfig, """
+                "lambdaCapturingTypes": []
+                """);
+        assertContains(serializationConfig, """
+                "proxies": []
+                """);
+    }
+
+
+    @Test
     void testMultipleClasses() throws IOException {
         assertContains(reflectionConfig, """
                 {
@@ -262,28 +292,18 @@ public class ReachableConfigTest {
     void testFullMemberAccess() throws IOException {
         assertContains(reflectionConfig, """
                 {
-                  "condition": {
-                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$FullMemberAccess"
-                  },
-                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$FullMemberAccess",
-                  "allDeclaredClasses": true,
-                  "allDeclaredMethods": true,
-                  "allDeclaredFields": true,
-                  "allDeclaredConstructors": true,
-                  "allPublicClasses": true,
-                  "allPublicMethods": true,
-                  "allPublicFields": true,
-                  "allPublicConstructors": true,
-                  "allRecordComponents": true,
-                  "allPermittedSubclasses": true,
-                  "allNestMembers": true,
-                  "allSigners": true,
-                  "queryAllDeclaredMethods": true,
-                  "queryAllDeclaredConstructors": true,
-                  "queryAllPublicMethods": true,
-                  "queryAllPublicConstructors": true,
-                  "unsafeAllocated": true
-                }
+                   "condition": {
+                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$FullMemberAccess"
+                   },
+                   "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$FullMemberAccess",
+                   "allDeclaredMethods": true,
+                   "allDeclaredFields": true,
+                   "allDeclaredConstructors": true,
+                   "allPublicMethods": true,
+                   "allPublicFields": true,
+                   "allPublicConstructors": true,
+                   "unsafeAllocated": true
+                 }
                 """);
     }
 

@@ -117,6 +117,36 @@ message ReflectConfigEntry {
 
 }
 
+// Serialized as an object
+message SerializationConfig {
+
+  message SerializedTypeEntry {
+
+    // Required condition to apply the serialization configuration
+    optional Condition condition = 1;
+
+    // Fully qualified class name of the class that should be serialized
+    required string name = 2;
+
+    // Fully qualified class name of the class whose constructor should be used to serialize the class
+    optional string customTargetConstructorClass = 3;
+
+  }
+
+  message SerializedLambdaEntry {
+    optional Condition condition = 1;
+  }
+
+  message SerializedProxyEntry {
+    optional Condition condition = 1;
+  }
+
+  repeated SerializedTypeEntry types = 1;
+  repeated SerializedLambdaEntry lambdaCapturingTypes = 2;
+  repeated SerializedProxyEntry proxies = 3;
+}
+
+
 // JSON schema for the resource-config that GraalVM Native Image uses (type: object)
 message ResourceConfig {
 

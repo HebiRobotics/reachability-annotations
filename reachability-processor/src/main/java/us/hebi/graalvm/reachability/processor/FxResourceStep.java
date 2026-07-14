@@ -22,6 +22,7 @@ package us.hebi.graalvm.reachability.processor;
 
 import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.annotations.ReachableFxResources;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.util.GlobUtil;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
@@ -80,19 +81,12 @@ public class FxResourceStep extends AbstractMetadataStep {
     private void processAnnotation(TypeElement type, ReachableFxResources annotation, AnnotationMirror mirror) {
         final var metadata = getConditionalMetadata(getConditionName(type, mirror));
         var sourceDir = ProcessorUtil.getSourceDirectory(env, type);
+        var searchBaseDir = getClassOutputDir();
 
-        var rootDir = getClassOutputDir();
         for (var glob : annotation.value()) {
-
-            final Path searchBaseDir;
-            if (glob.startsWith("/")) {
-                glob = glob.substring(1);
-                searchBaseDir = rootDir;
-                addResourceGlob(metadata, glob);
-            } else {
-                searchBaseDir = rootDir.resolve(sourceDir);
-                addResourceGlob(metadata, sourceDir + glob);
-            }
+            var entry = ReachabilityMetadata.ResourceEntry.fromString(sourceDir, glob);
+            metadata.addGlob(entry);
+            glob = entry.getGlobOrName();
 
             if (annotation.parseContents()) {
                 try {

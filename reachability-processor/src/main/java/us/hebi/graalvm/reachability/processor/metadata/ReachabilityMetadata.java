@@ -20,11 +20,14 @@
 
 package us.hebi.graalvm.reachability.processor.metadata;
 
+import com.google.common.base.Strings;
 import lombok.*;
 import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.processor.util.GlobUtil;
 
 import java.util.*;
+
+import static us.hebi.quickbuf.ProtoUtil.*;
 
 /**
  * @author Florian Enner
@@ -62,6 +65,7 @@ public class ReachabilityMetadata {
         final Set<ReflectedMethodIdentifier> methods = new TreeSet<>();
         final Set<String> fields = new TreeSet<>();
         public boolean jniAccessible = false;
+        public boolean serializable = false;
 
         public void addField(String fieldName) {
             fields.add(fieldName);
@@ -89,11 +93,68 @@ public class ReachabilityMetadata {
 
     }
 
-    @Data
+    /**
+     * v1.0.0 used regex, but the v1.2.0 format uses globs. We want to be forwards
+     * compatible with the newer format, so we limit it to blobs from the start.
+     */
+    @Value
     @RequiredArgsConstructor
-    public static class BundleEntry {
-        final String name;
-        Set<String> locales = new TreeSet<>();
+    public static class ResourceEntry {
+
+        public static ResourceEntry fromString(String baseDir, String resource) {
+            var module = ReachabilityMetadata.getModulePrefix(resource);
+            resource = ReachabilityMetadata.removeModulePrefix(resource);
+            boolean isAbs = resource.startsWith("/");
+            if (isAbs) resource = resource.substring(1);
+
+            if (module.isPresent()) {
+                // Module paths are relative to the target module root
+                return new ResourceEntry(module.get(), resource);
+            } else if (isAbs || Strings.isNullOrEmpty(baseDir)) {
+                // Paths relative to this output directory
+                return new ResourceEntry("", resource);
+            } else {
+                // Paths relative to the
+                return new ResourceEntry("", GlobUtil.ensureForwardSlash(baseDir) + resource);
+            }
+        }
+
+        public ResourceEntry verifyValidBundle() {
+            if (GlobUtil.hasWildcards(module) || GlobUtil.hasWildcards(globOrName)) {
+                throw new IllegalArgumentException("Bundles can't contain wildcards: " + this.toString());
+            }
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return Strings.isNullOrEmpty(module) ? globOrName : module + ":" + globOrName;
+        }
+
+        String module;
+        String globOrName;
+
+    }
+
+    private static void addResourceEntry(String module, String entry, Map<String, ResourceEntry> map) {
+        String key = Strings.isNullOrEmpty(module) ? entry : module + ":" + entry;
+        if (!map.containsKey(key)) {
+            map.put(key, new ResourceEntry(module, entry));
+        }
+    }
+
+    public static Optional<String> getModulePrefix(String input) {
+        int index = input.indexOf(":");
+        if (index >= 0) {
+            return Optional.of(input.substring(0, index));
+        }
+        return Optional.empty();
+    }
+
+    public static String removeModulePrefix(String input) {
+        int index = input.indexOf(":");
+        if (index < 0) return input;
+        return input.substring(index + 1);
     }
 
     @ToString
@@ -105,31 +166,36 @@ public class ReachabilityMetadata {
             return reflectedTypes.computeIfAbsent(typeName, ReflectionEntry::new);
         }
 
-        public BundleEntry addBundle(String name) {
-            return bundles.computeIfAbsent(name, BundleEntry::new);
+        public void addGlob(ResourceEntry entry) {
+            resourceGlobs.putIfAbsent(entry.toString(), entry);
         }
 
-        /**
-         * v1.0.0 used regex, but the v1.2.0 format uses globs. We want to be forwards
-         * compatible with the newer format, so we limit it to blobs from the start.
-         */
-        public void addResourceGlob(String glob) {
-            addResourcePattern(GlobUtil.convertGlobToRegex(glob));
-        }
-
-        void addResourcePattern(String pattern) {
-            resourcePatterns.add(pattern);
+        public void addBundle(ResourceEntry entry) {
+            bundles.putIfAbsent(entry.verifyValidBundle().toString(), entry);
         }
 
         public void addProxyInterfaces(String... fullyQualifiedNames) {
             proxyInterfaceNames.add(fullyQualifiedNames);
         }
 
+        Set<String> getAsPatterns() {
+            Set<String> patterns = new TreeSet<>(this.patterns);
+            for (var entry : resourceGlobs.values()) {
+                String pattern = GlobUtil.convertGlobToRegex(entry.globOrName);
+                if (!Strings.isNullOrEmpty(entry.module)) {
+                    pattern = entry.module + ":" + pattern;
+                }
+                patterns.add(pattern);
+            }
+            return patterns;
+        }
+
         final Condition condition;
         final Map<String, ReflectionEntry> reflectedTypes = new TreeMap<>();
-        final Set<String> resourcePatterns = new TreeSet<>();
+        final Map<String, ResourceEntry> resourceGlobs = new TreeMap<>();
+        final Map<String, ResourceEntry> bundles = new TreeMap<>();
+        final Set<String> patterns = new TreeSet<>(); // internal use for supporting both formats
         final Set<String[]> proxyInterfaceNames = new TreeSet<>(Arrays::compare);
-        final Map<String, BundleEntry> bundles = new TreeMap<>();
 
     }
 
