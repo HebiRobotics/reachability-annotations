@@ -1,0 +1,256 @@
+{
+  "resources": {
+    "includes": [{
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+      },
+      "pattern": "\\Qroot/path/custom.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/image.jpg\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/included.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/javafx.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/javafx.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/theme-base.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+      },
+      "pattern": "us/hebi/graalvm/reachability/.*/[^/]*\\.css"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+      },
+      "pattern": "us/hebi/graalvm/reachability/.*/[^/]*\\.fxml"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddNonexistingResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/hello.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddNonexistingResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/hello.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+      },
+      "pattern": "\\Qroot/path/custom.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/image.jpg\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/included.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/javafx.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/javafx.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/theme-base.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResourcesNonParsing"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/javafx.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResourcesNonParsing"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/javafx.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+      },
+      "pattern": "\\Qroot/path/custom.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/image.jpg\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/included.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/javafx.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/javafx.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/theme-base.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+      },
+      "pattern": "us/hebi/graalvm/reachability/sample/.*/[^/]*\\.css"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+      },
+      "pattern": "us/hebi/graalvm/reachability/sample/.*/[^/]*\\.fxml"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddResources"
+      },
+      "pattern": "assets/[^/]*\\.jpg"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddResources"
+      },
+      "pattern": "assets/[^/]*\\.png"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddResources"
+      },
+      "pattern": "us/hebi/graalvm/reachability/sample/images/[^/]*\\.jpg"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddResources"
+      },
+      "pattern": "us/hebi/graalvm/reachability/sample/images/[^/]*\\.png"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$MultipleResourceAnnotations"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/hello.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$MultipleResourceAnnotations"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/hello.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+      },
+      "pattern": "\\Qroot/path/custom.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/image.jpg\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/included.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/javafx.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/javafx.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/theme-base.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+      },
+      "pattern": "us/hebi/graalvm/reachability/sample/javafx/javafx[^/]*\\.properties"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/views/view1.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/views/view1.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/views/view2.css\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+      },
+      "pattern": "\\Qus/hebi/graalvm/reachability/sample/javafx/views/view2.fxml\\E"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+      },
+      "pattern": "us/hebi/graalvm/reachability/sample/javafx/views/view1[^/]*\\.properties"
+    }, {
+      "condition": {
+        "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+      },
+      "pattern": "us/hebi/graalvm/reachability/sample/javafx/views/view2[^/]*\\.properties"
+    }]
+  },
+  "bundles": [{
+    "condition": {
+      "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddBundle"
+    },
+    "name": "the.bundle.base"
+  }, {
+    "condition": {
+      "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddBundle"
+    },
+    "name": "us.hebi.graalvm.reachability.sample.relative.bundle"
+  }, {
+    "condition": {
+      "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "name": "us.hebi.graalvm.reachability.sample.javafx.javafx"
+  }, {
+    "condition": {
+      "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+    },
+    "name": "us.hebi.graalvm.reachability.sample.javafx.views.view1"
+  }, {
+    "condition": {
+      "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+    },
+    "name": "us.hebi.graalvm.reachability.sample.javafx.views.view2"
+  }]
+}

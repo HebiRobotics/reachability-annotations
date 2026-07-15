@@ -62,7 +62,7 @@ public class MarshallerV120 {
             var condition = proto.tryGetCondition().map(Condition::getTypeReached).orElse(null);
 
             if (proto.hasGlob()) {
-                metadata.getMetadata(condition).addBundle(new ResourceEntry(proto.getModule(), proto.getGlob()));
+                metadata.getMetadata(condition).addGlob(new ResourceEntry(proto.getModule(), proto.getGlob()));
             } else if (proto.hasBundle()) {
                 metadata.getMetadata(condition).addBundle(new ResourceEntry(proto.getModule(), proto.getBundle()));
             }
