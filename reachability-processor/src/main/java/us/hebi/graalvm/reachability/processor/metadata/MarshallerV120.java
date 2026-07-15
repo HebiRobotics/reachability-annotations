@@ -23,6 +23,8 @@ package us.hebi.graalvm.reachability.processor.metadata;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ResourceEntry;
+import us.hebi.graalvm.reachability.processor.metadata.schema.v1_0_0.ProxyConfig;
+import us.hebi.graalvm.reachability.processor.metadata.schema.v1_0_0.ProxyEntry;
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_2_0.Condition;
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_2_0.ReflectionEntry;
 import us.hebi.graalvm.reachability.processor.util.ProtoUtil;
@@ -66,7 +68,11 @@ public class MarshallerV120 {
             }
         }
 
-        // TODO: handle proxies
+        // Proxies are not implemented in 1.2.0 yet, so we use the old format for now
+        for (var proto : parseJsonList(sourceDir.resolve("proxy-config.json"), ProxyEntry.getFactory())) {
+            var condition = proto.getCondition().tryGetTypeReachable().orElse(null);
+            metadata.getMetadata(condition).addProxyInterfaces(toStringArray(proto.getInterfaces()));
+        }
 
         return metadata;
     }
@@ -126,6 +132,7 @@ public class MarshallerV120 {
 
     public static void saveMetadataTo(ReachabilityMetadata source, Path destDir) throws IOException {
         var proto = us.hebi.graalvm.reachability.processor.metadata.schema.v1_2_0.ReachabilityMetadata.newInstance();
+        var proxyConfig = ProxyConfig.newInstance();
 
         // Merge all conditional data into a single config file
         for (var metadata : source.getAll()) {
@@ -157,15 +164,20 @@ public class MarshallerV120 {
                 condition.ifPresent(entry::setCondition);
             }
 
-            // TODO: proxy-config is currently not supported
-            if (!metadata.proxyInterfaceNames.isEmpty()) {
-                throw new IllegalStateException("Reachability output format 1.2.0 does not yet support proxy interfaces. Please switch to the legacy 1.0.0 format using the compiler argument -Areachability.outputFormat=1.0.0");
+            // proxy-config stored using the old format for now (TOOD: implement in 1.2.0)
+            for (var interfaceNames : metadata.proxyInterfaceNames) {
+                var entry = proxyConfig.getMutableEntries().next();
+                for (var fqdn : interfaceNames) {
+                    entry.getMutableInterfaces().add(fqdn.trim());
+                }
+                condition.ifPresent(cond -> entry.getMutableCondition().setTypeReachable(cond.getTypeReached()));
             }
 
         }
 
         // Save combined metadata to corresponding files
         writeBytes(destDir.resolve("reachability-metadata.json"), ProtoUtil.toJson(proto));
+        writeBytes(destDir.resolve("proxy-config.json"), ProtoUtil.toJson(proxyConfig.getEntries()));
     }
 
     private static void deleteExistingFile(Path target) throws IOException {

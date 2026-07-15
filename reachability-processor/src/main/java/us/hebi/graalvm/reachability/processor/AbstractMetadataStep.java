@@ -98,6 +98,10 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
             // Save result to disk. Abort if nothing has been processed
             if (metadataDirectory != null) {
                 switch (env.getOptions().getOrDefault("reachability.outputFormat", "")) {
+                    case "all":
+                        MarshallerV120.saveMetadataTo(reachabilityMetadata, metadataDirectory);
+                        MarshallerV100.saveMetadataTo(reachabilityMetadata, metadataDirectory);
+                        break;
                     case "120":
                     case "1.2.0":
                         MarshallerV120.saveMetadataTo(reachabilityMetadata, metadataDirectory);

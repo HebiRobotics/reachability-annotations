@@ -57,7 +57,7 @@
                     <compilerArgs>
                         <arg>-Aproject=${project.groupId}/${project.artifactId}</arg> <!-- unique subdir -->
                         <arg>-Areachability.processDependencyInjection=true</arg> <!-- enable @Inject -->
-                        <arg>-Areachability.outputFormat=1.0.0</arg> <!-- fix output format -->
+                        <arg>-Areachability.outputFormat=all</arg> <!-- fix output format -->
                     </compilerArgs>
                 </configuration>
             </plugin>
