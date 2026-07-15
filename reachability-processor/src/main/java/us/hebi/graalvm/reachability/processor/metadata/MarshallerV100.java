@@ -195,8 +195,13 @@ public class MarshallerV100 {
 
         }
 
-        // Serialization configs always need all three empty lists
-        if(!serializationConfig.isEmpty()) {
+        // Fill in any required empty lists
+        if (!resourceConfig.isEmpty()) {
+            resourceConfig.getMutableBundles();
+            resourceConfig.getMutableResources();
+            resourceConfig.getMutableResources().getMutableIncludes();
+        }
+        if (!serializationConfig.isEmpty()) {
             serializationConfig.getMutableTypes();
             serializationConfig.getMutableProxies();
             serializationConfig.getMutableLambdaCapturingTypes();
