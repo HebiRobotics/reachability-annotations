@@ -161,7 +161,7 @@ as well as default constructors for the types of injected fields
 
 The metadata gets generated into the `META-INF/native-image/reachability-generated/${project}/<annotation>/` directory. The `${project}` name should be unique and needs to be set via a compiler argument. This is compatible with [picocli-codegen](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc#224-maven).
 
-Note that the default output format is currently the legacy `1.0.0` format (separate files) due to being compatible with all versions of GraalVM. The newer `1.2.0` format (single file) is currently experimental and can be enabled with `-Areachability.outputFormat=1.2.0`. Note that the current implementation does not yet support proxy configuration and falls back to storing a separate `proxy-config.json` alongside it. The default will likely change once we consider the implementation stable.
+Note that the default output format is currently the legacy `1.0.0` format (separate `*-config.json` files) due to some behavioral differences we've encountered regarding the activation conditions in some corner cases (e.g. registering a bundle that doesn't exist). You can manually switch to the modern format (combined `reachability-metadata.json`) with the compiler option `-Areachability.outputFormat=1.2.0`. Once the differences have been resolved, the modern format will likely become the default.
 
 For example, a Maven configuration could look like this:
 
