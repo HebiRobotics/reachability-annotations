@@ -28,4 +28,10 @@ import us.hebi.graalvm.reachability.annotations.ReachableFxView;
  */
 @ReachableFxView
 public class JavaFxView {
+
+    @ReachableFxView("views/view1")
+    @ReachableFxView("views/view2")
+    static class RepeatedAnnotations {
+    }
+
 }

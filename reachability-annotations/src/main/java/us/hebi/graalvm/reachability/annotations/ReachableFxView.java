@@ -20,10 +20,7 @@
 
 package us.hebi.graalvm.reachability.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Creates reachability configuration based on common conventions
@@ -42,9 +39,16 @@ import java.lang.annotation.Target;
  * @author Florian Enner
  * @since 25 Nov 2025
  */
+@Repeatable(ReachableFxView.List.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface ReachableFxView {
+
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    @interface List {
+        ReachableFxView[] value();
+    }
 
     /**
      * The value specifies the name of the fxml and optional css

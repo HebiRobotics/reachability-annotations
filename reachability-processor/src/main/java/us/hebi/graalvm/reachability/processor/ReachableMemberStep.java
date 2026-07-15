@@ -38,6 +38,10 @@ import java.util.function.Supplier;
  */
 public class ReachableMemberStep extends AbstractMetadataStep {
 
+    public ReachableMemberStep(Supplier<ProcessingEnvironment> env) {
+        super("reachable-member", env);
+    }
+
     @Override
     public Set<String> annotations() {
         return Set.of(
@@ -65,10 +69,6 @@ public class ReachableMemberStep extends AbstractMetadataStep {
             }
 
         }
-    }
-
-    public ReachableMemberStep(Supplier<ProcessingEnvironment> env) {
-        super("reachable-member", env);
     }
 
 }

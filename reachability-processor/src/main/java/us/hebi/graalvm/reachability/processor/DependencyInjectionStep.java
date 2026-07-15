@@ -37,6 +37,10 @@ import java.util.function.Supplier;
  */
 public class DependencyInjectionStep extends AbstractMetadataStep {
 
+    public DependencyInjectionStep(Supplier<ProcessingEnvironment> env) {
+        super("di", env);
+    }
+
     @Override
     public Set<String> annotations() {
         return Set.of(
@@ -76,10 +80,6 @@ public class DependencyInjectionStep extends AbstractMetadataStep {
         if (processDI) {
             super.finish();
         }
-    }
-
-    public DependencyInjectionStep(Supplier<ProcessingEnvironment> env) {
-        super("di", env);
     }
 
 }

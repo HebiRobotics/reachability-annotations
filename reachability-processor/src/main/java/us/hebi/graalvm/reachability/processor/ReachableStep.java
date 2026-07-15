@@ -22,6 +22,7 @@ package us.hebi.graalvm.reachability.processor;
 
 import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.annotations.Reachable;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ReflectionEntry;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ResourceEntry;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
@@ -40,55 +41,20 @@ import java.util.function.Supplier;
  * @author Florian Enner
  * @since 27 Nov 2025
  */
-public class ReachableStep extends AbstractMetadataStep {
+public class ReachableStep extends RepeatedMetadataStep<Reachable> {
 
-    @Override
-    public Set<String> annotations() {
-        return Set.of(
-                Reachable.class.getCanonicalName(),
-                Reachable.List.class.getCanonicalName()
-        );
+    public ReachableStep(Supplier<ProcessingEnvironment> env) {
+        super("reachable", env, Reachable.class, Reachable.List.class);
     }
 
     @Override
-    public void process0(ImmutableSetMultimap<String, Element> elementMap) {
-        // Single annotation
-        for (Element element : elementMap.get(Reachable.class.getCanonicalName())) {
-            if (element instanceof TypeElement type) {
-                var mirror = getAnnotationMirror(type, Reachable.class);
-                if (mirror != null) {
-                    Reachable annotation = type.getAnnotation(Reachable.class);
-                    processAnnotation(type, annotation, mirror);
-                }
-            }
-        }
-
-        // Multiple annotations
-        for (Element element : elementMap.get(Reachable.List.class.getCanonicalName())) {
-            if (element instanceof TypeElement type) {
-                var listMirror = getAnnotationMirror(type, Reachable.List.class);
-                if (listMirror != null) {
-                    var listAnnotation = type.getAnnotation(Reachable.List.class);
-                    var mirrors = getAnnotationArrayValue(listMirror, "value");
-                    var annotations = listAnnotation.value();
-                    for (int i = 0; i < annotations.length; i++) {
-                        processAnnotation(type, annotations[i], mirrors.get(i));
-                    }
-                }
-            }
-        }
-    }
-
-    private final Set<String> tmpLocales = new HashSet<>();
-
-    private void processAnnotation(TypeElement annotatedType, Reachable annotation, AnnotationMirror mirror) {
-        final var metadata = getConditionalMetadata(getConditionName(annotatedType, mirror));
+    protected void processAnnotation(ReachabilityMetadata.ConditionalMetadata metadata, TypeElement type, Reachable annotation) {
         boolean fieldsEmpty = true;
 
         // Absolute & relative resource paths
         if (annotation.resources().length > 0 || annotation.bundles().length > 0) {
             fieldsEmpty = false;
-            var baseDir = ProcessorUtil.getSourceDirectory(env, annotatedType);
+            var baseDir = ProcessorUtil.getSourceDirectory(env, type);
 
             // Resource globs
             for (var resource : annotation.resources()) {
@@ -137,13 +103,8 @@ public class ReachableStep extends AbstractMetadataStep {
 
         // Nothing else defined -> enable reflection of the annotated type itself
         if (fieldsEmpty) {
-            addReflectedType(metadata, annotatedType, annotation.includeClassHierarchy(), updateReflectEntry);
+            addReflectedType(metadata, type, annotation.includeClassHierarchy(), updateReflectEntry);
         }
-
-    }
-
-    public ReachableStep(Supplier<ProcessingEnvironment> env) {
-        super("reachable", env);
     }
 
 }
