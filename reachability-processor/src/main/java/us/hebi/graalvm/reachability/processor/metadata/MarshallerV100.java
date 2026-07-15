@@ -133,6 +133,11 @@ public class MarshallerV100 {
         }
     }
 
+    public static void mergeExistingAndSaveMetadataTo(ReachabilityMetadata source, Path destDir) throws IOException {
+        mergeMetadataFrom(destDir, source);
+        saveMetadataTo(source, destDir);
+    }
+
     public static void saveMetadataTo(ReachabilityMetadata source, Path destDir) throws IOException {
         ReflectConfig reflectConfig = ReflectConfig.newInstance();
         ReflectConfig jniConfig = ReflectConfig.newInstance();

@@ -65,6 +65,14 @@ public class ReachabilityMetadata {
         public boolean jniAccessible = false;
         public boolean serializable = false;
 
+        void merge(ReflectionEntry other) {
+            memberAccess.addAll(other.memberAccess);
+            methods.addAll(other.methods);
+            fields.addAll(other.fields);
+            jniAccessible |= other.jniAccessible;
+            serializable |= other.serializable;
+        }
+
         public void addField(String fieldName) {
             fields.add(fieldName);
         }
@@ -119,7 +127,7 @@ public class ReachabilityMetadata {
 
         public ResourceEntry toBundle() {
             if (GlobUtil.hasWildcards(module) || GlobUtil.hasWildcards(globOrName)) {
-                throw new IllegalArgumentException("Bundles can't contain wildcards: " + this.toString());
+                throw new IllegalArgumentException("Bundles can't contain wildcards: " + toString());
             }
             if (globOrName.contains("/")) {
                 return new ResourceEntry(module, globOrName.replace('/', '.'));
@@ -199,6 +207,19 @@ public class ReachabilityMetadata {
         final Set<String> patterns = new TreeSet<>(); // internal use for supporting both formats
         final Set<String[]> proxyInterfaceNames = new TreeSet<>(Arrays::compare);
 
+    }
+
+    public void merge(ReachabilityMetadata source) {
+        for (ConditionalMetadata other : source.getAll()) {
+            var local = getMetadata(other.condition.typeReachable);
+            for (var entry : other.reflectedTypes.entrySet()) {
+                local.addReflectedType(entry.getKey()).merge(entry.getValue());
+            }
+            local.resourceGlobs.putAll(other.resourceGlobs);
+            local.bundles.putAll(other.bundles);
+            local.patterns.addAll(other.patterns);
+            local.proxyInterfaceNames.addAll(other.proxyInterfaceNames);
+        }
     }
 
     public ConditionalMetadata getMetadata(String condition) {

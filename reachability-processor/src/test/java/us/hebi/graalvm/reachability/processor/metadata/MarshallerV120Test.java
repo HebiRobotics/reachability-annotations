@@ -50,6 +50,16 @@ public class MarshallerV120Test {
     }
 
     @Test
+    public void testMergeMetadata() throws Exception {
+        var base = MarshallerV120Test.class.getResource("sampleV120").toURI();
+        var expected = MarshallerV120.mergeMetadataFrom(Path.of(base), new ReachabilityMetadata());
+
+        var merged = new ReachabilityMetadata();
+        merged.merge(expected);
+        assertEquals(expected, merged);
+    }
+
+    @Test
     @Disabled
     public void testCopyV1toV2() throws Exception {
         var metadata = new ReachabilityMetadata();

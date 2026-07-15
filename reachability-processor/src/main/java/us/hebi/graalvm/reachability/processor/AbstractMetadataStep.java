@@ -22,6 +22,7 @@ package us.hebi.graalvm.reachability.processor;
 
 import com.google.auto.common.BasicAnnotationProcessor;
 import com.google.common.collect.ImmutableSetMultimap;
+import lombok.Getter;
 import us.hebi.graalvm.reachability.processor.metadata.MarshallerV100;
 import us.hebi.graalvm.reachability.processor.metadata.MarshallerV120;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
@@ -58,18 +59,9 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
     public final Set<? extends Element> process(ImmutableSetMultimap<String, Element> elementMap) {
         this.env = environmentSupplier.get();
         try {
-            // Merge any existing files in case we do a partial compilation
-            if (metadataDirectory == null) {
-                String coordinates = env.getOptions().getOrDefault("project", "");
-                if (!coordinates.endsWith("/")) {
-                    coordinates += "/";
-                }
-                metadataDirectory = getClassOutputDir().resolve("META-INF/native-image/reachability-generated/" + coordinates + stepId);
-
-                // Always load whatever data is already there
-                MarshallerV120.mergeMetadataFrom(metadataDirectory, reachabilityMetadata);
-                MarshallerV100.mergeMetadataFrom(metadataDirectory, reachabilityMetadata);
-
+            // Initialize metadata
+            if (reachabilityMetadata == null) {
+                reachabilityMetadata = new ReachabilityMetadata();
             }
 
             // Process
@@ -92,31 +84,6 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
     }
 
     public abstract void process0(ImmutableSetMultimap<String, Element> elementMap);
-
-    public void finish() {
-        try {
-            // Save result to disk. Abort if nothing has been processed
-            if (metadataDirectory != null) {
-                switch (env.getOptions().getOrDefault("reachability.outputFormat", "")) {
-                    case "all":
-                        MarshallerV120.saveMetadataTo(reachabilityMetadata, metadataDirectory);
-                        MarshallerV100.saveMetadataTo(reachabilityMetadata, metadataDirectory);
-                        break;
-                    case "120":
-                    case "1.2.0":
-                        MarshallerV120.saveMetadataTo(reachabilityMetadata, metadataDirectory);
-                        break;
-                    case "100":
-                    case "1.0.0":
-                    default:
-                        MarshallerV100.saveMetadataTo(reachabilityMetadata, metadataDirectory);
-                        break;
-                }
-            }
-        } catch (IOException e) {
-            printError(ExceptionUtil.getStackTrace(e));
-        }
-    }
 
     protected AnnotationMirror getAnnotationMirror(Element type, Class<?> annotationClass) {
         String annotationName = annotationClass.getCanonicalName();
@@ -302,10 +269,11 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
     }
 
     private Path classOutputDir;
-    private final String stepId;
+    protected final String stepId;
     private final Supplier<ProcessingEnvironment> environmentSupplier;
     protected ProcessingEnvironment env;
-    protected final ReachabilityMetadata reachabilityMetadata = new ReachabilityMetadata();
-    protected Path metadataDirectory;
+
+    @Getter
+    private ReachabilityMetadata reachabilityMetadata;
 
 }

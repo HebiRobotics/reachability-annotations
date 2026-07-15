@@ -48,6 +48,16 @@ public class MarshallerV100Test {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void testMergeMetadata() throws Exception {
+        var base = MarshallerV100Test.class.getResource("sampleV100").toURI();
+        var expected = MarshallerV100.mergeMetadataFrom(Path.of(base), new ReachabilityMetadata());
+
+        var merged = new ReachabilityMetadata();
+        merged.merge(expected);
+        assertEquals(expected, merged);
+    }
+
     @TempDir
     Path tempDir;
 

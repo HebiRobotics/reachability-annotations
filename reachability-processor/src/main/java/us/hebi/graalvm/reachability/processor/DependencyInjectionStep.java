@@ -21,13 +21,13 @@
 package us.hebi.graalvm.reachability.processor;
 
 import com.google.common.collect.ImmutableSetMultimap;
-import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ReflectionEntry;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.util.ElementUtil;
+import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -71,15 +71,9 @@ public class DependencyInjectionStep extends AbstractMetadataStep {
     }
 
     @Override
-    public void finish() {
-        boolean processDI = Optional.ofNullable(env)
-                .map(ProcessingEnvironment::getOptions)
-                .map(options -> options.get("reachability.processDependencyInjection"))
-                .map(Boolean::parseBoolean)
-                .orElse(false);
-        if (processDI) {
-            super.finish();
-        }
+    public ReachabilityMetadata getReachabilityMetadata() {
+        boolean isEnabled = ProcessorUtil.getBooleanOption(env, "reachability.processDependencyInjection", false);
+        return isEnabled ? super.getReachabilityMetadata() : null;
     }
 
 }

@@ -130,6 +130,11 @@ public class MarshallerV120 {
         }
     }
 
+    public static void mergeExistingAndSaveMetadataTo(ReachabilityMetadata source, Path destDir) throws IOException {
+        mergeMetadataFrom(destDir, source);
+        saveMetadataTo(source, destDir);
+    }
+
     public static void saveMetadataTo(ReachabilityMetadata source, Path destDir) throws IOException {
         var proto = us.hebi.graalvm.reachability.processor.metadata.schema.v1_2_0.ReachabilityMetadata.newInstance();
         var proxyConfig = ProxyConfig.newInstance();
