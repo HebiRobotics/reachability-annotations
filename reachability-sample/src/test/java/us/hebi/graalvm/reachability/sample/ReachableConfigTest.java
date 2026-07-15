@@ -442,6 +442,26 @@ public class ReachableConfigTest {
     }
 
     @Test
+    void testBundles() throws IOException {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddBundle"
+                  },
+                  "name": "the.bundle.base"
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddBundle"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.relative.bundle"
+                }
+                """);
+    }
+
+    @Test
     void testProxies() throws IOException {
         assertContains(proxyConfig, """
                 {

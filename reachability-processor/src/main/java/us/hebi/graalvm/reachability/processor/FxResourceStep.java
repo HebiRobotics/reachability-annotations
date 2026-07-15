@@ -31,7 +31,6 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Set;
 import java.util.function.Supplier;
 

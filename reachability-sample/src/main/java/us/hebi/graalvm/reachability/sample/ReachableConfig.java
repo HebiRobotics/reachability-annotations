@@ -107,6 +107,13 @@ public class ReachableConfig {
     public static class AddResources {
     }
 
+    @Reachable(bundles = {
+            "/the.bundle.base",
+            "relative.bundle",
+    })
+    public static class AddBundle {
+    }
+
     @Reachable(proxies = {
             @Proxy({"name1", "name2"}),
             @Proxy({"name3", "name4"}),

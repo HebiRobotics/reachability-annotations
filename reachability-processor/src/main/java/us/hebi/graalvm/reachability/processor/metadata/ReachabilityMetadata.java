@@ -27,8 +27,6 @@ import us.hebi.graalvm.reachability.processor.util.GlobUtil;
 
 import java.util.*;
 
-import static us.hebi.quickbuf.ProtoUtil.*;
-
 /**
  * @author Florian Enner
  * @since 09 Jul 2026
@@ -119,9 +117,12 @@ public class ReachabilityMetadata {
             }
         }
 
-        public ResourceEntry verifyValidBundle() {
+        public ResourceEntry toBundle() {
             if (GlobUtil.hasWildcards(module) || GlobUtil.hasWildcards(globOrName)) {
                 throw new IllegalArgumentException("Bundles can't contain wildcards: " + this.toString());
+            }
+            if (globOrName.contains("/")) {
+                return new ResourceEntry(module, globOrName.replace('/', '.'));
             }
             return this;
         }
@@ -171,7 +172,8 @@ public class ReachabilityMetadata {
         }
 
         public void addBundle(ResourceEntry entry) {
-            bundles.putIfAbsent(entry.verifyValidBundle().toString(), entry);
+            var bundle = entry.toBundle();
+            bundles.putIfAbsent(bundle.toString(), bundle);
         }
 
         public void addProxyInterfaces(String... fullyQualifiedNames) {
