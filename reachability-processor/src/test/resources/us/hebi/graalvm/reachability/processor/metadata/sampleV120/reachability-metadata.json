@@ -1,0 +1,997 @@
+{
+  "reflection": [{
+    "type": "java.lang.String",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "type": "jdk.internal.vm.annotation.Stable",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "ClassLevelCondition"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableMemberConfig$MemberConditionHierarchy",
+    "methods": [{
+      "name": "method2",
+      "parameterTypes": []
+    }],
+    "fields": [{
+      "name": "field2"
+    }],
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "FieldLevelCondition"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableMemberConfig$MemberConditionHierarchy",
+    "fields": [{
+      "name": "field1"
+    }]
+  }, {
+    "condition": {
+      "typeReached": "MethodLevelCondition"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableMemberConfig$MemberConditionHierarchy",
+    "methods": [{
+      "name": "method",
+      "parameterTypes": ["java.lang.String"]
+    }]
+  }, {
+    "condition": {
+      "typeReached": "java.lang.String"
+    },
+    "type": "java.lang.String",
+    "methods": [{
+      "name": "<init>",
+      "parameterTypes": []
+    }]
+  }, {
+    "condition": {
+      "typeReached": "java.net.InetAddress"
+    },
+    "type": "java.net.InetAddress",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "sun.misc.Unsafe"
+    },
+    "type": "sun.misc.Unsafe",
+    "allDeclaredFields": true,
+    "jniAccessible": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.InjectionConfig"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.InjectionConfig",
+    "methods": [{
+      "name": "<init>",
+      "parameterTypes": []
+    }]
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.InjectionConfig$ConstructorInjection"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.InjectionConfig$ConstructorInjection",
+    "methods": [{
+      "name": "<init>",
+      "parameterTypes": ["java.lang.String"]
+    }]
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.InjectionConfig$FieldInjection"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.InjectionConfig$FieldInjection",
+    "fields": [{
+      "name": "config"
+    }, {
+      "name": "string"
+    }]
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.InjectionConfig$InjectionSample"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.InjectionConfig$InjectionSample",
+    "methods": [{
+      "name": "<init>",
+      "parameterTypes": ["java.lang.String"]
+    }, {
+      "name": "postConstruct",
+      "parameterTypes": []
+    }, {
+      "name": "preDestroy",
+      "parameterTypes": []
+    }],
+    "fields": [{
+      "name": "injectedField"
+    }]
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.InjectionConfig$MethodInjection"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.InjectionConfig$MethodInjection",
+    "methods": [{
+      "name": "close",
+      "parameterTypes": []
+    }]
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "javafx.scene.Node",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "javafx.scene.Parent",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "javafx.scene.control.Button",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "javafx.scene.control.ButtonBase",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "javafx.scene.control.Control",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "javafx.scene.control.Labeled",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "javafx.scene.image.Image",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "javafx.scene.image.ImageView",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "javafx.scene.layout.AnchorPane",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "javafx.scene.layout.Pane",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "javafx.scene.layout.Region",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "nonexisting.Controller",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.javafx.IncludedFxController",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "javafx.scene.Node",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "javafx.scene.Parent",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "javafx.scene.control.Button",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "javafx.scene.control.ButtonBase",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "javafx.scene.control.Control",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "javafx.scene.control.Labeled",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "javafx.scene.image.Image",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "javafx.scene.image.ImageView",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "javafx.scene.layout.AnchorPane",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "javafx.scene.layout.Pane",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "javafx.scene.layout.Region",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "nonexisting.Controller",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.javafx.IncludedFxController",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "javafx.scene.Node",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "javafx.scene.Parent",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "javafx.scene.control.Button",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "javafx.scene.control.ButtonBase",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "javafx.scene.control.Control",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "javafx.scene.control.Labeled",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "javafx.scene.image.Image",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "javafx.scene.image.ImageView",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "javafx.scene.layout.AnchorPane",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "javafx.scene.layout.Pane",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "javafx.scene.layout.Region",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "nonexisting.Controller",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.javafx.IncludedFxController",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$FullMemberAccess"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableConfig$FullMemberAccess",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true,
+    "unsafeAllocated": true,
+    "jniAccessible": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedChildClass"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedChildClass",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedChildClass"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedParentClass",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedParentClass"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedParentClass",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$NoMemberAccess"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableConfig$NoMemberAccess",
+    "methods": [{
+      "name": "<init>",
+      "parameterTypes": []
+    }]
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$PrivateClassHierarchy"
+    },
+    "type": "java.net.JarURLConnection",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$PrivateClassHierarchy"
+    },
+    "type": "java.net.URLConnection",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$PrivateClassHierarchy"
+    },
+    "type": "sun.net.www.protocol.jar.JarURLConnection",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReferencingChildClass"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedChildClass",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "serializable": true,
+    "jniAccessible": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReferencingChildClass"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedParentClass",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "serializable": true,
+    "jniAccessible": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReferencingChildClassWithoutParent"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedChildClass",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReferencingMultipleClasses"
+    },
+    "type": "java.net.InetAddress",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReferencingMultipleClasses"
+    },
+    "type": "java.net.InetSocketAddress",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReferencingMultipleClasses"
+    },
+    "type": "java.net.SocketAddress",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReferencingMultipleClasses"
+    },
+    "type": "other.random.class",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReferencingMultipleClasses"
+    },
+    "type": "some.random.class$Nested",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReflectEnum"
+    },
+    "type": "java.lang.Enum",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReflectEnum"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableConfig$ReflectEnum",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableMemberConfig$ReflectConstructors"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableMemberConfig$ReflectConstructors",
+    "methods": [{
+      "name": "<init>",
+      "parameterTypes": []
+    }, {
+      "name": "<init>",
+      "parameterTypes": ["java.lang.String"]
+    }]
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableMemberConfig$ReflectFields"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableMemberConfig$ReflectFields",
+    "fields": [{
+      "name": "field1"
+    }, {
+      "name": "field2"
+    }]
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableMemberConfig$ReflectMethods"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.ReachableMemberConfig$ReflectMethods",
+    "methods": [{
+      "name": "convert",
+      "parameterTypes": ["java.lang.String"]
+    }, {
+      "name": "doNothing",
+      "parameterTypes": ["java.lang.String", "java.lang.Object"]
+    }]
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "javafx.scene.Node",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "javafx.scene.Parent",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "javafx.scene.control.Button",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "javafx.scene.control.ButtonBase",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "javafx.scene.control.Control",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "javafx.scene.control.Labeled",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "javafx.scene.image.Image",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "javafx.scene.image.ImageView",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "javafx.scene.layout.AnchorPane",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "javafx.scene.layout.Pane",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "javafx.scene.layout.Region",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "nonexisting.Controller",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.javafx.IncludedFxController",
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView",
+    "methods": [{
+      "name": "<init>",
+      "parameterTypes": []
+    }]
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+    },
+    "type": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations",
+    "methods": [{
+      "name": "<init>",
+      "parameterTypes": []
+    }]
+  }],
+  "resources": [{
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "glob": "root/path/custom.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/**/*.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/**/*.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/image.jpg"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/included.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/javafx.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/javafx.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/theme-base.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddBundle"
+    },
+    "bundle": "the.bundle.base"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddBundle"
+    },
+    "bundle": "us.hebi.graalvm.reachability.sample.relative.bundle"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddNonexistingResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/hello.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddNonexistingResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/hello.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "glob": "root/path/custom.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/image.jpg"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/included.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/javafx.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/javafx.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/theme-base.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResourcesNonParsing"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/javafx.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResourcesNonParsing"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/javafx.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "glob": "root/path/custom.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/**/*.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/**/*.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/image.jpg"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/included.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/javafx.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/javafx.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/theme-base.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddResources"
+    },
+    "glob": "assets/*.jpg"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddResources"
+    },
+    "glob": "assets/*.png"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/images/*.jpg"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddResources"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/images/*.png"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$MultipleResourceAnnotations"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/hello.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.ReachableConfig$MultipleResourceAnnotations"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/hello.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "glob": "root/path/custom.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/image.jpg"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/included.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/javafx*.properties"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/javafx.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/javafx.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/theme-base.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+    },
+    "bundle": "us.hebi.graalvm.reachability.sample.javafx.javafx"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/views/view1*.properties"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/views/view1.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/views/view1.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/views/view2*.properties"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/views/view2.css"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+    },
+    "glob": "us/hebi/graalvm/reachability/sample/javafx/views/view2.fxml"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+    },
+    "bundle": "us.hebi.graalvm.reachability.sample.javafx.views.view1"
+  }, {
+    "condition": {
+      "typeReached": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+    },
+    "bundle": "us.hebi.graalvm.reachability.sample.javafx.views.view2"
+  }]
+}

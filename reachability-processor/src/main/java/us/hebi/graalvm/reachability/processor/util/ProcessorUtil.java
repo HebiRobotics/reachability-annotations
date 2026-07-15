@@ -28,6 +28,7 @@ import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * @author Florian Enner
@@ -61,6 +62,14 @@ public class ProcessorUtil {
                 .toString()
                 .replace('.', '/');
         return directory.isBlank() ? "" : directory + "/";
+    }
+
+    public boolean getBooleanOption(ProcessingEnvironment env, String name, boolean fallback) {
+        return Optional.ofNullable(env)
+                .map(ProcessingEnvironment::getOptions)
+                .map(options -> options.get(name))
+                .map(Boolean::parseBoolean)
+                .orElse(fallback);
     }
 
 }

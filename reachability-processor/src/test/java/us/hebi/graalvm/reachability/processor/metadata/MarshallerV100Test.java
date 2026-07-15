@@ -23,6 +23,7 @@ package us.hebi.graalvm.reachability.processor.metadata;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,19 +34,33 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class MarshallerV100Test {
 
+    public static Path getTestDir100() {
+        try {
+            return Path.of(MarshallerV100Test.class.getResource("sampleV100").toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Test
     public void testMergeMetadataFrom() throws Exception {
-        var base = MarshallerV100Test.class.getResource("sampleV100").toURI();
-        var metadata = MarshallerV100.mergeMetadataFrom(Path.of(base), new ReachabilityMetadata());
+        var metadata = MarshallerV100.mergeMetadataFrom(getTestDir100(), new ReachabilityMetadata());
     }
 
     @Test
     public void testSaveMetadataTo() throws Exception {
-        var base = MarshallerV100Test.class.getResource("sampleV100").toURI();
-        var expected = MarshallerV100.mergeMetadataFrom(Path.of(base), new ReachabilityMetadata());
+        var expected = MarshallerV100.mergeMetadataFrom(getTestDir100(), new ReachabilityMetadata());
         MarshallerV100.saveMetadataTo(expected, tempDir);
         var actual = MarshallerV100.mergeMetadataFrom(tempDir, new ReachabilityMetadata());
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testMergeMetadata() throws Exception {
+        var expected = MarshallerV100.mergeMetadataFrom(getTestDir100(), new ReachabilityMetadata());
+        var merged = new ReachabilityMetadata();
+        merged.merge(expected);
+        assertEquals(expected, merged);
     }
 
     @TempDir

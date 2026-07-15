@@ -23,6 +23,7 @@ package us.hebi.graalvm.reachability.processor;
 import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.annotations.ReachableFxResources;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
+import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ConditionalMetadata;
 import us.hebi.graalvm.reachability.processor.util.GlobUtil;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
@@ -31,7 +32,6 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -39,47 +39,14 @@ import java.util.function.Supplier;
  * @author Florian Enner
  * @since 10 Jul 2026
  */
-public class FxResourceStep extends AbstractMetadataStep {
+public class FxResourceStep extends RepeatedMetadataStep<ReachableFxResources> {
 
-    @Override
-    public Set<String> annotations() {
-        return Set.of(
-                ReachableFxResources.class.getCanonicalName(),
-                ReachableFxResources.List.class.getCanonicalName()
-        );
+    public FxResourceStep(Supplier<ProcessingEnvironment> env) {
+        super("fx-resources", env, ReachableFxResources.class, ReachableFxResources.List.class);
     }
 
     @Override
-    public void process0(ImmutableSetMultimap<String, Element> elementMap) {
-        // Single annotation
-        for (Element element : elementMap.get(ReachableFxResources.class.getCanonicalName())) {
-            if (element instanceof TypeElement type) {
-                var mirror = getAnnotationMirror(type, ReachableFxResources.class);
-                if (mirror != null) {
-                    var annotation = type.getAnnotation(ReachableFxResources.class);
-                    processAnnotation(type, annotation, mirror);
-                }
-            }
-        }
-
-        // Multiple annotations
-        for (Element element : elementMap.get(ReachableFxResources.List.class.getCanonicalName())) {
-            if (element instanceof TypeElement type) {
-                var listMirror = getAnnotationMirror(type, ReachableFxResources.List.class);
-                if (listMirror != null) {
-                    var listAnnotation = type.getAnnotation(ReachableFxResources.List.class);
-                    var mirrors = getAnnotationArrayValue(listMirror, "value");
-                    var annotations = listAnnotation.value();
-                    for (int i = 0; i < annotations.length; i++) {
-                        processAnnotation(type, annotations[i], mirrors.get(i));
-                    }
-                }
-            }
-        }
-    }
-
-    private void processAnnotation(TypeElement type, ReachableFxResources annotation, AnnotationMirror mirror) {
-        final var metadata = getConditionalMetadata(getConditionName(type, mirror));
+    protected void processAnnotation(ConditionalMetadata metadata, TypeElement type, ReachableFxResources annotation) {
         var sourceDir = ProcessorUtil.getSourceDirectory(env, type);
         var searchBaseDir = getClassOutputDir();
 
@@ -97,11 +64,6 @@ public class FxResourceStep extends AbstractMetadataStep {
             }
 
         }
-
-    }
-
-    protected FxResourceStep(Supplier<ProcessingEnvironment> env) {
-        super("fx-resources", env);
     }
 
 }

@@ -32,7 +32,7 @@ class FxViewConfigTest {
 
     private static String stepId = "fx-view";
     private static String reflectionConfig = readJsonContent(stepId, "reflect-config.json");
-    private static String resourceConfig = readJsonContent(stepId,  "resource-config.json");
+    private static String resourceConfig = readJsonContent(stepId, "resource-config.json");
 
     @Test
     void testCss() {
@@ -181,6 +181,26 @@ class FxViewConfigTest {
                   "allDeclaredMethods": true,
                   "allDeclaredFields": true,
                   "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
+    void testRepeatedAnnotation() {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/reachability/sample/javafx/views/view1.css\\\\E"
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView$RepeatedAnnotations"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.javafx.views.view2"
                 }
                 """);
     }

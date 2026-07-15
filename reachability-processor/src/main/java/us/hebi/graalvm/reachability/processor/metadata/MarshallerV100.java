@@ -23,6 +23,7 @@ package us.hebi.graalvm.reachability.processor.metadata;
 import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ResourceEntry;
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_0_0.*;
+import us.hebi.graalvm.reachability.processor.util.GlobUtil;
 import us.hebi.graalvm.reachability.processor.util.ProtoUtil;
 import us.hebi.quickbuf.JsonSource;
 
@@ -63,14 +64,19 @@ public class MarshallerV100 {
         // Serialization config
         for (var proto : parseJsonObject(sourceDir.resolve("serialization-config.json"), SerializationConfig.getFactory()).getTypes()) {
             var condition = proto.tryGetCondition().map(Condition::getTypeReachable).orElse(null);
-            metadata.getMetadata(condition).addReflectedType(proto.getName()).setJniAccessible(true);
+            metadata.getMetadata(condition).addReflectedType(proto.getName()).setSerializable(true);
         }
 
         // Resources & Bundles
         ResourceConfig resourceConfig = ProtoUtil.parseJsonObject(sourceDir.resolve("resource-config.json"), ResourceConfig.getFactory());
         for (var proto : resourceConfig.getResources().getIncludes()) {
             var condition = proto.tryGetCondition().map(Condition::getTypeReachable).orElse(null);
-            metadata.getMetadata(condition).patterns.add(proto.getPattern());
+            var glob = GlobUtil.tryConvertRegexToGlob(proto.getPattern());
+            if (glob.isPresent()) {
+                metadata.getMetadata(condition).addGlob(ResourceEntry.fromString("", glob.get()));
+            } else {
+                metadata.getMetadata(condition).patterns.add(proto.getPattern());
+            }
         }
         for (var proto : resourceConfig.getBundles()) {
             var condition = proto.tryGetCondition().map(Condition::getTypeReachable).orElse(null);
@@ -131,6 +137,11 @@ public class MarshallerV100 {
         for (var fieldName : entry.getFields()) {
             proto.getMutableFields().next().setName(fieldName);
         }
+    }
+
+    public static void mergeExistingAndSaveMetadataTo(ReachabilityMetadata source, Path destDir) throws IOException {
+        mergeMetadataFrom(destDir, source);
+        saveMetadataTo(source, destDir);
     }
 
     public static void saveMetadataTo(ReachabilityMetadata source, Path destDir) throws IOException {
@@ -195,8 +206,13 @@ public class MarshallerV100 {
 
         }
 
-        // Serialization configs always need all three empty lists
-        if(!serializationConfig.isEmpty()) {
+        // Fill in any required empty lists
+        if (!resourceConfig.isEmpty()) {
+            resourceConfig.getMutableBundles();
+            resourceConfig.getMutableResources();
+            resourceConfig.getMutableResources().getMutableIncludes();
+        }
+        if (!serializationConfig.isEmpty()) {
             serializationConfig.getMutableTypes();
             serializationConfig.getMutableProxies();
             serializationConfig.getMutableLambdaCapturingTypes();

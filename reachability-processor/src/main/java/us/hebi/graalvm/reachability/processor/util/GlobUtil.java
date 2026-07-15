@@ -27,6 +27,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -112,6 +113,83 @@ public class GlobUtil {
             }
         }
         return regex.toString();
+    }
+
+    // NOTE: LLM generated reversal code
+    public static Optional<String> tryConvertRegexToGlob(String pattern) {
+        if (pattern == null || pattern.isEmpty()) {
+            return Optional.of("");
+        }
+
+        // Handle the literal regex block shortcut
+        if (pattern.startsWith("\\Q") && pattern.endsWith("\\E")) {
+            String literal = pattern.substring(2, pattern.length() - 2);
+            // Ensure it doesn't accidentally contain unescaped wildcards
+            if (!literal.contains("*") && !literal.contains("?")) {
+                return Optional.of(literal);
+            }
+            return Optional.empty();
+        }
+
+        StringBuilder glob = new StringBuilder();
+        int i = 0;
+        int len = pattern.length();
+
+        while (i < len) {
+            char c = pattern.charAt(i++);
+
+            if (c == '\\') {
+                if (i >= len) return Optional.empty(); // Malformed escape
+                char next = pattern.charAt(i++);
+
+                switch (next) {
+                    // Characters that were explicitly escaped in the original glob
+                    case '\\':
+                        glob.append('\\');
+                        break;
+                    // Meta-characters escaped during conversion
+                    case '.':
+                    case '(':
+                    case ')':
+                    case '+':
+                    case '|':
+                    case '^':
+                    case '$':
+                    case '@':
+                    case '%':
+                        glob.append(next);
+                        break;
+                    default:
+                        // If it's escaping something else, it doesn't match our encoder rules
+                        return Optional.empty();
+                }
+            } else if (c == '.') {
+                // Check for ".*" which maps to "**"
+                if (i < len && pattern.charAt(i) == '*') {
+                    glob.append("**");
+                    i++;
+                } else {
+                    // Single "." maps to "?"
+                    glob.append('?');
+                }
+            } else if (c == '[') {
+                // Check for "[^/]*" which maps to "*"
+                if (i + 4 <= len && pattern.substring(i, i + 4).equals("^/]*")) {
+                    glob.append('*');
+                    i += 4;
+                } else {
+                    return Optional.empty(); // Custom character class not supported by this glob logic
+                }
+            } else {
+                // Unescaped regex control characters shouldn't exist unless they were literals
+                if ("*?+()|^$".indexOf(c) != -1) {
+                    return Optional.empty();
+                }
+                glob.append(c);
+            }
+        }
+
+        return Optional.of(glob.toString());
     }
 
     public static void forEachFile(Path searchBaseDir, String glob, Consumer<Path> onFile) throws IOException {

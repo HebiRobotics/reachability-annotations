@@ -1,0 +1,11 @@
+[{
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddProxies"
+  },
+  "interfaces": ["name1", "name2"]
+}, {
+  "condition": {
+    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddProxies"
+  },
+  "interfaces": ["name3", "name4"]
+}]

@@ -112,7 +112,7 @@ public @interface Reachable {
     String[] bundles() default {};
 
     /**
-     * TODO: not working in the 1.2.0 format yet
+     * TODO: not implemented in the 1.2.0 format yet, so it may create a separate proxy-config.json as needed
      *
      * @return Dynamic proxy interface groups to register under this condition.
      */

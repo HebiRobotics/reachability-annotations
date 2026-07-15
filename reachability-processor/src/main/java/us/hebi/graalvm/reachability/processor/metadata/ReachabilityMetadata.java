@@ -27,8 +27,6 @@ import us.hebi.graalvm.reachability.processor.util.GlobUtil;
 
 import java.util.*;
 
-import static us.hebi.quickbuf.ProtoUtil.*;
-
 /**
  * @author Florian Enner
  * @since 09 Jul 2026
@@ -66,6 +64,14 @@ public class ReachabilityMetadata {
         final Set<String> fields = new TreeSet<>();
         public boolean jniAccessible = false;
         public boolean serializable = false;
+
+        void merge(ReflectionEntry other) {
+            memberAccess.addAll(other.memberAccess);
+            methods.addAll(other.methods);
+            fields.addAll(other.fields);
+            jniAccessible |= other.jniAccessible;
+            serializable |= other.serializable;
+        }
 
         public void addField(String fieldName) {
             fields.add(fieldName);
@@ -119,9 +125,12 @@ public class ReachabilityMetadata {
             }
         }
 
-        public ResourceEntry verifyValidBundle() {
+        public ResourceEntry toBundle() {
             if (GlobUtil.hasWildcards(module) || GlobUtil.hasWildcards(globOrName)) {
-                throw new IllegalArgumentException("Bundles can't contain wildcards: " + this.toString());
+                throw new IllegalArgumentException("Bundles can't contain wildcards: " + toString());
+            }
+            if (globOrName.contains("/")) {
+                return new ResourceEntry(module, globOrName.replace('/', '.'));
             }
             return this;
         }
@@ -171,7 +180,8 @@ public class ReachabilityMetadata {
         }
 
         public void addBundle(ResourceEntry entry) {
-            bundles.putIfAbsent(entry.verifyValidBundle().toString(), entry);
+            var bundle = entry.toBundle();
+            bundles.putIfAbsent(bundle.toString(), bundle);
         }
 
         public void addProxyInterfaces(String... fullyQualifiedNames) {
@@ -197,6 +207,19 @@ public class ReachabilityMetadata {
         final Set<String> patterns = new TreeSet<>(); // internal use for supporting both formats
         final Set<String[]> proxyInterfaceNames = new TreeSet<>(Arrays::compare);
 
+    }
+
+    public void merge(ReachabilityMetadata source) {
+        for (ConditionalMetadata other : source.getAll()) {
+            var local = getMetadata(other.condition.typeReachable);
+            for (var entry : other.reflectedTypes.entrySet()) {
+                local.addReflectedType(entry.getKey()).merge(entry.getValue());
+            }
+            local.resourceGlobs.putAll(other.resourceGlobs);
+            local.bundles.putAll(other.bundles);
+            local.patterns.addAll(other.patterns);
+            local.proxyInterfaceNames.addAll(other.proxyInterfaceNames);
+        }
     }
 
     public ConditionalMetadata getMetadata(String condition) {
