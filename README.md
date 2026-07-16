@@ -181,12 +181,12 @@ For example, a Maven configuration could look like this:
 
 ### Generator Options
 
-| Compiler Argument (`-A`)                  | Values                            | Comment                                                                                           |
-|:------------------------------------------|:----------------------------------|:--------------------------------------------------------------------------------------------------|
-| `project`                                 | directory                         | Should be `${project.groupId}/${project.artifactId}`                                              |
-| `reachability.outputFormat`              | `1.0.0` (default), `1.2.0`, `all` | The output format of the metadata                                                                 |
-| `reachability.mergeSteps`                 | `true` (default), `false`         | Whether the different processing steps should be merged into a single file. Mainly for debugging. |
-| `reachability.processDependencyInjection` | `false` (default), `true`         | True enables metadata generation for `@Inject` annotations.
+| Compiler Argument (`-A`)                  | Values                             | Comment                                                                                           |
+|:------------------------------------------|:-----------------------------------|:--------------------------------------------------------------------------------------------------|
+| `project`                                 | `directory`                         | Should be `${project.groupId}/${project.artifactId}`                                              |
+| `reachability.outputFormat`              | `1.0.0` (default), `1.2.0`, `all`  | The output format of the metadata                                                                 |
+| `reachability.mergeSteps`                 | `true` (default), `false`          | Whether the different processing steps should be merged into a single file. Mainly for debugging. |
+| `reachability.processDependencyInjection` | `false` (default), `true`          | True enables metadata generation for `@Inject` annotations.
 
 ## Maven Instructions
 
@@ -195,6 +195,10 @@ You need add a compile-time dependency on the annotations, and add the annotatio
 Note that starting with JDK23, `javac` no longer automatically discovers or runs annotation processors from the standard classpath, so you need to explicitly enable it in the compiler arguments.
 
 ```xml
+<properties>
+    <reachability.version>1.0.0-RC1</reachability.version>
+</properties>
+
 <dependencies>
     <dependency> <!-- compile time annotations -->
         <groupId>us.hebi.graalvm</groupId>
@@ -229,7 +233,11 @@ Note that starting with JDK23, `javac` no longer automatically discovers or runs
 </build>
 ```
 
-So far this project is in an early adopters stage, so there has not been an official release to maven central yet. However, if you have snapshots enabled, you can use `<version>1.0-SNAPSHOT</version>`.
+## Building from source
+
+``` bash
+mvn clean verify
+```
 
 ## JitPack Snapshots
 
@@ -264,10 +272,4 @@ This project supports jitpack, so you can directly depend on specific commits. Y
     <version>${reachability.hash}</version>
     <scope>provided</scope>
 </dependency>
-```
-
-## Building from source
-
-``` bash
-mvn clean verify
 ```

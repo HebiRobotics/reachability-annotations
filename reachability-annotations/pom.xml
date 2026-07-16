@@ -5,10 +5,11 @@
     <parent>
         <artifactId>reachability-parent</artifactId>
         <groupId>us.hebi.graalvm</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-RC1</version>
     </parent>
 
     <artifactId>reachability-annotations</artifactId>
+    <name>Reachability Annotations</name>
 
     <description>
         Annotations for specifying GraalVM native-image configuration files
