@@ -1,8 +1,8 @@
 # Reachability Annotations
 
-This library provides zero-dependency annotations for generating [GraalVM Native Image](https://www.graalvm.org/native-image/) [Reachability Metadata](https://www.graalvm.org/latest/reference-manual/native-image/metadata/) at compile time. They are compatible with standard Java code and are independent of any framework like Quarkus or Micronaut.
+This library provides standalone zero-dependency annotations for generating [GraalVM Native Image](https://www.graalvm.org/native-image/) [Reachability Metadata](https://www.graalvm.org/latest/reference-manual/native-image/metadata/) at compile time. They are compatible with standard Java code and are independent of any framework like Quarkus or Micronaut.
 
-The annotations also make extensive use of `typeReached` conditions. By default, the settings are only applied if the annotated type is reachable in the native image. This mitigates binary size explosion for features that aren't used. The condition can be changed by setting a custom `condition`, or disabled by setting `condition = Object.class`.
+The annotations also make extensive use of `typeReachable` conditions. By default, the settings are only applied if the annotated type is reachable in the native image. This mitigates binary size explosion for features that aren't used. The condition can be changed by setting a custom `condition`, or disabled by setting `condition = Object.class`.
 
 ## @Reachable
 
@@ -159,9 +159,9 @@ as well as default constructors for the types of injected fields
 
 ## Generated Metadata
 
-The metadata gets generated into the `META-INF/native-image/reachability-generated/${project}/<annotation>/` directory. The `${project}` name should be unique and needs to be set via a compiler argument. This is compatible with [picocli-codegen](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc#224-maven).
+The metadata gets generated into the `META-INF/native-image/reachability-generated/${project}/` directory. The `${project}` name should be unique and needs to be set via a compiler argument. This is compatible with [picocli-codegen](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc#224-maven).
 
-Note that the default output format is currently the legacy `1.0.0` format (separate `*-config.json` files) due to some behavioral differences we've encountered regarding the activation conditions in some corner cases (e.g. registering a bundle that doesn't exist). You can manually switch to the modern format (combined `reachability-metadata.json`) with the compiler option `-Areachability.outputFormat=1.2.0`. Once the differences have been resolved, the modern format will likely become the default.
+Unfortunately, the `typeReached` condition in the modern 1.2.0 format (combined `reachability-metadata.json`) is stricter and does not seem to work as well as the `typeReachable` condition in the older 1.0.0 format (separate `*-config.json` files), so we default to generating the older format for a better starting experience. You can switch to the modern format with the compiler option `-Areachability.outputFormat=1.2.0` and check whether your application still works.
 
 For example, a Maven configuration could look like this:
 
@@ -178,6 +178,15 @@ For example, a Maven configuration could look like this:
     </configuration>
 </plugin>
 ```
+
+### Generator Options
+
+| Compiler Argument (`-A`)                  | Values                            | Comment                                                                                           |
+|:------------------------------------------|:----------------------------------|:--------------------------------------------------------------------------------------------------|
+| `project`                                 | directory                         | Should be `${project.groupId}/${project.artifactId}`                                              |
+| `reachability.outputFormat`              | `1.0.0` (default), `1.2.0`, `all` | The output format of the metadata                                                                 |
+| `reachability.mergeSteps`                 | `true` (default), `false`         | Whether the different processing steps should be merged into a single file. Mainly for debugging. |
+| `reachability.processDependencyInjection` | `false` (default), `true`         | True enables metadata generation for `@Inject` annotations.
 
 ## Maven Instructions
 
