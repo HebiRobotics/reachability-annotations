@@ -5,7 +5,7 @@
     <parent>
         <artifactId>reachability-parent</artifactId>
         <groupId>us.hebi.graalvm</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-RC1</version>
     </parent>
 
     <artifactId>reachability-processor</artifactId>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>us.hebi.graalvm</groupId>
             <artifactId>reachability-annotations</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0-RC1</version>
         </dependency>
         <dependency>
             <groupId>com.google.auto</groupId>
