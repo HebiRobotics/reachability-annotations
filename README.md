@@ -4,15 +4,83 @@ This library provides standalone zero-dependency annotations for generating [Gra
 
 The annotations also make extensive use of `typeReachable` conditions. By default, the settings are only applied if the annotated type is reachable in the native image. This mitigates binary size explosion for features that aren't used. The condition can be changed by setting a custom `condition`, or disabled by setting `condition = Object.class`.
 
-## @Reachable
+## Default Case
 
-Declares classes, resources, dynamic proxies, and bundles that should be available in the native image. Below are some examples to get started. Check the JavaDoc for more detailed documentation.
+```Java
+@Reachable
+public class Example {}
+```
+
+The default configuration enables full reflection with a condition on the annotated type
+
+```json
+{
+  "condition": { "typeReached": "reachability.sample.Example" },
+  "type": "reachability.sample.Example",
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true,
+  "allDeclaredConstructors": true
+}
+```
+
+## Fine Control
+
+```Java
+@Reachable(
+        condition = InetSocketAddress.class,
+        classes = { Example.class },
+        memberAccess = {
+                MemberAccess.ALL_DECLARED_CONSTRUCTORS,
+                MemberAccess.ALL_PUBLIC_METHODS,
+        },
+        resources = { "images/*.png" },
+        bundles = { "bundle" },
+        jniAccessible = true)
+public class Example {
+
+	@ReachableMember
+	String field;
+
+}
+```
+
+The deeper annotation settings enable access to all of the fields available in the metadata format. Relative resource/bundle paths are relative to the annotated type.
+
+```json
+    {
+      "condition": { "typeReached": "java.net.InetSocketAddress" },
+      "type": "reachability.sample.Example",
+      "fields": [
+        { "name": "field" }
+      ],
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "jniAccessible": true
+    }
+    
+    {
+      "condition": { "typeReached": "java.net.InetSocketAddress" },
+      "glob": "reachability/sample/images/*.png"
+    }
+    
+    {
+      "condition": { "typeReached": "java.net.InetSocketAddress" },
+      "bundle": "reachability.sample.bundle"
+    }
+```
+
+## Supported Annotations
+
+Below is a list of all supported annotations and some examples to get started. Check the JavaDoc for more detailed documentation.
+
+### @Reachable
+
+Declares classes, resources, dynamic proxies, and bundles that should be available in the native image. 
 
 ```Java
 // Enables full reflection if the annotated class is reached from any point
 @Reachable
-public enum ReflectivelyAccessedEnum {
-}
+public enum ReflectivelyAccessedEnum {}
 
 // Full reflection of all specified classes and their parent hierarchy
 @Reachable(
@@ -20,24 +88,21 @@ public enum ReflectivelyAccessedEnum {
         classes = {InetAddress.class, InetSocketAddress.class},
         classNames = {"some.internal.class$Nested", "other.internal.class"}
 )
-public class ReferencingOtherClasses {
-}
+public class ReferencingOtherClasses {}
 
 // Resource globs relative to the annotated class
 @Reachable(condition = ImageLoader.class, resources = {
         "images/*.png",
         "images/*.jpg",
 })
-public class RelativeResourceGlobs {
-}
+public class RelativeResourceGlobs {}
 
 // Resource globs relative to the class path root (start with '/')
 @Reachable(conditionName = "custom.condition.ImageLoader", resources = {
         "/assets/*.png",
         "/assets/*.jpg",
 })
-public class AbsoluteResourceGlobs {
-}
+public class AbsoluteResourceGlobs {}
 
 // Unconditional custom access of a hidden class w/ JNI
 @Reachable(
@@ -46,11 +111,10 @@ public class AbsoluteResourceGlobs {
         memberAccess = { MemberAccess.ALL_DECLARED_FIELDS},
         jniAccessible = true
 )
-public static class FineGrainedAccess {
-}
+public static class FineGrainedAccess {}
 ```
 
-## @ReachableMember, @FXML
+### @ReachableMember, @FXML
 
 The `@ReachableMember` annotation provides more fine-grained access for configuring access to individual fields and methods. The JavaFX annotation `@FXML` gets picked up as well with the same behavior.
 
@@ -58,8 +122,7 @@ The `@ReachableMember` annotation provides more fine-grained access for configur
 public static class IndividualFieldsAndMethods {
     
     @ReachableMember
-    void doNothing(String input, Object output) {
-    }
+    void doNothing(String input, Object output) {}
 
     @ReachableMember
     String field1;
@@ -67,7 +130,7 @@ public static class IndividualFieldsAndMethods {
 }
 ```
 
-## @ReachableFxView
+### @ReachableFxView
 
 This is a special annotation for working with JavaFX FXML - a markup language for GUI layouts that makes extensive use of reflection.
 
@@ -81,12 +144,11 @@ The default naming convention follows established conventions (see [FxmlKit](htt
 
 ```Java
 @ReachableFxView("dialog") // checks for dialog.fxml, dialog.css, dialog.properties etc.
-public enum DialogView extends com.airhacks.afterburner.views.FXMLView {
-}
+public enum DialogView extends com.airhacks.afterburner.views.FXMLView {}
 ```
 
 
-## @ReachableFxResources
+### @ReachableFxResources
 
 Another JavaFX related annotation that provides more resource control and can parse multiple FXML/CSS files based on globs.
 
@@ -97,12 +159,11 @@ Another JavaFX related annotation that provides more resource control and can pa
         "views/**/*.fxml", // relative to annotated type
         "views/**/*.css", // relative to annotated type
 })
-public class MyApp extends Application {
-}
+public class MyApp extends Application {}
 ```
 
 
-## @Inject, @PostConstruct, @PreDestroy
+### @Inject, @PostConstruct, @PreDestroy
 
 This processor also includes an opt-in feature that looks at common dependency injection annotations (both `javafx.*` and `jakarta.*`), and generates reflection configurations that covers most standard usage. It is opt-in to avoid interfering with static code generators of other frameworks.
 
