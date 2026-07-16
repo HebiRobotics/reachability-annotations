@@ -9,6 +9,7 @@
     </parent>
 
     <artifactId>reachability-processor</artifactId>
+    <name>Reachability Annotations Processor</name>
 
     <description>
         Annotation processor for generating GraalVM native-image configuration files

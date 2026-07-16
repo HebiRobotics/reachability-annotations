@@ -9,6 +9,7 @@
     </parent>
 
     <artifactId>reachability-annotations</artifactId>
+    <name>Reachability Annotations</name>
 
     <description>
         Annotations for specifying GraalVM native-image configuration files

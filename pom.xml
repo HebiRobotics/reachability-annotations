@@ -39,10 +39,10 @@
 
     </properties>
 
-    <name>Reachability Annotations</name>
-    <url>https://github.com/HebiRobotics/native-config-generator</url>
+    <name>Reachability Annotations (Parent)</name>
+    <url>https://github.com/HebiRobotics/reachability-annotations</url>
     <description>
-        Annotation processor for generating GraalVM reachability configuration files.
+        Annotation processor for generating GraalVM reachability metadata files.
     </description>
 
     <organization>
@@ -53,9 +53,9 @@
 
     <!-- source control information: -->
     <scm>
-        <url>https://github.com/HebiRobotics/native-config-generator</url>
-        <connection>scm:git:git://github.com/HebiRobotics/native-config-generator.git</connection>
-        <developerConnection>scm:git:git@github.com:HebiRobotics/native-config-generator.git</developerConnection>
+        <url>https://github.com/HebiRobotics/reachability-annotations</url>
+        <connection>scm:git:git://github.com/HebiRobotics/reachability-annotations.git</connection>
+        <developerConnection>scm:git:git@github.com:HebiRobotics/reachability-annotations.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
