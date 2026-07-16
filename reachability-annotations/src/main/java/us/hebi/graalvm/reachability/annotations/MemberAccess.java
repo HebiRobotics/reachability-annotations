@@ -32,6 +32,5 @@ public enum MemberAccess {
     ALL_DECLARED_CONSTRUCTORS, // Register constructors which would be returned by the java.lang.Class#getDeclaredConstructors call
     ALL_PUBLIC_METHODS, // Register all public methods which would be returned by the java.lang.Class#getMethods call
     ALL_PUBLIC_FIELDS, // Register all public fields which would be returned by the java.lang.Class#getFields call
-    ALL_PUBLIC_CONSTRUCTORS, // Register all public constructors which would be returned by the java.lang.Class#getConstructors call
-    UNSAFE_ALLOCATED; // Allow objects of this class to be instantiated with a call to jdk.internal.misc.Unsafe#allocateInstance
+    ALL_PUBLIC_CONSTRUCTORS; // Register all public constructors which would be returned by the java.lang.Class#getConstructors call
 }

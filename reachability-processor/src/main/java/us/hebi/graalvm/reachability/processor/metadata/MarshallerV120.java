@@ -91,8 +91,8 @@ public class MarshallerV120 {
         if (proto.getAllPublicMethods()) entry.addMemberAccess(MemberAccess.ALL_PUBLIC_METHODS);
         if (proto.getAllPublicFields()) entry.addMemberAccess(MemberAccess.ALL_PUBLIC_FIELDS);
         if (proto.getAllPublicConstructors()) entry.addMemberAccess(MemberAccess.ALL_PUBLIC_CONSTRUCTORS);
-        if (proto.getUnsafeAllocated()) entry.addMemberAccess(MemberAccess.UNSAFE_ALLOCATED);
 
+        if (proto.getUnsafeAllocated()) entry.setUnsafeAllocated(true);
         if (proto.getJniAccessible()) entry.setJniAccessible(true);
         if (proto.getSerializable()) entry.setSerializable(true);
 
@@ -113,10 +113,10 @@ public class MarshallerV120 {
                 case ALL_PUBLIC_METHODS -> proto.setAllPublicMethods(true);
                 case ALL_PUBLIC_FIELDS -> proto.setAllPublicFields(true);
                 case ALL_PUBLIC_CONSTRUCTORS -> proto.setAllPublicConstructors(true);
-                case UNSAFE_ALLOCATED -> proto.setUnsafeAllocated(true);
             }
         }
 
+        if (entry.isUnsafeAllocated()) proto.setUnsafeAllocated(true);
         if (entry.isJniAccessible()) proto.setJniAccessible(true);
         if (entry.isSerializable()) proto.setSerializable(true);
 

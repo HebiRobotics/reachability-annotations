@@ -77,6 +77,7 @@ public class ReachableStep extends RepeatedMetadataStep<Reachable> {
         // JNI and reflectively accessible classes
         final Consumer<ReflectionEntry> updateReflectEntry = entry -> {
             entry.addMemberAccess(annotation.memberAccess());
+            entry.unsafeAllocated |= annotation.unsafeAllocated();
             entry.jniAccessible |= annotation.jniAccessible();
             entry.serializable |= annotation.serializable();
         };

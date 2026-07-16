@@ -21,8 +21,8 @@
 package us.hebi.graalvm.reachability.sample;
 
 
-import us.hebi.graalvm.reachability.annotations.Reachable;
 import us.hebi.graalvm.reachability.annotations.MemberAccess;
+import us.hebi.graalvm.reachability.annotations.Reachable;
 import us.hebi.graalvm.reachability.annotations.Reachable.Proxy;
 import us.hebi.graalvm.reachability.annotations.ReachableFxResources;
 
@@ -81,8 +81,9 @@ public class ReachableConfig {
             MemberAccess.ALL_PUBLIC_METHODS,
             MemberAccess.ALL_PUBLIC_FIELDS,
             MemberAccess.ALL_PUBLIC_CONSTRUCTORS,
-            MemberAccess.UNSAFE_ALLOCATED
-    }, jniAccessible = true)
+    },
+            jniAccessible = true,
+            unsafeAllocated = true)
     public static class FullMemberAccess {
     }
 

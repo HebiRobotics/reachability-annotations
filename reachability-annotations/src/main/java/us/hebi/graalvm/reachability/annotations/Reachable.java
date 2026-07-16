@@ -76,6 +76,12 @@ public @interface Reachable {
     boolean includeClassHierarchy() default false;
 
     /**
+     * Allow objects of this class to be instantiated with a call to
+     * jdk.internal.misc.Unsafe#allocateInstance or JNI's AllocObject.
+     */
+    boolean unsafeAllocated() default false;
+
+    /**
      * @return whether the reflected classes should also be available through JNI
      */
     boolean jniAccessible() default false;

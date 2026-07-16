@@ -106,7 +106,7 @@ public class MarshallerV100 {
         if (proto.getAllPublicMethods()) entry.addMemberAccess(MemberAccess.ALL_PUBLIC_METHODS);
         if (proto.getAllPublicFields()) entry.addMemberAccess(MemberAccess.ALL_PUBLIC_FIELDS);
         if (proto.getAllPublicConstructors()) entry.addMemberAccess(MemberAccess.ALL_PUBLIC_CONSTRUCTORS);
-        if (proto.getUnsafeAllocated()) entry.addMemberAccess(MemberAccess.UNSAFE_ALLOCATED);
+        if (proto.getUnsafeAllocated()) entry.setUnsafeAllocated(true);
 
         for (var method : proto.getMethods()) {
             entry.addMethod(method.getName(), ProtoUtil.toStringArray(method.getParameterTypes()));
@@ -125,9 +125,10 @@ public class MarshallerV100 {
                 case ALL_PUBLIC_METHODS -> proto.setAllPublicMethods(true);
                 case ALL_PUBLIC_FIELDS -> proto.setAllPublicFields(true);
                 case ALL_PUBLIC_CONSTRUCTORS -> proto.setAllPublicConstructors(true);
-                case UNSAFE_ALLOCATED -> proto.setUnsafeAllocated(true);
             }
         }
+
+        if (entry.isUnsafeAllocated()) proto.setUnsafeAllocated(true);
 
         for (var method : entry.getMethods()) {
             proto.getMutableMethods().next()

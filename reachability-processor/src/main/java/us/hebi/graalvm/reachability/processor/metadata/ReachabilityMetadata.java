@@ -62,6 +62,7 @@ public class ReachabilityMetadata {
         final EnumSet<MemberAccess> memberAccess = EnumSet.noneOf(MemberAccess.class);
         final Set<ReflectedMethodIdentifier> methods = new TreeSet<>();
         final Set<String> fields = new TreeSet<>();
+        public boolean unsafeAllocated = false;
         public boolean jniAccessible = false;
         public boolean serializable = false;
 
@@ -69,6 +70,7 @@ public class ReachabilityMetadata {
             memberAccess.addAll(other.memberAccess);
             methods.addAll(other.methods);
             fields.addAll(other.fields);
+            unsafeAllocated |= other.unsafeAllocated;
             jniAccessible |= other.jniAccessible;
             serializable |= other.serializable;
         }
