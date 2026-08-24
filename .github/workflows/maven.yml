@@ -1,0 +1,28 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        jdk: [21]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: zulu
+        java-version: ${{ matrix.jdk }}
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn -B clean verify
