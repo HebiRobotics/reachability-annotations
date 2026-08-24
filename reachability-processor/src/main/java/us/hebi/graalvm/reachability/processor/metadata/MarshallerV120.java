@@ -20,7 +20,6 @@
 
 package us.hebi.graalvm.reachability.processor.metadata;
 
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ResourceEntry;
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_0_0.ProxyConfig;
@@ -84,7 +83,7 @@ public class MarshallerV120 {
         return Optional.of(JsonSource.newInstance(Files.readAllBytes(file)));
     }
 
-    private static void copyEntryFromProto(@MonotonicNonNull ReflectionEntry proto, ReachabilityMetadata.ReflectionEntry entry) {
+    private static void copyEntryFromProto(ReflectionEntry proto, ReachabilityMetadata.ReflectionEntry entry) {
         if (proto.getAllDeclaredMethods()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_METHODS);
         if (proto.getAllDeclaredFields()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_FIELDS);
         if (proto.getAllDeclaredConstructors()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_CONSTRUCTORS);
