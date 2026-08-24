@@ -278,7 +278,7 @@ Note that starting with JDK23, `javac` no longer automatically discovers or runs
 
 ```xml
 <properties>
-    <reachability.version>1.0.0-RC1</reachability.version>
+    <reachability.version>1.0.0-RC2</reachability.version>
 </properties>
 
 <dependencies>
