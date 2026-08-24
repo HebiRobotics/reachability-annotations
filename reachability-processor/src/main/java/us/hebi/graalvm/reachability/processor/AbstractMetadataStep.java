@@ -108,17 +108,6 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         return Collections.emptyList();
     }
 
-    protected boolean isSpecified(AnnotationMirror mirror, String key) {
-        // Note: getElementValues() contains only the attributes explicitly specified
-        // in the source, so we don't need to rely on a default value.
-        for (var element : mirror.getElementValues().keySet()) {
-            if (element.getSimpleName().toString().equals(key)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     protected String getConditionName(TypeElement element, Class<? extends Annotation> annotation) {
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             if (!mirror.getAnnotationType().toString().equals(annotation.getName())) {

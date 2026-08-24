@@ -91,10 +91,10 @@ public abstract class RepeatedMetadataStep<A extends Annotation> extends Abstrac
     }
 
     protected void processAnnotation(TypeElement type, A annotation, AnnotationMirror mirror) {
-        processAnnotation(getConditionalMetadata(getConditionName(type, mirror)), type, annotation, mirror);
+        processAnnotation(getConditionalMetadata(getConditionName(type, mirror)), type, annotation);
     }
 
-    protected abstract void processAnnotation(ConditionalMetadata metadata, TypeElement type, A annotation, AnnotationMirror mirror);
+    protected abstract void processAnnotation(ConditionalMetadata metadata, TypeElement type, A annotation);
 
     private final Class<A> annotationClass;
     private final Class<? extends Annotation> annotationListClass;

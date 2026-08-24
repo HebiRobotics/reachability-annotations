@@ -30,16 +30,16 @@ Resources, bundles, and proxies are registered in addition to the annotated type
 public class Example {}
 ```
 
-Adding `classes` or `classNames` replaces the default class. If the annotated class is needed as well, it needs to be specified explicitly
+`classes` and `classNames` are registered in addition to the annotated type. Use `self = false` to leave it out
 
 ```Java
-@Reachable(classes = { Other.class }) // registers Other, but not Example
+@Reachable(classes = { Other.class }) // registers Example and Other
 public class Example {}
 
-@Reachable(classes = { Example.class, Other.class }) // registers both
+@Reachable(self = false, classes = { Other.class }) // registers only Other
 public class Example {}
 
-@Reachable(classes = {}, resources = { "images/*.png" }) // registers only resources
+@Reachable(self = false, resources = { "images/*.png" }) // registers only resources
 public class Example {}
 ```
 

@@ -160,7 +160,7 @@ public class ReachableConfigTest {
 
     @Test
     void testResourcesWithClass() throws IOException {
-        // Listing resources does not suppress the registration of the annotated type
+        // Annotated type and resources
         assertContains(reflectionConfig, """
                 {
                   "condition": {
@@ -184,7 +184,6 @@ public class ReachableConfigTest {
 
     @Test
     void testResourcesWithoutClass() throws IOException {
-        // An empty class list registers no types at all, but the resources still apply
         assertMaxOccurences(reflectionConfig, "$ResourcesWithoutClass", 0);
         assertContains(resourceConfig, """
                 {
@@ -198,7 +197,6 @@ public class ReachableConfigTest {
 
     @Test
     void testClassAndOtherClass() throws IOException {
-        // The annotated type can add itself back to the list
         assertContains(reflectionConfig, """
                 {
                   "condition": {
@@ -224,9 +222,19 @@ public class ReachableConfigTest {
     }
 
     @Test
-    void testClassNamesOnly() throws IOException {
-        // A written name list suppresses the annotated type just like 'classes' does
-        assertMaxOccurences(reflectionConfig, "$PrivateClassHierarchy", 3);
+    void testOtherClassOnly() throws IOException {
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$OtherClassOnly"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedParentClass",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+        assertMaxOccurences(reflectionConfig, "$OtherClassOnly", 1);
     }
 
     @Test

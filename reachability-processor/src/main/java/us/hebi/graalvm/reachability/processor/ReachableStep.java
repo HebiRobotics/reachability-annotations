@@ -27,7 +27,6 @@ import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.Reso
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypesException;
 import java.util.function.Consumer;
@@ -44,7 +43,7 @@ public class ReachableStep extends RepeatedMetadataStep<Reachable> {
     }
 
     @Override
-    protected void processAnnotation(ReachabilityMetadata.ConditionalMetadata metadata, TypeElement type, Reachable annotation, AnnotationMirror mirror) {
+    protected void processAnnotation(ReachabilityMetadata.ConditionalMetadata metadata, TypeElement type, Reachable annotation) {
         // Absolute & relative resource paths
         if (annotation.resources().length > 0 || annotation.bundles().length > 0) {
             var baseDir = ProcessorUtil.getSourceDirectory(env, type);
@@ -91,8 +90,7 @@ public class ReachableStep extends RepeatedMetadataStep<Reachable> {
             }
         }
 
-        // Only add the annotated type if no classes were specified
-        if (!isSpecified(mirror, "classes") && !isSpecified(mirror, "classNames")) {
+        if (annotation.self()) {
             addReflectedType(metadata, type, annotation.includeClassHierarchy(), updateReflectEntry);
         }
     }
