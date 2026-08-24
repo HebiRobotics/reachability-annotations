@@ -21,7 +21,6 @@
 package us.hebi.graalvm.reachability.processor;
 
 
-import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ConditionalMetadata;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -29,6 +28,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.lang.annotation.Annotation;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -50,9 +50,9 @@ public abstract class RepeatedMetadataStep<A extends Annotation> extends Abstrac
     }
 
     @Override
-    public void process0(ImmutableSetMultimap<String, Element> elementMap) {
+    public void process0(Map<String, Set<Element>> elementMap) {
         // Single annotation
-        for (Element element : elementMap.get(annotationClass.getCanonicalName())) {
+        for (Element element : elementMap.getOrDefault(annotationClass.getCanonicalName(), Set.of())) {
             if (element instanceof TypeElement type) {
                 var mirror = getAnnotationMirror(type, annotationClass);
                 if (mirror != null) {
@@ -63,7 +63,7 @@ public abstract class RepeatedMetadataStep<A extends Annotation> extends Abstrac
         }
 
         // Multiple annotations
-        for (Element element : elementMap.get(annotationListClass.getCanonicalName())) {
+        for (Element element : elementMap.getOrDefault(annotationListClass.getCanonicalName(), Set.of())) {
             if (element instanceof TypeElement type) {
                 var listMirror = getAnnotationMirror(type, annotationListClass);
                 if (listMirror != null) {

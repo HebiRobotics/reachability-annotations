@@ -20,7 +20,6 @@
 
 package us.hebi.graalvm.reachability.processor.parsers;
 
-import com.google.mu.util.Substring;
 import lombok.RequiredArgsConstructor;
 
 import java.nio.file.Path;
@@ -47,10 +46,7 @@ public class CssParser {
         var content = contentOpt.get();
 
         // Parse import statements
-        Substring.between("@import", ";")
-                .repeatedly()
-                .match(content)
-                .map(Substring.Match::toString)
+        SpanUtil.findBetween(content, "@import", ";").stream()
                 .map(String::trim)
                 .map(CssParser::removeUrlAndQuotes)
                 .filter(s -> !s.isEmpty())
@@ -58,10 +54,7 @@ public class CssParser {
                 .forEach(this::addCssFile);
 
         // Parse other url() resources, e.g., in @font-face rules or background images
-        Substring.between("url(", ")")
-                .repeatedly()
-                .match(content)
-                .map(Object::toString)
+        SpanUtil.findBetween(content, "url(", ")").stream()
                 .map(CssParser::removeUrlAndQuotes)
                 .filter(s -> !s.isEmpty())
                 .map(file -> resolve(path, file))

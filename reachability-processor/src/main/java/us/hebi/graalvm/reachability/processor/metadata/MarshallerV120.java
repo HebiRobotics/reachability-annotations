@@ -33,10 +33,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static com.google.common.base.Preconditions.*;
 import static us.hebi.graalvm.reachability.processor.util.ProtoUtil.*;
 
 /**
@@ -46,7 +46,7 @@ import static us.hebi.graalvm.reachability.processor.util.ProtoUtil.*;
 public class MarshallerV120 {
 
     public static ReachabilityMetadata mergeMetadataFrom(Path sourceDir, ReachabilityMetadata metadata) throws IOException {
-        checkNotNull(sourceDir, "source path can't be null");
+        Objects.requireNonNull(sourceDir, "source path can't be null");
 
         var rootProto = parseJsonObject(sourceDir.resolve("reachability-metadata.json"),
                 us.hebi.graalvm.reachability.processor.metadata.schema.v1_2_0.ReachabilityMetadata.getFactory());
