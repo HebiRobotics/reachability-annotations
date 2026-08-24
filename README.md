@@ -23,23 +23,22 @@ The default configuration enables full reflection with a condition on the annota
 }
 ```
 
-Resources, bundles, and proxies are registered in addition to the annotated type
+Specifying other targets (`classes`, `classNames`, `resources`, `bundles`, or `proxies`) replaces the default class. If the annotated class is needed as well, it needs to be added to the list
 
 ```Java
-@Reachable(resources = { "images/*.png" }) // registers the class and resources
-public class Example {}
-```
-
-`classes` and `classNames` are registered in addition to the annotated type. Use `self = false` to leave it out
-
-```Java
-@Reachable(classes = { Other.class }) // registers Example and Other
+@Reachable // registers Example
 public class Example {}
 
-@Reachable(self = false, classes = { Other.class }) // registers only Other
+@Reachable(classes = { Other.class }) // registers only Other
 public class Example {}
 
-@Reachable(self = false, resources = { "images/*.png" }) // registers only resources
+@Reachable(classes = { Example.class, Other.class }) // registers Example and Other
+public class Example {}
+
+@Reachable(resources = { "images/*.png" }) // registers only resources
+public class Example {}
+
+@Reachable(classes = Example.class, resources = { "images/*.png" }) // registers Example and resources
 public class Example {}
 ```
 

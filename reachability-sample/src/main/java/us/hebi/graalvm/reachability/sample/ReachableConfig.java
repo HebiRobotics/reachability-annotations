@@ -52,7 +52,7 @@ public class ReachableConfig {
     public static class ReferencingChildClass {
     }
 
-    @Reachable(self = false, classes = NestedChildClass.class, includeClassHierarchy = false)
+    @Reachable(classes = NestedChildClass.class, includeClassHierarchy = false)
     public static class ReferencingChildClassWithoutParent {
     }
 
@@ -70,19 +70,19 @@ public class ReachableConfig {
     public static class PrivateClassHierarchy {
     }
 
-    @Reachable(resources = "images/*.png")
+    @Reachable(classes = ResourcesWithClass.class, resources = "images/*.png")
     public static class ResourcesWithClass {
     }
 
-    @Reachable(self = false, resources = "images/*.jpg")
+    @Reachable(resources = "images/*.jpg")
     public static class ResourcesWithoutClass {
     }
 
-    @Reachable(classes = NestedParentClass.class)
+    @Reachable(classes = {ClassAndOtherClass.class, NestedParentClass.class})
     public static class ClassAndOtherClass {
     }
 
-    @Reachable(self = false, classes = NestedParentClass.class)
+    @Reachable(classes = NestedParentClass.class)
     public static class OtherClassOnly {
     }
 

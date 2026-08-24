@@ -25,9 +25,9 @@ import java.lang.annotation.*;
 /**
  * Annotation for defining reachability metadata.
  * <p>
- * The annotated type gets registered for reflection unless {@code self}
- * is set to false. Resources, bundles, and proxies always need to be
- * explicit.
+ * The annotated type gets registered for reflection unless other classes,
+ * resources, proxies, or bundles are specified. The annotated type can
+ * be explicitly added to the list like any other class.
  *
  * @author Florian Enner
  * @since 25 Nov 2025
@@ -62,12 +62,8 @@ public @interface Reachable {
     String conditionName() default "";
 
     /**
-     * Whether the annotated type itself should be available for reflection.
-     */
-    boolean self() default true;
-
-    /**
-     * Additional classes that should be available for reflection.
+     * Classes that should be available for reflection. The annotated type is not
+     * part of the list unless it is specified.
      *
      * @return classes that should be available for reflection
      */

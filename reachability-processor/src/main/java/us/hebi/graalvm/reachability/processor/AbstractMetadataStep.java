@@ -93,6 +93,18 @@ public abstract class AbstractMetadataStep {
         return null;
     }
 
+    /**
+     * @return true if the attribute was explicitly specified in the source
+     */
+    protected boolean isSpecified(AnnotationMirror mirror, String key) {
+        for (var attribute : mirror.getElementValues().keySet()) {
+            if (attribute.getSimpleName().toString().equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected List<AnnotationMirror> getAnnotationArrayValue(AnnotationMirror mirror, String key) {
         for (var entry : mirror.getElementValues().entrySet()) {
             if (entry.getKey().getSimpleName().toString().equals(key)) {
