@@ -24,6 +24,10 @@ import java.lang.annotation.*;
 
 /**
  * Annotation for defining reachability metadata.
+ * <p>
+ * The annotated type gets registered for reflection unless {@code self}
+ * is set to false. Resources, bundles, and proxies always need to be
+ * explicit.
  *
  * @author Florian Enner
  * @since 25 Nov 2025
@@ -58,15 +62,22 @@ public @interface Reachable {
     String conditionName() default "";
 
     /**
-     * Classes that should be available for reflection. Defaults to the annotated class if
-     * no other items (classes, resources, proxies, bundles, ...) are specified.
+     * Whether the annotated type itself should be available for reflection.
+     */
+    boolean self() default true;
+
+    /**
+     * Additional classes that should be available for reflection.
      *
      * @return classes that should be available for reflection
      */
     Class<?>[] classes() default {};
 
     /**
-     * @return fully qualified names of classes that must be available for reflection, e.g., package.Class$Nested
+     * Names for classes that are not accessible at compile time. GraalVM expects
+     * nested classes to be specified as: "package.Class$Nested".
+     *
+     * @return fully qualified names of classes that must be available for reflection
      */
     String[] classNames() default {};
 

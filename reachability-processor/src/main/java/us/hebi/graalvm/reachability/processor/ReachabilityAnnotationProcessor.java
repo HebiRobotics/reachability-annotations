@@ -20,7 +20,6 @@
 
 package us.hebi.graalvm.reachability.processor;
 
-import com.google.auto.common.BasicAnnotationProcessor;
 import com.google.auto.service.AutoService;
 import us.hebi.graalvm.reachability.processor.metadata.MarshallerV100;
 import us.hebi.graalvm.reachability.processor.metadata.MarshallerV120;
@@ -28,15 +27,21 @@ import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.util.ExceptionUtil;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
+import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -44,7 +49,7 @@ import java.util.Set;
  * @since 09 Jul 2026
  */
 @AutoService(Processor.class)
-public class ReachabilityAnnotationProcessor extends BasicAnnotationProcessor {
+public class ReachabilityAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -62,11 +67,46 @@ public class ReachabilityAnnotationProcessor extends BasicAnnotationProcessor {
     }
 
     @Override
-    protected Iterable<? extends BasicAnnotationProcessor.Step> steps() {
-        return steps;
+    public Set<String> getSupportedAnnotationTypes() {
+        Set<String> annotations = new LinkedHashSet<>();
+        for (var step : steps) {
+            annotations.addAll(step.annotations());
+        }
+        return annotations;
     }
 
-    protected void postRound(RoundEnvironment roundEnv) {
+    @Override
+    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        // Same dispatch as auto-common's BasicAnnotationProcessor without the deferral
+        if (!roundEnv.processingOver()) {
+            for (var step : steps) {
+                var elementMap = getAnnotatedElements(step, roundEnv);
+                if (!elementMap.isEmpty()) {
+                    step.process(elementMap);
+                }
+            }
+        }
+        postRound(roundEnv);
+        return false;
+    }
+
+    private Map<String, Set<Element>> getAnnotatedElements(AbstractMetadataStep step, RoundEnvironment roundEnv) {
+        Map<String, Set<Element>> elementMap = new LinkedHashMap<>();
+        for (String annotation : step.annotations()) {
+            // Annotation is not on the classpath
+            TypeElement type = getEnv().getElementUtils().getTypeElement(annotation);
+            if (type == null) {
+                continue;
+            }
+            var elements = roundEnv.getElementsAnnotatedWith(type);
+            if (!elements.isEmpty()) {
+                elementMap.put(annotation, new LinkedHashSet<>(elements));
+            }
+        }
+        return elementMap;
+    }
+
+    private void postRound(RoundEnvironment roundEnv) {
         if (roundEnv.processingOver()) {
 
             var baseDir = ProcessorUtil.getClassOutputDirectory(getEnv())

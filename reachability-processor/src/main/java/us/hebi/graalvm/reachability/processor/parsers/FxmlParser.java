@@ -19,17 +19,6 @@
  */
 package us.hebi.graalvm.reachability.processor.parsers;
 
-import com.google.mu.util.Substring;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-
-
-import com.google.mu.util.Substring;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -71,18 +60,12 @@ public class FxmlParser {
 
         // Remove comments
         resources.add(path);
-        content = Substring.spanningInOrder("<!--", "-->")
-                .repeatedly()
-                .removeAllFrom(content);
+        content = SpanUtil.removeSpans(content, "<!--", "-->");
 
         // Look at special statements that figure out all classes that may get reflectively
         // accessed. We keep all fields and methods in the config, so we don't need to parse
         // individual field accesses.
-        List<String> localImports = Substring.between("<?import ", "?>")
-                .repeatedly()
-                .match(content)
-                .map(Substring.Match::toString)
-                .toList(); // TODO: fail on wildcard imports?
+        List<String> localImports = SpanUtil.findBetween(content, "<?import ", "?>"); // TODO: fail on wildcard imports?
         imports.addAll(localImports);
 
         // Controllers may not be fully-qualified, so we check for import matches first
@@ -124,16 +107,9 @@ public class FxmlParser {
     }
 
     public static void onAttribute(String content, String tag, String attribute, Consumer<String> consumer) {
-        Substring.between("<" + tag, ">")
-                .repeatedly()
-                .match(content)
-                .forEach(element -> {
-                    Substring.between(attribute + "=\"", "\"")
-                            .repeatedly()
-                            .match(element.toString())
-                            .map(Substring.Match::toString)
-                            .forEach(consumer::accept);
-                });
+        for (String element : SpanUtil.findBetween(content, "<" + tag, ">")) {
+            SpanUtil.findBetween(element, attribute + "=\"", "\"").forEach(consumer);
+        }
     }
 
     @Override

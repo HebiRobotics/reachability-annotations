@@ -20,7 +20,6 @@
 
 package us.hebi.graalvm.reachability.processor.metadata;
 
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ResourceEntry;
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_0_0.ProxyConfig;
@@ -34,10 +33,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static com.google.common.base.Preconditions.*;
 import static us.hebi.graalvm.reachability.processor.util.ProtoUtil.*;
 
 /**
@@ -47,7 +46,7 @@ import static us.hebi.graalvm.reachability.processor.util.ProtoUtil.*;
 public class MarshallerV120 {
 
     public static ReachabilityMetadata mergeMetadataFrom(Path sourceDir, ReachabilityMetadata metadata) throws IOException {
-        checkNotNull(sourceDir, "source path can't be null");
+        Objects.requireNonNull(sourceDir, "source path can't be null");
 
         var rootProto = parseJsonObject(sourceDir.resolve("reachability-metadata.json"),
                 us.hebi.graalvm.reachability.processor.metadata.schema.v1_2_0.ReachabilityMetadata.getFactory());
@@ -84,7 +83,7 @@ public class MarshallerV120 {
         return Optional.of(JsonSource.newInstance(Files.readAllBytes(file)));
     }
 
-    private static void copyEntryFromProto(@MonotonicNonNull ReflectionEntry proto, ReachabilityMetadata.ReflectionEntry entry) {
+    private static void copyEntryFromProto(ReflectionEntry proto, ReachabilityMetadata.ReflectionEntry entry) {
         if (proto.getAllDeclaredMethods()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_METHODS);
         if (proto.getAllDeclaredFields()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_FIELDS);
         if (proto.getAllDeclaredConstructors()) entry.addMemberAccess(MemberAccess.ALL_DECLARED_CONSTRUCTORS);

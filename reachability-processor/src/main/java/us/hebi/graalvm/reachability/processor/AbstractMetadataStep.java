@@ -20,11 +20,7 @@
 
 package us.hebi.graalvm.reachability.processor;
 
-import com.google.auto.common.BasicAnnotationProcessor;
-import com.google.common.collect.ImmutableSetMultimap;
 import lombok.Getter;
-import us.hebi.graalvm.reachability.processor.metadata.MarshallerV100;
-import us.hebi.graalvm.reachability.processor.metadata.MarshallerV120;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ConditionalMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ReflectionEntry;
@@ -40,7 +36,6 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,10 +48,14 @@ import java.util.stream.Collectors;
  * @author Florian Enner
  * @since 27 Nov 2025
  */
-public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.Step {
+public abstract class AbstractMetadataStep {
 
-    @Override
-    public final Set<? extends Element> process(ImmutableSetMultimap<String, Element> elementMap) {
+    /**
+     * @return fully qualified names of the supported annotations
+     */
+    public abstract Set<String> annotations();
+
+    public final void process(Map<String, Set<Element>> elementMap) {
         this.env = environmentSupplier.get();
         try {
             // Initialize metadata
@@ -72,7 +71,6 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         } catch (Exception e) {
             printError(ExceptionUtil.getStackTrace(e));
         }
-        return Collections.emptySet();
     }
 
     protected void printError(String message) {
@@ -83,7 +81,7 @@ public abstract class AbstractMetadataStep implements BasicAnnotationProcessor.S
         env.getMessager().printMessage(Diagnostic.Kind.WARNING, message);
     }
 
-    public abstract void process0(ImmutableSetMultimap<String, Element> elementMap);
+    public abstract void process0(Map<String, Set<Element>> elementMap);
 
     protected AnnotationMirror getAnnotationMirror(Element type, Class<?> annotationClass) {
         String annotationName = annotationClass.getCanonicalName();

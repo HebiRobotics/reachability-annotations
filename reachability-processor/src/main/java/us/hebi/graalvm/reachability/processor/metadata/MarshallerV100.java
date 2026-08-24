@@ -31,10 +31,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static com.google.common.base.Preconditions.*;
 import static us.hebi.graalvm.reachability.processor.util.ProtoUtil.*;
 
 /**
@@ -44,7 +44,7 @@ import static us.hebi.graalvm.reachability.processor.util.ProtoUtil.*;
 public class MarshallerV100 {
 
     public static ReachabilityMetadata mergeMetadataFrom(Path sourceDir, ReachabilityMetadata metadata) throws IOException {
-        checkNotNull(sourceDir, "source path can't be null");
+        Objects.requireNonNull(sourceDir, "source path can't be null");
 
         // Reflection config
         for (var proto : parseJsonList(sourceDir.resolve("reflect-config.json"), ReflectConfigEntry.getFactory())) {

@@ -20,7 +20,6 @@
 
 package us.hebi.graalvm.reachability.processor;
 
-import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.annotations.ReachableFxResources;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ConditionalMetadata;
@@ -28,7 +27,6 @@ import us.hebi.graalvm.reachability.processor.util.GlobUtil;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
