@@ -20,7 +20,6 @@
 
 package us.hebi.graalvm.reachability.processor;
 
-import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.annotations.ReachableFxResources;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ConditionalMetadata;

@@ -20,7 +20,6 @@
 
 package us.hebi.graalvm.reachability.processor;
 
-import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.util.ElementUtil;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
@@ -28,6 +27,7 @@ import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -53,20 +53,21 @@ public class DependencyInjectionStep extends AbstractMetadataStep {
         );
     }
 
-    public void process0(ImmutableSetMultimap<String, Element> elementMap) {
-        for (var element : elementMap.values()) {
-            if (element instanceof TypeElement typeElement) {
-                continue;
-            }
+    public void process0(Map<String, Set<Element>> elementMap) {
+        for (var elements : elementMap.values()) {
+            for (var element : elements) {
+                if (element instanceof TypeElement typeElement) {
+                    continue;
+                }
 
-            // fine-grained reflection
-            if (element.getEnclosingElement() instanceof TypeElement typeElement) {
-                var metadata = getConditionalMetadata(ElementUtil.getBinaryName(typeElement));
-                addReflectedFieldOrMethod(metadata, typeElement, element, true);
-            } else {
-                printWarning("Parent is not a TypeElement: " + element);
+                // fine-grained reflection
+                if (element.getEnclosingElement() instanceof TypeElement typeElement) {
+                    var metadata = getConditionalMetadata(ElementUtil.getBinaryName(typeElement));
+                    addReflectedFieldOrMethod(metadata, typeElement, element, true);
+                } else {
+                    printWarning("Parent is not a TypeElement: " + element);
+                }
             }
-
         }
     }
 
