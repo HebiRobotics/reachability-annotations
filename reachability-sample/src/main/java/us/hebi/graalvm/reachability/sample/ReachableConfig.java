@@ -52,7 +52,7 @@ public class ReachableConfig {
     public static class ReferencingChildClass {
     }
 
-    @Reachable(classes = NestedChildClass.class, includeClassHierarchy = false)
+    @Reachable(self = false, classes = NestedChildClass.class, includeClassHierarchy = false)
     public static class ReferencingChildClassWithoutParent {
     }
 
@@ -68,6 +68,22 @@ public class ReachableConfig {
 
     @Reachable(classNames = "sun.net.www.protocol.jar.JarURLConnection", includeClassHierarchy = true)
     public static class PrivateClassHierarchy {
+    }
+
+    @Reachable(resources = "images/*.png")
+    public static class ResourcesWithClass {
+    }
+
+    @Reachable(self = false, resources = "images/*.jpg")
+    public static class ResourcesWithoutClass {
+    }
+
+    @Reachable(classes = NestedParentClass.class)
+    public static class ClassAndOtherClass {
+    }
+
+    @Reachable(self = false, classes = NestedParentClass.class)
+    public static class OtherClassOnly {
     }
 
     @Reachable(memberAccess = {})

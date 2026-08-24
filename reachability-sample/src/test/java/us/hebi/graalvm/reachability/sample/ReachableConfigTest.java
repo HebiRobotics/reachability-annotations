@@ -159,6 +159,85 @@ public class ReachableConfigTest {
     }
 
     @Test
+    void testResourcesWithClass() throws IOException {
+        // Annotated type and resources
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ResourcesWithClass"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$ResourcesWithClass",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ResourcesWithClass"
+                  },
+                  "pattern": "us/hebi/graalvm/reachability/sample/images/[^/]*\\\\.png"
+                }
+                """);
+    }
+
+    @Test
+    void testResourcesWithoutClass() throws IOException {
+        assertMaxOccurences(reflectionConfig, "$ResourcesWithoutClass", 0);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ResourcesWithoutClass"
+                  },
+                  "pattern": "us/hebi/graalvm/reachability/sample/images/[^/]*\\\\.jpg"
+                }
+                """);
+    }
+
+    @Test
+    void testClassAndOtherClass() throws IOException {
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ClassAndOtherClass"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$ClassAndOtherClass",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ClassAndOtherClass"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedParentClass",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
+    void testOtherClassOnly() throws IOException {
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$OtherClassOnly"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedParentClass",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+        assertMaxOccurences(reflectionConfig, "$OtherClassOnly", 1);
+    }
+
+    @Test
     void testJniSpecifiedChildClass() throws IOException {
         assertContains(jniConfig, """
                 {
@@ -211,7 +290,6 @@ public class ReachableConfigTest {
                 "proxies": []
                 """);
     }
-
 
     @Test
     void testMultipleClasses() throws IOException {

@@ -20,7 +20,6 @@
 
 package us.hebi.graalvm.reachability.processor;
 
-import com.google.common.collect.ImmutableSetMultimap;
 import us.hebi.graalvm.reachability.annotations.Reachable;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ReflectionEntry;
@@ -28,12 +27,8 @@ import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.Reso
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypesException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -49,11 +44,8 @@ public class ReachableStep extends RepeatedMetadataStep<Reachable> {
 
     @Override
     protected void processAnnotation(ReachabilityMetadata.ConditionalMetadata metadata, TypeElement type, Reachable annotation) {
-        boolean fieldsEmpty = true;
-
         // Absolute & relative resource paths
         if (annotation.resources().length > 0 || annotation.bundles().length > 0) {
-            fieldsEmpty = false;
             var baseDir = ProcessorUtil.getSourceDirectory(env, type);
 
             // Resource globs
@@ -70,7 +62,6 @@ public class ReachableStep extends RepeatedMetadataStep<Reachable> {
 
         // Explicitly added proxy interface names
         for (var proxy : annotation.proxies()) {
-            fieldsEmpty = false;
             metadata.addProxyInterfaces(proxy.value());
         }
 
@@ -82,28 +73,24 @@ public class ReachableStep extends RepeatedMetadataStep<Reachable> {
             entry.serializable |= annotation.serializable();
         };
         for (String name : annotation.classNames()) {
-            fieldsEmpty = false;
             addReflectedType(metadata, name, annotation.includeClassHierarchy(), updateReflectEntry);
         }
         try {
             // Processing classes immediately hit a MirroredTypeException,
             // so this code doesn't actually run.
             for (var clazz : annotation.classes()) {
-                fieldsEmpty = false;
                 addReflectedType(metadata, clazz.getName(), annotation.includeClassHierarchy(), updateReflectEntry);
             }
         } catch (MirroredTypesException e) {
             // Add all target classes and their parents
             for (var typeMirror : e.getTypeMirrors()) {
-                fieldsEmpty = false;
                 if (env.getTypeUtils().asElement(typeMirror) instanceof TypeElement typeElement) {
                     addReflectedType(metadata, typeElement, annotation.includeClassHierarchy(), updateReflectEntry);
                 }
             }
         }
 
-        // Nothing else defined -> enable reflection of the annotated type itself
-        if (fieldsEmpty) {
+        if (annotation.self()) {
             addReflectedType(metadata, type, annotation.includeClassHierarchy(), updateReflectEntry);
         }
     }

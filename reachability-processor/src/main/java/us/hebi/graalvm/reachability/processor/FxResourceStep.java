@@ -28,7 +28,6 @@ import us.hebi.graalvm.reachability.processor.util.GlobUtil;
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
