@@ -103,7 +103,7 @@ public class ReachabilityMetadata {
 
     /**
      * v1.0.0 used regex, but the v1.2.0 format uses globs. We want to be forwards
-     * compatible with the newer format, so we limit it to blobs from the start.
+     * compatible with the newer format, so we limit it to globs from the start.
      */
     @Value
     @RequiredArgsConstructor
@@ -122,7 +122,7 @@ public class ReachabilityMetadata {
                 // Paths relative to this output directory
                 return new ResourceEntry("", resource);
             } else {
-                // Paths relative to the
+                // Paths relative to the annotated type's package
                 return new ResourceEntry("", GlobUtil.ensureForwardSlash(baseDir) + resource);
             }
         }

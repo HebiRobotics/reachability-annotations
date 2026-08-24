@@ -25,7 +25,6 @@ import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.Reso
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_0_0.*;
 import us.hebi.graalvm.reachability.processor.util.GlobUtil;
 import us.hebi.graalvm.reachability.processor.util.ProtoUtil;
-import us.hebi.quickbuf.JsonSource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -90,13 +89,6 @@ public class MarshallerV100 {
         }
 
         return metadata;
-    }
-
-    private static Optional<JsonSource> tryReadFile(Path file) throws IOException {
-        if (!Files.exists(file)) {
-            return Optional.empty();
-        }
-        return Optional.of(JsonSource.newInstance(Files.readAllBytes(file)));
     }
 
     private static void copyEntryFromProto(ReflectConfigEntry proto, ReachabilityMetadata.ReflectionEntry entry) {

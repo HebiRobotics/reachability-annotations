@@ -27,7 +27,6 @@ import us.hebi.graalvm.reachability.processor.metadata.schema.v1_0_0.ProxyEntry;
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_2_0.Condition;
 import us.hebi.graalvm.reachability.processor.metadata.schema.v1_2_0.ReflectionEntry;
 import us.hebi.graalvm.reachability.processor.util.ProtoUtil;
-import us.hebi.quickbuf.JsonSource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -74,13 +73,6 @@ public class MarshallerV120 {
         }
 
         return metadata;
-    }
-
-    private static Optional<JsonSource> tryReadFile(Path file) throws IOException {
-        if (!Files.exists(file)) {
-            return Optional.empty();
-        }
-        return Optional.of(JsonSource.newInstance(Files.readAllBytes(file)));
     }
 
     private static void copyEntryFromProto(ReflectionEntry proto, ReachabilityMetadata.ReflectionEntry entry) {
@@ -168,7 +160,7 @@ public class MarshallerV120 {
                 condition.ifPresent(entry::setCondition);
             }
 
-            // proxy-config stored using the old format for now (TOOD: implement in 1.2.0)
+            // proxy-config stored using the old format for now (TODO: implement in 1.2.0)
             for (var interfaceNames : metadata.proxyInterfaceNames) {
                 var entry = proxyConfig.getMutableEntries().next();
                 for (var fqdn : interfaceNames) {

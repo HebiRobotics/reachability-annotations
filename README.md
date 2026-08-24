@@ -165,7 +165,7 @@ The default naming convention follows established conventions (see [FxmlKit](htt
 
 ```Java
 @ReachableFxView("dialog") // checks for dialog.fxml, dialog.css, dialog.properties etc.
-public enum DialogView extends com.airhacks.afterburner.views.FXMLView {}
+public class DialogView extends com.airhacks.afterburner.views.FXMLView {}
 ```
 
 
