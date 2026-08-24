@@ -1,6 +1,6 @@
 /*-
  * #%L
- * reachability-processor
+ * reachability-annotations
  * %%
  * Copyright (C) 2026 HEBI Robotics
  * %%
