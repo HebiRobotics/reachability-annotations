@@ -20,10 +20,10 @@
 
 package us.hebi.graalvm.reachability.processor.metadata;
 
-import com.google.common.base.Strings;
 import lombok.*;
 import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.processor.util.GlobUtil;
+import us.hebi.graalvm.reachability.processor.util.StringUtil;
 
 import java.util.*;
 
@@ -118,7 +118,7 @@ public class ReachabilityMetadata {
             if (module.isPresent()) {
                 // Module paths are relative to the target module root
                 return new ResourceEntry(module.get(), resource);
-            } else if (isAbs || Strings.isNullOrEmpty(baseDir)) {
+            } else if (isAbs || StringUtil.isNullOrEmpty(baseDir)) {
                 // Paths relative to this output directory
                 return new ResourceEntry("", resource);
             } else {
@@ -139,7 +139,7 @@ public class ReachabilityMetadata {
 
         @Override
         public String toString() {
-            return Strings.isNullOrEmpty(module) ? globOrName : module + ":" + globOrName;
+            return StringUtil.isNullOrEmpty(module) ? globOrName : module + ":" + globOrName;
         }
 
         String module;
@@ -148,7 +148,7 @@ public class ReachabilityMetadata {
     }
 
     private static void addResourceEntry(String module, String entry, Map<String, ResourceEntry> map) {
-        String key = Strings.isNullOrEmpty(module) ? entry : module + ":" + entry;
+        String key = StringUtil.isNullOrEmpty(module) ? entry : module + ":" + entry;
         if (!map.containsKey(key)) {
             map.put(key, new ResourceEntry(module, entry));
         }
@@ -194,7 +194,7 @@ public class ReachabilityMetadata {
             Set<String> patterns = new TreeSet<>(this.patterns);
             for (var entry : resourceGlobs.values()) {
                 String pattern = GlobUtil.convertGlobToRegex(entry.globOrName);
-                if (!Strings.isNullOrEmpty(entry.module)) {
+                if (!StringUtil.isNullOrEmpty(entry.module)) {
                     pattern = entry.module + ":" + pattern;
                 }
                 patterns.add(pattern);
