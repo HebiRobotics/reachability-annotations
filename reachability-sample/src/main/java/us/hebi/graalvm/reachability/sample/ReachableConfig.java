@@ -70,6 +70,18 @@ public class ReachableConfig {
     public static class PrivateClassHierarchy {
     }
 
+    @Reachable(resources = "images/*.png")
+    public static class ResourcesWithClass {
+    }
+
+    @Reachable(classes = {}, resources = "images/*.jpg")
+    public static class ResourcesWithoutClass {
+    }
+
+    @Reachable(classes = {ClassAndOtherClass.class, NestedParentClass.class})
+    public static class ClassAndOtherClass {
+    }
+
     @Reachable(memberAccess = {})
     public static class NoMemberAccess {
     }

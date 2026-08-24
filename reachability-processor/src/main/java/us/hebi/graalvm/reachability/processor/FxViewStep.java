@@ -27,6 +27,7 @@ import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.Reso
 import us.hebi.graalvm.reachability.processor.util.ProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.TypeElement;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -42,7 +43,7 @@ public class FxViewStep extends RepeatedMetadataStep<ReachableFxView> {
     }
 
     @Override
-    protected void processAnnotation(ConditionalMetadata metadata, TypeElement type, ReachableFxView annotation) {
+    protected void processAnnotation(ConditionalMetadata metadata, TypeElement type, ReachableFxView annotation, AnnotationMirror mirror) {
         final var rootDir = getClassOutputDir();
 
         // Use Afterburner convention for the name

@@ -23,6 +23,26 @@ The default configuration enables full reflection with a condition on the annota
 }
 ```
 
+Resources, bundles, and proxies are registered in addition to the annotated type
+
+```Java
+@Reachable(resources = { "images/*.png" }) // registers the class and resources
+public class Example {}
+```
+
+Adding `classes` or `classNames` replaces the default class. If the annotated class is needed as well, it needs to be specified explicitly
+
+```Java
+@Reachable(classes = { Other.class }) // registers Other, but not Example
+public class Example {}
+
+@Reachable(classes = { Example.class, Other.class }) // registers both
+public class Example {}
+
+@Reachable(classes = {}, resources = { "images/*.png" }) // registers only resources
+public class Example {}
+```
+
 ## Fine Control
 
 ```Java
@@ -82,7 +102,8 @@ Declares classes, resources, dynamic proxies, and bundles that should be availab
 @Reachable
 public enum ReflectivelyAccessedEnum {}
 
-// Full reflection of all specified classes and their parent hierarchy
+// Full reflection of all specified classes and their parent hierarchy. The annotated
+// class itself is not part of the list unless explicitly specified
 @Reachable(
         includeClassHierarchy = true,
         classes = {InetAddress.class, InetSocketAddress.class},

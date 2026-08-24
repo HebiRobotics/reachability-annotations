@@ -159,6 +159,77 @@ public class ReachableConfigTest {
     }
 
     @Test
+    void testResourcesWithClass() throws IOException {
+        // Listing resources does not suppress the registration of the annotated type
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ResourcesWithClass"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$ResourcesWithClass",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ResourcesWithClass"
+                  },
+                  "pattern": "us/hebi/graalvm/reachability/sample/images/[^/]*\\\\.png"
+                }
+                """);
+    }
+
+    @Test
+    void testResourcesWithoutClass() throws IOException {
+        // An empty class list registers no types at all, but the resources still apply
+        assertMaxOccurences(reflectionConfig, "$ResourcesWithoutClass", 0);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ResourcesWithoutClass"
+                  },
+                  "pattern": "us/hebi/graalvm/reachability/sample/images/[^/]*\\\\.jpg"
+                }
+                """);
+    }
+
+    @Test
+    void testClassAndOtherClass() throws IOException {
+        // The annotated type can add itself back to the list
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ClassAndOtherClass"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$ClassAndOtherClass",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$ClassAndOtherClass"
+                  },
+                  "name": "us.hebi.graalvm.reachability.sample.ReachableConfig$NestedParentClass",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
+    void testClassNamesOnly() throws IOException {
+        // A written name list suppresses the annotated type just like 'classes' does
+        assertMaxOccurences(reflectionConfig, "$PrivateClassHierarchy", 3);
+    }
+
+    @Test
     void testJniSpecifiedChildClass() throws IOException {
         assertContains(jniConfig, """
                 {
@@ -211,7 +282,6 @@ public class ReachableConfigTest {
                 "proxies": []
                 """);
     }
-
 
     @Test
     void testMultipleClasses() throws IOException {

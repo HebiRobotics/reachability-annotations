@@ -46,7 +46,7 @@ public class FxResourceStep extends RepeatedMetadataStep<ReachableFxResources> {
     }
 
     @Override
-    protected void processAnnotation(ConditionalMetadata metadata, TypeElement type, ReachableFxResources annotation) {
+    protected void processAnnotation(ConditionalMetadata metadata, TypeElement type, ReachableFxResources annotation, AnnotationMirror mirror) {
         var sourceDir = ProcessorUtil.getSourceDirectory(env, type);
         var searchBaseDir = getClassOutputDir();
 
