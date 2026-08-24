@@ -143,7 +143,8 @@ public class ReachabilityAnnotationProcessor extends AbstractProcessor {
      */
     private void saveMetadata(ReachabilityMetadata metadata, Path outputDir) {
         try {
-            switch (getEnv().getOptions().getOrDefault("reachability.outputFormat", "")) {
+            var outputFormat = getEnv().getOptions().getOrDefault("reachability.outputFormat", "");
+            switch (outputFormat) {
                 case "all":
                     MarshallerV120.mergeExistingAndSaveMetadataTo(metadata, outputDir);
                     MarshallerV100.mergeExistingAndSaveMetadataTo(metadata, outputDir);
@@ -152,10 +153,14 @@ public class ReachabilityAnnotationProcessor extends AbstractProcessor {
                 case "1.2.0":
                     MarshallerV120.mergeExistingAndSaveMetadataTo(metadata, outputDir);
                     break;
+                case "": // unset defaults to 1.0.0
                 case "100":
                 case "1.0.0":
-                default:
                     MarshallerV100.mergeExistingAndSaveMetadataTo(metadata, outputDir);
+                    break;
+                default:
+                    getEnv().getMessager().printError("Unknown reachability.outputFormat '" + outputFormat
+                            + "'. Expected one of: all, 120, 1.2.0, 100, 1.0.0");
                     break;
             }
         } catch (IOException e) {
