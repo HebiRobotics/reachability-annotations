@@ -23,6 +23,8 @@ package us.hebi.graalvm.reachability.processor.parsers;
 import lombok.RequiredArgsConstructor;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -55,6 +57,9 @@ public class CssParser {
                 .map(file -> resolve(path, file))
                 .forEach(this::addCssFile);
 
+        // Parse skins that get instantiated reflectively, e.g., -fx-skin: "com.example.CustomSkin";
+        classes.addAll(findPropertyValues(content, "-fx-skin"));
+
         // Parse other url() resources, e.g., in @font-face rules or background images
         SpanUtil.findBetween(content, "url(", ")").stream()
                 .map(CssParser::removeUrlAndQuotes)
@@ -73,6 +78,25 @@ public class CssParser {
         } else {
             resources.add(path);
         }
+    }
+
+    /**
+     * @return values of a property, e.g., "com.example.CustomSkin" for '-fx-skin: "com.example.CustomSkin";'
+     */
+    private static List<String> findPropertyValues(String content, String property) {
+        List<String> values = new ArrayList<>();
+        for (String match : SpanUtil.findBetween(content, property, ";")) {
+            // Ignore properties that merely start with the same name, e.g., "-fx-skinny-border"
+            var value = match.stripLeading();
+            if (!value.startsWith(":")) {
+                continue;
+            }
+            value = removeUrlAndQuotes(value.substring(1));
+            if (!value.isEmpty()) {
+                values.add(value);
+            }
+        }
+        return values;
     }
 
     private static String removeUrlAndQuotes(String url) {
@@ -94,6 +118,10 @@ public class CssParser {
     @Override
     public String toString() {
         StringBuilder out = new StringBuilder();
+        out.append("Classes:\n");
+        for (var v : classes) {
+            out.append("  ").append(v).append("\n");
+        }
         out.append("Resources:\n");
         for (var v : resources) {
             out.append("  ").append(v).append("\n");
@@ -101,7 +129,12 @@ public class CssParser {
         return out.toString();
     }
 
+    final Set<String> classes = new TreeSet<>();
     final Set<Path> resources = new TreeSet<>();
+
+    public Set<String> getClasses() {
+        return classes;
+    }
 
     public Set<Path> getResources() {
         return resources;

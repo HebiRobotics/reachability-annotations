@@ -21,6 +21,7 @@
 package us.hebi.graalvm.reachability.processor;
 
 import lombok.Getter;
+import us.hebi.graalvm.reachability.annotations.MemberAccess;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ConditionalMetadata;
 import us.hebi.graalvm.reachability.processor.metadata.ReachabilityMetadata.ReflectionEntry;
@@ -225,6 +226,10 @@ public abstract class AbstractMetadataStep {
         if (lowercaseFile.endsWith(".css")) {
             var cssParser = new CssParser(getClassOutputDir());
             cssParser.addCssFile(file);
+            for (var name : cssParser.getClasses()) {
+                // Skins get looked up via Class::getConstructors and instantiated with the control
+                addReflectedType(metadata, name, includeHierarchy, entry -> entry.addMemberAccess(MemberAccess.ALL_PUBLIC_CONSTRUCTORS));
+            }
             for (var resource : cssParser.getResources()) {
                 addAbsFileResource(metadata, resource);
             }
