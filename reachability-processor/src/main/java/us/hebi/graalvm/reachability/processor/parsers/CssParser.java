@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -58,7 +59,21 @@ public class CssParser {
                 .forEach(this::addCssFile);
 
         // Parse skins that get instantiated reflectively, e.g., -fx-skin: "com.example.CustomSkin";
-        classes.addAll(findPropertyValues(content, "-fx-skin"));
+        findPropertyValues(content, "-fx-skin").stream()
+                .map(CssParser::removeUrlAndQuotes)
+                .filter(s -> !s.isEmpty())
+                .forEach(classes::add);
+
+        // Parse uri properties that may omit the url() wrapper, e.g., -fx-image: "images/icon.png";
+        for (var property : URI_PROPERTIES) {
+            findPropertyValues(content, property).stream()
+                    .flatMap(value -> Arrays.stream(value.split(","))) // layered images
+                    .filter(uri -> !uri.contains("url(")) // handled by the url() search below
+                    .map(CssParser::removeUrlAndQuotes)
+                    .filter(s -> !s.isEmpty())
+                    .map(file -> resolve(path, file))
+                    .forEach(this::addResource);
+        }
 
         // Parse other url() resources, e.g., in @font-face rules or background images
         SpanUtil.findBetween(content, "url(", ")").stream()
@@ -81,23 +96,30 @@ public class CssParser {
     }
 
     /**
-     * @return values of a property, e.g., "com.example.CustomSkin" for '-fx-skin: "com.example.CustomSkin";'
+     * @return raw values of a property, e.g., '"com.example.CustomSkin"' for '-fx-skin: "com.example.CustomSkin";'
      */
     private static List<String> findPropertyValues(String content, String property) {
         List<String> values = new ArrayList<>();
         for (String match : SpanUtil.findBetween(content, property, ";")) {
-            // Ignore properties that merely start with the same name, e.g., "-fx-skinny-border"
+            // Ignore properties that merely start with the same name, e.g., "-fx-skinny-border",
+            // as well as identical style class names, e.g., ".src:hover { ... }"
             var value = match.stripLeading();
-            if (!value.startsWith(":")) {
+            if (!value.startsWith(":") || value.contains("{")) {
                 continue;
             }
-            value = removeUrlAndQuotes(value.substring(1));
-            if (!value.isEmpty()) {
-                values.add(value);
-            }
+            values.add(value.substring(1).trim());
         }
         return values;
     }
+
+    // Properties that reference a resource and accept a plain string in addition to url
+    private static final List<String> URI_PROPERTIES = List.of(
+            "-fx-image",
+            "-fx-graphic",
+            "-fx-background-image",
+            "-fx-border-image-source",
+            "src" // @font-face
+    );
 
     private static String removeUrlAndQuotes(String url) {
         // Trim whitespace

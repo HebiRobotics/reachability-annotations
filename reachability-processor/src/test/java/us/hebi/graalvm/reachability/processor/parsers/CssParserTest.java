@@ -43,7 +43,13 @@ class CssParserTest {
         assertThat(parser.getResources()).containsExactlyInAnyOrder(
                 testDir.resolve("javafx.css"),
                 testDir.resolve("theme-base.css"),
-                rootDir.resolve("root/path/custom.css")
+                rootDir.resolve("root/path/custom.css"),
+                testDir.resolve("images/plain.png"),
+                testDir.resolve("images/wrapped.png"),
+                testDir.resolve("images/layer1.png"),
+                testDir.resolve("images/layer2.png"),
+                rootDir.resolve("root/path/border.png"),
+                testDir.resolve("fonts/font.ttf")
         );
         assertThat(parser.getClasses()).containsExactlyInAnyOrder("com.example.CustomSkin");
 

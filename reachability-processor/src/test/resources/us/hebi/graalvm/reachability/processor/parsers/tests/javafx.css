@@ -29,3 +29,18 @@
 @import "ignored.css";
 .other { -fx-skin: "com.example.IgnoredSkin"; }
 */
+
+.uri-properties {
+    -fx-image: "images/plain.png";
+    -fx-graphic: url("images/wrapped.png");
+    -fx-background-image: "images/layer1.png", "images/layer2.png";
+    -fx-border-image-source: "/root/path/border.png";
+}
+
+.src:hover {
+    -fx-fill: red;
+}
+
+@font-face {
+    src: url("fonts/font.ttf") format("truetype");
+}
