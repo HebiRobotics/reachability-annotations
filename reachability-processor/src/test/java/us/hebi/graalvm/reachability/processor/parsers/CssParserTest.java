@@ -45,6 +45,7 @@ class CssParserTest {
                 testDir.resolve("theme-base.css"),
                 rootDir.resolve("root/path/custom.css")
         );
+        assertThat(parser.getClasses()).containsExactlyInAnyOrder("com.example.CustomSkin");
 
     }
 

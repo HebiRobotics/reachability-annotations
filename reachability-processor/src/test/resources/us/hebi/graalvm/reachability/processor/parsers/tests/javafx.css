@@ -19,3 +19,13 @@
  */
 
 @import "theme-base.css";
+
+.custom-control {
+    -fx-skin: "com.example.CustomSkin";
+    -fx-skinny-border: 2px;
+}
+
+/* commented out
+@import "ignored.css";
+.other { -fx-skin: "com.example.IgnoredSkin"; }
+*/
