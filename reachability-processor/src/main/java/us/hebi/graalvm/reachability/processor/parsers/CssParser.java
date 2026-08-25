@@ -43,7 +43,9 @@ public class CssParser {
         if (contentOpt.isEmpty()) {
             return; // TODO: warn if a file does not exist?
         }
-        var content = contentOpt.get();
+
+        // Remove comments (TODO: line comments as well, but gets more complex with url:// etc)
+        var content = SpanUtil.removeSpans(contentOpt.get(), "/*", "*/");
 
         // Parse import statements
         SpanUtil.findBetween(content, "@import", ";").stream()
