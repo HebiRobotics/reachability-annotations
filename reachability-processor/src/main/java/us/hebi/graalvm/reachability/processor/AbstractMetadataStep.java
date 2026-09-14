@@ -205,21 +205,28 @@ public abstract class AbstractMetadataStep {
         String lowercaseFile = file.getFileName().toString().toLowerCase();
 
         if (lowercaseFile.endsWith(".fxml")) {
-            var fxmlParser = new FxmlParser(getClassOutputDir());
-            fxmlParser.addFxmlFile(file);
-            for (var name : fxmlParser.getImports()) {
-                if (name.contains("*")) {
-                    printWarning("Ignoring unsupported wildcard import: " + name);
-                    continue;
+            for (var fxmlFile : FxmlParser.parse(getClassOutputDir(), file)) {
+                for (var name : fxmlFile.getImports()) {
+                    if (name.contains("*")) {
+                        printWarning("Ignoring unsupported wildcard import: " + name);
+                        continue;
+                    }
+                    addReflectedType(metadata, name, includeHierarchy, ReflectionEntry::enableFullReflection);
                 }
-                addReflectedType(metadata, name, includeHierarchy, ReflectionEntry::enableFullReflection);
-
-            }
-            for (var name : fxmlParser.getControllers()) {
-                addReflectedType(metadata, name, includeHierarchy, ReflectionEntry::enableFullReflection);
-            }
-            for (var resource : fxmlParser.getResources()) {
-                addAbsFileResource(metadata, resource);
+                for (var entry : fxmlFile.getProperties().entrySet()) {
+                    var className = resolveClassName(entry.getKey(), fxmlFile.getImports());
+                    addReflectedType(metadata, className, includeHierarchy, ReflectionEntry::enableFullReflection);
+                    addCoercedPropertyTypes(metadata, className, entry.getValue());
+                }
+                addAbsFileResource(metadata, fxmlFile.getPath());
+                for (var resource : fxmlFile.getResources()) {
+                    addAbsFileResource(metadata, resource);
+                    // Referenced stylesheets need to be parsed as well, e.g. stylesheets="@../styles/style.css".
+                    // Fxml files stay out: the parser already visited them, and re-dispatching could cycle.
+                    if (resource.getFileName().toString().toLowerCase().endsWith(".css") && Files.isRegularFile(resource)) {
+                        addMetadataFromParsedFileContents(metadata, resource, includeHierarchy);
+                    }
+                }
             }
         }
 
@@ -259,6 +266,81 @@ public abstract class AbstractMetadataStep {
                 }
             }
         });
+    }
+
+    /**
+     * @return the class name resolved against the file's imports, or the input if no import matches
+     */
+    private static String resolveClassName(String name, List<String> imports) {
+        if (!name.contains(".")) {
+            for (String fqname : imports) {
+                if (fqname.endsWith("." + name)) {
+                    return fqname;
+                }
+            }
+        }
+        return name;
+    }
+
+    /**
+     * The reflectively used classes are already fully added, but a property setter like
+     * <Button alignment="CENTER" /> would also need the enum parameter. This adds metadata
+     * for the setters.
+     * <p>
+     * FXMLLoader coerces attribute strings into the setter's parameter type, and BeanAdapter's
+     * fallback looks up valueOf(String) reflectively. String, primitives and BigDecimal/BigInteger
+     * need no metadata.
+     */
+    private void addCoercedPropertyTypes(ConditionalMetadata metadata, String className, Set<String> propertyNames) {
+        var type = env.getElementUtils().getTypeElement(className);
+        if (type == null) {
+            return;
+        }
+
+        var setterNames = new TreeSet<String>();
+        for (var propertyName : propertyNames) {
+            setterNames.add("set" + Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1));
+        }
+
+        for (var member : env.getElementUtils().getAllMembers(type)) {
+            if (member.getKind() != ElementKind.METHOD
+                    || !member.getModifiers().contains(Modifier.PUBLIC)
+                    || !setterNames.contains(member.getSimpleName().toString())) {
+                continue;
+            }
+            var parameters = ((ExecutableElement) member).getParameters();
+            int setterParameters = member.getModifiers().contains(Modifier.STATIC) ? 2 : 1;
+            if (parameters.size() != setterParameters) {
+                continue;
+            }
+            var valueType = parameters.get(parameters.size() - 1).asType();
+            if (!(env.getTypeUtils().asElement(valueType) instanceof TypeElement propertyType)) {
+                continue;
+            }
+            var binaryName = ElementUtil.getBinaryName(propertyType);
+            if (propertyType.getKind() == ElementKind.ENUM) {
+                // Enum.valueOf internally reaches values() as well
+                addReflectedType(metadata, binaryName, false, entry -> entry.addMemberAccess(MemberAccess.ALL_DECLARED_METHODS));
+            } else if (!binaryName.startsWith("java.") && hasDeclaredValueOfString(propertyType)) {
+                addReflectedType(metadata, binaryName, false, entry -> entry.addMethod("valueOf", "java.lang.String"));
+            }
+        }
+    }
+
+    private boolean hasDeclaredValueOfString(TypeElement type) {
+        for (var member : type.getEnclosedElements()) {
+            if (member.getKind() != ElementKind.METHOD
+                    || !member.getModifiers().contains(Modifier.PUBLIC)
+                    || !member.getModifiers().contains(Modifier.STATIC)
+                    || !"valueOf".contentEquals(member.getSimpleName())) {
+                continue;
+            }
+            var parameters = ((ExecutableElement) member).getParameters();
+            if (parameters.size() == 1 && "java.lang.String".equals(parameters.get(0).asType().toString())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void addAbsFileResource(ConditionalMetadata metadata, Path path) {
