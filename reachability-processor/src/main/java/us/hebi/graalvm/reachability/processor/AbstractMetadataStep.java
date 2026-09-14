@@ -259,7 +259,7 @@ public abstract class AbstractMetadataStep {
                     // encountered when using the 1.2.0 output format.
                     if (addDefaultConstructorForFields) {
                         ElementUtil.getFieldType(env, fieldOrMethod).ifPresent(fqdn ->
-                                addReflectedType(getConditionalMetadata(fqdn), fqdn, false, ReflectionEntry::addConstructor)
+                                addReflectedType(metadata, fqdn, false, ReflectionEntry::addConstructor)
                         );
                     }
                 }
