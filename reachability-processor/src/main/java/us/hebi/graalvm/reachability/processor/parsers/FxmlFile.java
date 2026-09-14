@@ -20,6 +20,7 @@
 package us.hebi.graalvm.reachability.processor.parsers;
 
 import lombok.Getter;
+import us.hebi.graalvm.reachability.processor.util.StringUtil;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -38,11 +39,21 @@ public class FxmlFile {
         this.path = path;
     }
 
+    /**
+     * Adds a reflectively accessed class without any properties, e.g., the controller
+     */
+    public void addClass(String className) {
+        properties.computeIfAbsent(className, k -> new TreeSet<>());
+    }
+
+    public void addProperty(String className, String property) {
+        if (StringUtil.isNullOrEmpty(className)) return;
+        properties.computeIfAbsent(className, k -> new TreeSet<>()).add(property);
+    }
+
     final Path path;
     final List<String> imports = new ArrayList<>();
-    String controller; // fx:controller, only allowed on the root element
-    String rootType; // fx:root type, the class of the root element
-    final Map<String, Set<String>> properties = new TreeMap<>(); // property names set on each class
+    final Map<String, Set<String>> properties = new TreeMap<>(); // reflectively accessed classes and the property names set on each
     final Set<Path> resources = new TreeSet<>(); // referenced files other than fxml
 
 }

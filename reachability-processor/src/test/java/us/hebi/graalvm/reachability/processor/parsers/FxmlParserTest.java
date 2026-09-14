@@ -46,9 +46,6 @@ class FxmlParserTest {
         var javafx = files.get(0);
         assertThat(javafx.getPath()).isEqualTo(testDir.resolve("javafx.fxml"));
 
-        assertThat(javafx.getController()).isEqualTo("nonexisting.Controller");
-        assertThat(javafx.getRootType()).isNull();
-
         assertThat(javafx.getImports()).containsExactlyInAnyOrder(
                 "javafx.scene.control.Button",
                 "javafx.scene.image.Image",
@@ -58,8 +55,9 @@ class FxmlParserTest {
 
         assertThat(javafx.getResources()).containsExactly(testDir.resolve("image.jpg"));
 
-        // class names stay as written in the source
-        assertThat(javafx.getProperties()).containsOnlyKeys("AnchorPane", "Button", "Image", "ImageView");
+        // class names stay as written in the source, and the controller is a class without properties
+        assertThat(javafx.getProperties()).containsOnlyKeys("AnchorPane", "Button", "Image", "ImageView", "nonexisting.Controller");
+        assertThat(javafx.getProperties().get("nonexisting.Controller")).isEmpty();
         assertThat(javafx.getProperties().get("Button"))
                 .containsExactlyInAnyOrder("layoutX", "layoutY", "mnemonicParsing", "text");
         assertThat(javafx.getProperties().get("ImageView"))
@@ -67,9 +65,9 @@ class FxmlParserTest {
 
         var included = files.get(1);
         assertThat(included.getPath()).isEqualTo(testDir.resolve("included.fxml"));
-        assertThat(included.getController()).isEqualTo("us.hebi.graalvm.reachability.sample.javafx.IncludedFxController");
         assertThat(included.getImports()).containsExactly("javafx.scene.control.Button");
         assertThat(included.getResources()).isEmpty();
+        assertThat(included.getProperties()).containsOnlyKeys("Button", "us.hebi.graalvm.reachability.sample.javafx.IncludedFxController");
         assertThat(included.getProperties().get("Button")).containsExactlyInAnyOrder("mnemonicParsing", "text");
     }
 
@@ -87,7 +85,8 @@ class FxmlParserTest {
                 "ButtonBar",
                 "ColumnConstraints",
                 "GridPane",
-                "javafx.scene.control.Slider"
+                "javafx.scene.control.Slider",
+                "nonexisting.Controller"
         );
 
         // fx:id, onAction, and xmlns are not properties
@@ -120,8 +119,6 @@ class FxmlParserTest {
         assertThat(files).hasSize(1);
 
         var root = files.get(0);
-        assertThat(root.getRootType()).isEqualTo("VBox");
-        assertThat(root.getController()).isNull();
 
         // the type attribute names the class and is not one of its properties
         assertThat(root.getProperties()).containsOnlyKeys("VBox");

@@ -123,8 +123,8 @@ public class FxmlParser {
             }
             if ("root".equals(localName)) {
                 var type = tryGetAttribute(reader, "type");
+                type.ifPresent(file::addClass);
                 if (type.isPresent()) {
-                    file.rootType = type.get();
                     addAttributeProperties(reader, type.get(), "type", file, relativeResources);
                     return type.get();
                 }
@@ -135,7 +135,7 @@ public class FxmlParser {
         }
 
         // fx:controller is only allowed on the root element, so there can be at most one
-        tryGetFxAttribute(reader, "controller").ifPresent(controller -> file.controller = controller);
+        tryGetFxAttribute(reader, "controller").ifPresent(file::addClass);
 
         // Elements can be properties, e.g., <children> or <GridPane.margin>
         if (isPropertyElement(localName)) {
@@ -143,7 +143,8 @@ public class FxmlParser {
             return NO_CLASS;
         }
 
-        // Attributes are always properties
+        // Class construction, e.g. <VBox/>. Attributes are always properties
+        file.addClass(localName);
         addAttributeProperties(reader, localName, "", file, relativeResources);
         return localName;
     }
@@ -190,7 +191,7 @@ public class FxmlParser {
         if (NO_CLASS.equals(className)) {
             return;
         }
-        file.properties.computeIfAbsent(className, k -> new TreeSet<>()).add(property);
+        file.addProperty(className, property);
     }
 
     /**
