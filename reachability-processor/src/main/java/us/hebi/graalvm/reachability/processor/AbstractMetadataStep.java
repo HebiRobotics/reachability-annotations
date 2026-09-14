@@ -208,7 +208,6 @@ public abstract class AbstractMetadataStep {
             for (var fxmlFile : FxmlParser.parse(getClassOutputDir(), file)) {
                 for (var name : fxmlFile.getImports()) {
                     if (name.contains("*")) {
-                        printWarning("Ignoring unsupported wildcard import: " + name);
                         continue;
                     }
                     addReflectedType(metadata, name, includeHierarchy, ReflectionEntry::enableFullReflection);
@@ -271,14 +270,30 @@ public abstract class AbstractMetadataStep {
     /**
      * @return the class name resolved against the file's imports, or the input if no import matches
      */
-    private static String resolveClassName(String name, List<String> imports) {
-        if (!name.contains(".")) {
-            for (String fqname : imports) {
-                if (fqname.endsWith("." + name)) {
-                    return fqname;
+    private String resolveClassName(String name, List<String> imports) {
+        // FXMLLoader treats names starting with a lowercase character as fully qualified.
+        if (Character.isLowerCase(name.charAt(0))) {
+            return name;
+        }
+
+        // Explicit imports win over wildcard packages (nested classes keep their hierarchy, so works as well)
+        for (String fqname : imports) {
+            if (fqname.endsWith("." + name)) {
+                return fqname;
+            }
+        }
+
+        // Try wildcards
+        for (String fqname : imports) {
+            if (fqname.endsWith(".*")) {
+                var candidate = fqname.substring(0, fqname.length() - 1) + name;
+                if (env.getElementUtils().getTypeElement(candidate) != null) {
+                    return candidate;
                 }
             }
         }
+
+        // Fall back to original name. TODO: should we fail instead?
         return name;
     }
 
