@@ -23,12 +23,11 @@ package us.hebi.graalvm.reachability.processor.util;
 import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static us.hebi.quickbuf.ProtoUtil.*;
@@ -49,11 +48,6 @@ public class GlobUtil {
             string = string.replace('\\', '/');
         }
         return string;
-    }
-
-    private static String ensureForwardSlashDir(Path path) {
-        var string = ensureForwardSlashPath(path);
-        return string.endsWith("/") ? string : string + "/";
     }
 
     public static boolean hasWildcards(String glob) {
@@ -84,11 +78,19 @@ public class GlobUtil {
                     regex.append('\\').append(next);
                     break;
                 case '*':
-                    // Handle double-star recursive wildcard (**) vs single-star (*)
-                    if (i < len && glob.charAt(i) == '*') {
+                    // A standalone '**' segment matches zero or more directory levels. Like GraalVM,
+                    // a '**' mixed into a segment silently degrades to a single-level '*'.
+                    boolean startsSegment = i == 1 || glob.charAt(i - 2) == '/';
+                    if (startsSegment && glob.startsWith("**/", i - 1)) {
+                        regex.append("(?:.*/)?");
+                        i += 2;
+                    } else if (startsSegment && glob.startsWith("**", i - 1) && i + 1 == len) {
                         regex.append(".*");
-                        i++; // skip second star
+                        i++;
                     } else {
+                        if (glob.startsWith("*", i)) {
+                            i++; // collapse '**' within a segment
+                        }
                         regex.append("[^/]*"); // match within package level
                     }
                     break;
@@ -172,6 +174,14 @@ public class GlobUtil {
                     // Single "." maps to "?"
                     glob.append('?');
                 }
+            } else if (c == '(') {
+                // Check for "(?:.*/)?" which maps to "**/"
+                if (pattern.startsWith("?:.*/)?", i)) {
+                    glob.append("**/");
+                    i += 7;
+                } else {
+                    return Optional.empty(); // Grouping not produced by this glob logic
+                }
             } else if (c == '[') {
                 // Check for "[^/]*" which maps to "*"
                 if (i + 4 <= len && pattern.substring(i, i + 4).equals("^/]*")) {
@@ -207,13 +217,13 @@ public class GlobUtil {
 
         } else {
 
-            // Case 2 -> walk file tree with wildcards
-            String absGlob = ensureForwardSlashDir(searchBaseDir) + glob;
-            PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + absGlob);
+            // Case 2 -> walk file tree with wildcards, matched with the same
+            // translation as the registered runtime pattern
+            Pattern pattern = Pattern.compile(convertGlobToRegex(glob));
 
             try (Stream<Path> stream = Files.walk(searchBaseDir)) {
                 stream.filter(Files::isRegularFile)
-                        .filter(matcher::matches)
+                        .filter(file -> pattern.matcher(ensureForwardSlashPath(searchBaseDir.relativize(file))).matches())
                         .forEach(onFile);
             }
 

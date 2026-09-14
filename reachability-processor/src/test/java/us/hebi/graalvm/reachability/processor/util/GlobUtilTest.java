@@ -32,12 +32,38 @@ class GlobUtilTest {
 
       @Test
     void convertGlobToRegex() {
-          // TODO: confirm that all these are all reasonable translations?
-        checkConvertsTo("/directory/**/*.json", "/directory/.*/[^/]*\\.json");
+        checkConvertsTo("/directory/**/*.json", "/directory/(?:.*/)?[^/]*\\.json");
         checkConvertsTo("directory/literal.txt", "\\Qdirectory/literal.txt\\E");
-        checkConvertsTo("directory/**/literal.txt", "directory/.*/literal\\.txt");
+        checkConvertsTo("directory/**/literal.txt", "directory/(?:.*/)?literal\\.txt");
         checkConvertsTo("directory/*.txt", "directory/[^/]*\\.txt");
-        checkConvertsTo("/**/**/**/*/*.txt", "/.*/.*/.*/[^/]*/[^/]*\\.txt");
+        checkConvertsTo("/**/**/**/*/*.txt", "/(?:.*/)?(?:.*/)?(?:.*/)?[^/]*/[^/]*\\.txt");
+        checkConvertsTo("**", ".*");
+        checkConvertsTo("directory/**", "directory/.*");
+        checkConvertsTo("**/literal.txt", "(?:.*/)?literal\\.txt");
+        // non-standalone '**' degrades to a single-level '*' like GraalVM
+        checkConvertsTo("directory/**.txt", "directory/[^/]*\\.txt");
+        checkConvertsTo("x/**hello/*.json", "x/[^/]*hello/[^/]*\\.json");
+        checkConvertsTo("x**/y", "x[^/]*/y");
+    }
+
+    @Test
+    void globstarMatchesZeroOrMoreDirectories() {
+        // reference behavior of the GraalVM glob format, e.g. 'fxml/**/*.fxml' includes 'fxml/overview.fxml'
+        checkMatches("fxml/**/*.fxml", "fxml/overview.fxml", true);
+        checkMatches("fxml/**/*.fxml", "fxml/blueprints/music-player.fxml", true);
+        checkMatches("fxml/**/*.fxml", "fxml/a/b/c.fxml", true);
+        checkMatches("fxml/**/*.fxml", "other/overview.fxml", false);
+        checkMatches("**/literal.txt", "literal.txt", true);
+        checkMatches("**/literal.txt", "a/b/literal.txt", true);
+        checkMatches("directory/**", "directory/file.txt", true);
+        checkMatches("directory/**", "directory/a/file.txt", true);
+        checkMatches("directory/*.txt", "directory/a/file.txt", false);
+        // verified against GraalVM: mixed '**' stays within one level
+        checkMatches("x/**hello/*.json", "x/hello/f.json", true);
+        checkMatches("x/**hello/*.json", "x/deephello/f.json", true);
+        checkMatches("x/**hello/*.json", "x/d/hello/f.json", false);
+        checkMatches("a**.txt", "ab.txt", true);
+        checkMatches("a**.txt", "a.txt", true);
     }
 
     @Test
@@ -47,10 +73,16 @@ class GlobUtilTest {
         checkRoundTripReversal("directory/**/literal.txt");
         checkRoundTripReversal("directory/*.txt");
         checkRoundTripReversal("/**/**/**/*/*.txt");
+        checkRoundTripReversal("directory/**");
+        checkRoundTripReversal("**/literal.txt");
     }
 
     private void checkConvertsTo(String glob, String expected) {
         assertEquals(expected, GlobUtil.convertGlobToRegex(glob), glob);
+    }
+
+    private void checkMatches(String glob, String path, boolean expected) {
+        assertEquals(expected, path.matches(GlobUtil.convertGlobToRegex(glob)), glob + " vs " + path);
     }
 
     private void checkRoundTripReversal(String glob) {
