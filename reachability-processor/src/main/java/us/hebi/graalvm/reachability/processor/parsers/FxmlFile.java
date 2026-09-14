@@ -40,7 +40,8 @@ public class FxmlFile {
 
     final Path path;
     final List<String> imports = new ArrayList<>();
-    final List<String> controllers = new ArrayList<>();
+    String controller; // fx:controller, only allowed on the root element
+    String rootType; // fx:root type, the class of the root element
     final Map<String, Set<String>> properties = new TreeMap<>(); // property names set on each class
     final Set<Path> resources = new TreeSet<>(); // referenced files other than fxml
 

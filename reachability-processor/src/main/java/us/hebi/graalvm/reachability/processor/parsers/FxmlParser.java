@@ -124,7 +124,7 @@ public class FxmlParser {
             if ("root".equals(localName)) {
                 var type = tryGetAttribute(reader, "type");
                 if (type.isPresent()) {
-                    file.controllers.add(type.get());
+                    file.rootType = type.get();
                     addAttributeProperties(reader, type.get(), "type", file, relativeResources);
                     return type.get();
                 }
@@ -134,8 +134,8 @@ public class FxmlParser {
             return NO_CLASS;
         }
 
-        // fx:controller is only allowed on the root element, but it's harmless to check more
-        tryGetFxAttribute(reader, "controller").ifPresent(file.controllers::add);
+        // fx:controller is only allowed on the root element, so there can be at most one
+        tryGetFxAttribute(reader, "controller").ifPresent(controller -> file.controller = controller);
 
         // Elements can be properties, e.g., <children> or <GridPane.margin>
         if (isPropertyElement(localName)) {

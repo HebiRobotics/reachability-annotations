@@ -46,7 +46,8 @@ class FxmlParserTest {
         var javafx = files.get(0);
         assertThat(javafx.getPath()).isEqualTo(testDir.resolve("javafx.fxml"));
 
-        assertThat(javafx.getControllers()).containsExactly("nonexisting.Controller");
+        assertThat(javafx.getController()).isEqualTo("nonexisting.Controller");
+        assertThat(javafx.getRootType()).isNull();
 
         assertThat(javafx.getImports()).containsExactlyInAnyOrder(
                 "javafx.scene.control.Button",
@@ -66,7 +67,7 @@ class FxmlParserTest {
 
         var included = files.get(1);
         assertThat(included.getPath()).isEqualTo(testDir.resolve("included.fxml"));
-        assertThat(included.getControllers()).containsExactly("us.hebi.graalvm.reachability.sample.javafx.IncludedFxController");
+        assertThat(included.getController()).isEqualTo("us.hebi.graalvm.reachability.sample.javafx.IncludedFxController");
         assertThat(included.getImports()).containsExactly("javafx.scene.control.Button");
         assertThat(included.getResources()).isEmpty();
         assertThat(included.getProperties().get("Button")).containsExactlyInAnyOrder("mnemonicParsing", "text");
@@ -119,7 +120,8 @@ class FxmlParserTest {
         assertThat(files).hasSize(1);
 
         var root = files.get(0);
-        assertThat(root.getControllers()).containsExactly("VBox");
+        assertThat(root.getRootType()).isEqualTo("VBox");
+        assertThat(root.getController()).isNull();
 
         // the type attribute names the class and is not one of its properties
         assertThat(root.getProperties()).containsOnlyKeys("VBox");
