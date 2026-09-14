@@ -83,11 +83,15 @@ class FxmlParserTest {
         assertThat(properties).containsOnlyKeys(
                 "Button",
                 "ButtonBar",
+                "ButtonBar.ButtonData",
                 "ColumnConstraints",
                 "GridPane",
                 "javafx.scene.control.Slider",
                 "nonexisting.Controller"
         );
+
+        // nested class element, dots stay as written
+        assertThat(properties.get("ButtonBar.ButtonData")).isEmpty();
 
         // fx:id, onAction, and xmlns are not properties
         assertThat(properties.get("Button"))

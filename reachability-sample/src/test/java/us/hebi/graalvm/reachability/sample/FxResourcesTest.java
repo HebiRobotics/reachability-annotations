@@ -156,6 +156,22 @@ public class FxResourcesTest {
     }
 
     @Test
+    void relativeResourceNestedClass() throws IOException {
+        // nested classes resolve through their canonical import and register under the binary name
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+                  },
+                  "name": "javafx.scene.control.ButtonBar$ButtonData",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
     void relativeResourceValueOfSetterTypes() throws IOException {
         assertContains(reflectionConfig, """
                 {
