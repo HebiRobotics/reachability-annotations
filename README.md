@@ -2,7 +2,11 @@
 
 This library provides standalone zero-dependency annotations for generating [GraalVM Native Image](https://www.graalvm.org/native-image/) [Reachability Metadata](https://www.graalvm.org/latest/reference-manual/native-image/metadata/) at compile time. They are compatible with standard Java code and are independent of any framework like Quarkus or Micronaut.
 
-The annotations also make extensive use of `typeReachable` conditions. By default, the settings are only applied if the annotated type is reachable in the native image. This mitigates binary size explosion for features that aren't used. The condition can be changed by setting a custom `condition`, or disabled by setting `condition = Object.class`.
+The annotations also make extensive use of reachability conditions. By default, the settings are only applied if the annotated type is reachable in the native image. This mitigates binary size explosion for features that aren't used. The condition can be changed by setting a custom `condition`, or disabled by setting `condition = Object.class`.
+
+You can look at [BEST_PRACTICES.md](BEST_PRACTICES.md) for examples of how to find reflective, JNI, and resource lookups, which annotation fits each case, and how to verify the result.
+
+Note that the current default output is the older 1.0.0 format with separate `*-config.json` files, but this will likely change to 1.2.0 with a combined `reachability-metadata.json` in the future. The newer format has a narrower reachability condition (`typeReached` instead of `typeReachable`), so you should always specify the format to avoid surprises (see [Generated Metadata](#generated-metadata)). The examples below show the 1.2.0 output for readability.
 
 ## Default Case
 
@@ -154,7 +158,7 @@ public static class IndividualFieldsAndMethods {
 
 This is a special annotation for working with JavaFX FXML - a markup language for GUI layouts that makes extensive use of reflection.
 
-Matching FXML and CSS files on the output classpath are automatically parsed, and add appropriate reachability configuration for included files, `fx:controller` classes as well as imported types.
+Matching FXML and CSS files on the output classpath are automatically parsed, and add reachability configuration for the classes and resources they use.
 
 The default naming convention follows established conventions (see [FxmlKit](https://github.com/dlsc-software-consulting-gmbh/FxmlKit) or [Afterburner.fx](https://github.com/adambien/afterburner.fx)) to determine the resource names based on the lowercased view name. For example,
  - `${Name}View.java` -> `DialogView.java`
@@ -182,6 +186,27 @@ Another JavaFX related annotation that provides more resource control and can pa
 public class MyApp extends Application {}
 ```
 
+<!--- TODO: maybe integrate? seems unnecessary.
+### FXML and CSS Parsing
+
+Both JavaFX annotations parse the FXML and CSS files they find and register what `FXMLLoader` and the CSS engine look up reflectively at runtime.
+
+FXML files register
+ - all explicitly imported classes. `FXMLLoader` loads every explicit import eagerly, so unused imports need metadata as well
+ - element tags that construct objects, e.g., `<VBox/>`, including fully qualified tags and nested classes like `ButtonBar.ButtonData`
+ - `fx:controller` and `fx:root` types, and owners of static properties like `GridPane.vgrow`
+ - enum and `valueOf(String)` parameter types of setters that receive attribute values, e.g., `Priority` for `HBox.hgrow="ALWAYS"`
+ - files referenced via `fx:include` or `@` locations like `url="@../images/logo.png"`. Referenced FXML and CSS files get parsed as well
+
+Class names are resolved like `FXMLLoader` does it, i.e., names starting with a lowercase character are fully qualified, then explicit imports, then wildcard imports. Wildcard imports only register the classes that are actually used. Resolving names requires the referenced types to be on the compile classpath, e.g., a `provided` dependency on `javafx-controls`. Names that cannot be resolved are written as they are and have no effect.
+
+CSS files register
+ - resources referenced via `url()` and `@import`
+ - image and font properties that omit the `url()` wrapper, e.g., `-fx-image: "icon.png"`
+ - skin classes referenced via `-fx-skin`, with their public constructors
+
+Note that the CSS parser does not remove JavaFX-specific `//` line comments yet, so commented-out declarations still get registered. Inline `data:` URIs are not supported.
+-->
 
 ### @Inject, @PostConstruct, @PreDestroy
 
@@ -213,8 +238,8 @@ generates metadata for the class
 
 ```json
 {
-  "condition": { "typeReachable": "demo.InjectionSample" },
-  "name": "demo.InjectionSample",
+  "condition": { "typeReached": "demo.InjectionSample" },
+  "type": "demo.InjectionSample",
   "methods": [
     { "name": "<init>", "parameterTypes": ["java.lang.String"] },
     { "name": "postConstruct", "parameterTypes": [] },
@@ -230,8 +255,8 @@ as well as default constructors for the types of injected fields
 
 ```json
 {
-  "condition": { "typeReachable": "demo.InjectionSample" },
-  "name": "demo.InjectedType",
+  "condition": { "typeReached": "demo.InjectionSample" },
+  "type": "demo.InjectedType",
   "methods": [
     { "name": "<init>", "parameterTypes": [] }
   ]
@@ -242,7 +267,9 @@ as well as default constructors for the types of injected fields
 
 The metadata gets generated into the `META-INF/native-image/reachability-generated/${project}/` directory. The `${project}` name should be unique and needs to be set via a compiler argument. This is compatible with [picocli-codegen](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc#224-maven).
 
-Unfortunately, the `typeReached` condition in the modern 1.2.0 format (combined `reachability-metadata.json`) is stricter and does not seem to work as well as the `typeReachable` condition in the older 1.0.0 format (separate `*-config.json` files), so we default to generating the older format for a better starting experience. You can switch to the modern format with the compiler option `-Areachability.outputFormat=1.2.0` and check whether your application still works.
+The processor currently defaults to the older 1.0.0 format (separate `*-config.json` files) rather than the modern 1.2.0 format (combined `reachability-metadata.json`) for three reasons: (1) the modern format is not yet fully implemented, (2) the older format is still supported by all GraalVM versions, and (3) narrowed condition behavior: the older `typeReachable` condition triggers as soon as a type is included in the image, while the newer `typeReached` condition adds a runtime trigger that requires the class to be initialized. In practice this is too limiting for some use cases and can cause issues at runtime (e.g., when the lookup can run before the condition class gets initialized).
+
+However, for most applications the difference does not matter, and it is likely that the default will change to the newer format in the future. We recommend always setting the format explicitly with the compiler option `-Areachability.outputFormat=1.0.0` to avoid future surprises.
 
 For example, a Maven configuration could look like this:
 
@@ -273,11 +300,11 @@ For example, a Maven configuration could look like this:
 
 You need add a compile-time dependency on the annotations, and add the annotation-processor to the list of executed annotation processors. 
 
-Note that starting with JDK23, `javac` no longer automatically discovers or runs annotation processors from the standard classpath, so you need to explicitly enable it in the compiler arguments.
+Note that starting with JDK23, `javac` no longer runs annotation processors by default. You can set the `annotationProcessorPaths` as shown below, or use `<proc>full</proc>` in the compiler plugin configuration (`-proc:full`).
 
 ```xml
 <properties>
-    <reachability.version>1.0.0-RC2</reachability.version>
+    <reachability.version>1.0.0-RC4</reachability.version>
 </properties>
 
 <dependencies>
