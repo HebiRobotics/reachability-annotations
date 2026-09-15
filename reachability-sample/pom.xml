@@ -24,6 +24,13 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- lets the processor resolve JavaFX types referenced from fxml/css files -->
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>26.0.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
             <version>2.1.1</version>
