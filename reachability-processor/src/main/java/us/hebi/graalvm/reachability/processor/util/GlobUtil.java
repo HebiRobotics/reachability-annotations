@@ -80,9 +80,11 @@ public class GlobUtil {
                 case '*':
                     // A standalone '**' segment matches zero or more directory levels. Like GraalVM,
                     // a '**' mixed into a segment silently degrades to a single-level '*'.
+                    // Uses a capturing group because GraalVM's legacy resource-config parser splits
+                    // patterns on the first ':' as a module prefix, so '(?:' breaks the pattern.
                     boolean startsSegment = i == 1 || glob.charAt(i - 2) == '/';
                     if (startsSegment && glob.startsWith("**/", i - 1)) {
-                        regex.append("(?:.*/)?");
+                        regex.append("(.*/)?");
                         i += 2;
                     } else if (startsSegment && glob.startsWith("**", i - 1) && i + 1 == len) {
                         regex.append(".*");
@@ -175,10 +177,10 @@ public class GlobUtil {
                     glob.append('?');
                 }
             } else if (c == '(') {
-                // Check for "(?:.*/)?" which maps to "**/"
-                if (pattern.startsWith("?:.*/)?", i)) {
+                // Check for "(.*/)?" which maps to "**/"
+                if (pattern.startsWith(".*/)?", i)) {
                     glob.append("**/");
-                    i += 7;
+                    i += 5;
                 } else {
                     return Optional.empty(); // Grouping not produced by this glob logic
                 }

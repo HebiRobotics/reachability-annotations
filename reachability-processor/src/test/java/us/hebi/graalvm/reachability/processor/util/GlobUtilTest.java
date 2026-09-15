@@ -32,14 +32,14 @@ class GlobUtilTest {
 
       @Test
     void convertGlobToRegex() {
-        checkConvertsTo("/directory/**/*.json", "/directory/(?:.*/)?[^/]*\\.json");
+        checkConvertsTo("/directory/**/*.json", "/directory/(.*/)?[^/]*\\.json");
         checkConvertsTo("directory/literal.txt", "\\Qdirectory/literal.txt\\E");
-        checkConvertsTo("directory/**/literal.txt", "directory/(?:.*/)?literal\\.txt");
+        checkConvertsTo("directory/**/literal.txt", "directory/(.*/)?literal\\.txt");
         checkConvertsTo("directory/*.txt", "directory/[^/]*\\.txt");
-        checkConvertsTo("/**/**/**/*/*.txt", "/(?:.*/)?(?:.*/)?(?:.*/)?[^/]*/[^/]*\\.txt");
+        checkConvertsTo("/**/**/**/*/*.txt", "/(.*/)?(.*/)?(.*/)?[^/]*/[^/]*\\.txt");
         checkConvertsTo("**", ".*");
         checkConvertsTo("directory/**", "directory/.*");
-        checkConvertsTo("**/literal.txt", "(?:.*/)?literal\\.txt");
+        checkConvertsTo("**/literal.txt", "(.*/)?literal\\.txt");
         // non-standalone '**' degrades to a single-level '*' like GraalVM
         checkConvertsTo("directory/**.txt", "directory/[^/]*\\.txt");
         checkConvertsTo("x/**hello/*.json", "x/[^/]*hello/[^/]*\\.json");
