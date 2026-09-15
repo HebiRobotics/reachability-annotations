@@ -44,7 +44,7 @@ public class FxResourcesTest {
                   "condition": {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
                   },
-                  "pattern": "us/hebi/graalvm/reachability/.*/[^/]*\\\\.css"
+                  "pattern": "us/hebi/graalvm/reachability/(.*/)?[^/]*\\\\.css"
                 }
                 """);
         assertContains(resourceConfig, """
@@ -52,7 +52,7 @@ public class FxResourcesTest {
                   "condition": {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddAbsoluteWildcardResources"
                   },
-                  "pattern": "us/hebi/graalvm/reachability/.*/[^/]*\\\\.fxml"
+                  "pattern": "us/hebi/graalvm/reachability/(.*/)?[^/]*\\\\.fxml"
                 }
                 """);
         assertContains(reflectionConfig, """
@@ -75,7 +75,7 @@ public class FxResourcesTest {
                   "condition": {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
                   },
-                  "pattern": "us/hebi/graalvm/reachability/sample/.*/[^/]*\\\\.css"
+                  "pattern": "us/hebi/graalvm/reachability/sample/(.*/)?[^/]*\\\\.css"
                 }
                 """);
         assertContains(resourceConfig, """
@@ -83,7 +83,7 @@ public class FxResourcesTest {
                   "condition": {
                     "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeWildcardResources"
                   },
-                  "pattern": "us/hebi/graalvm/reachability/sample/.*/[^/]*\\\\.fxml"
+                  "pattern": "us/hebi/graalvm/reachability/sample/(.*/)?[^/]*\\\\.fxml"
                 }
                 """);
         assertContains(reflectionConfig, """
@@ -126,6 +126,88 @@ public class FxResourcesTest {
                   "allDeclaredMethods": true,
                   "allDeclaredFields": true,
                   "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
+    void relativeResourceEnumSetterTypes() throws IOException {
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+                  },
+                  "name": "javafx.geometry.Pos",
+                  "allDeclaredMethods": true
+                }
+                """);
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+                  },
+                  "name": "javafx.scene.layout.Priority",
+                  "allDeclaredMethods": true
+                }
+                """);
+
+        // Enums of setters that the fxml never sets stay out
+        Assertions.assertFalse(reflectionConfig.contains("javafx.scene.AccessibleRole"));
+    }
+
+    @Test
+    void relativeResourceNestedClass() throws IOException {
+        // nested classes resolve through their canonical import and register under the binary name
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+                  },
+                  "name": "javafx.scene.control.ButtonBar$ButtonData",
+                  "allDeclaredMethods": true,
+                  "allDeclaredFields": true,
+                  "allDeclaredConstructors": true
+                }
+                """);
+    }
+
+    @Test
+    void relativeResourceValueOfSetterTypes() throws IOException {
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+                  },
+                  "name": "javafx.scene.paint.Paint",
+                  "methods": [{
+                    "name": "valueOf",
+                    "parameterTypes": ["java.lang.String"]
+                  }]
+                }
+                """);
+
+        // Types that BeanAdapter coerces without reflection stay out
+        Assertions.assertFalse(reflectionConfig.contains("\"name\": \"java.lang.String\""));
+    }
+
+    @Test
+    void relativeResourceFxmlStylesheet() throws IOException {
+        // fxml-theme.css is referenced only via stylesheets="@fxml-theme.css" in the fxml
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/reachability/sample/javafx/fxml-theme.css\\\\E"
+                }
+                """);
+        assertContains(reflectionConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+                  },
+                  "name": "com.example.FxmlSkin",
+                  "allPublicConstructors": true
                 }
                 """);
     }

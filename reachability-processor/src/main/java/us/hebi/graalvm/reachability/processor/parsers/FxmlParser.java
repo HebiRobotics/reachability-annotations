@@ -19,23 +19,21 @@
  */
 package us.hebi.graalvm.reachability.processor.parsers;
 
-import lombok.RequiredArgsConstructor;
-
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.Consumer;
+import java.util.*;
 
 /**
  * @author Florian Enner
  * @since 25 Nov 2025
  */
-@RequiredArgsConstructor
 public class FxmlParser {
 
     public static Optional<String> tryReadContent(Path path) {
@@ -46,110 +44,206 @@ public class FxmlParser {
         }
     }
 
-    public void addFxmlFile(Path path) {
+    /**
+     * @return the parsed file followed by every fxml file that it references, in discovery order
+     */
+    public static Set<FxmlFile> parse(Path rootDir, Path file) {
+        var files = new LinkedHashMap<Path, FxmlFile>();
+        addFxmlFile(rootDir, file, files);
+        return new LinkedHashSet<>(files.values());
+    }
+
+    private static void addFxmlFile(Path rootDir, Path path, Map<Path, FxmlFile> files) {
         // Ignore files that we already looked at (e.g. via includes)
-        if (resources.contains(path)) {
+        if (files.containsKey(path)) {
             return;
         }
 
+        // Ignore files that don't actually exist TODO: throw an error for e.g. a missing fx:include target?
         var contentOpt = tryReadContent(path);
         if (contentOpt.isEmpty()) {
-            return; // TODO: warn if a file does not exist?
+            return;
         }
-        var content = contentOpt.get();
 
-        // Remove comments
-        resources.add(path);
-        content = SpanUtil.removeSpans(content, "<!--", "-->");
+        var fxmlFile = new FxmlFile(path);
+        files.put(path, fxmlFile);
 
-        // Look at special statements that figure out all classes that may get reflectively
-        // accessed. We keep all fields and methods in the config, so we don't need to parse
-        // individual field accesses.
-        List<String> localImports = SpanUtil.findBetween(content, "<?import ", "?>"); // TODO: fail on wildcard imports?
-        imports.addAll(localImports);
+        // Parse the content for a single file
+        var relativeResources = new ArrayList<String>();
+        try {
+            parseContent(contentOpt.get(), fxmlFile, relativeResources);
+        } catch (XMLStreamException malformed) {
+            // Any malformed issues would fail in FXMLLoader too, so we keep whatever we found until here
+        }
 
-        // Controllers may not be fully-qualified, so we check for import matches first
-        Consumer<String> addController = name -> {
-            if (!name.contains(".")) {
-                for (String fqname : localImports) {
-                    if (fqname.endsWith(name)) {
-                        controllers.add(fqname);
-                        return;
+        // Resolve any resources that were loaded from within the content.
+        // Doing it at the end avoids errors with open readers.
+        for (var relativePath : relativeResources) {
+            var resource = resolve(rootDir, path, relativePath);
+            if (relativePath.toLowerCase().endsWith(".fxml")) {
+                addFxmlFile(rootDir, resource, files);
+            } else {
+                fxmlFile.resources.add(resource);
+            }
+        }
+    }
+
+    /**
+     * Parses the FXML content and adds reflectively accessed classes and properties
+     */
+    private static void parseContent(String content, FxmlFile file, List<String> relativeResources) throws XMLStreamException {
+        var reader = createReader(content);
+        var elementStack = new ArrayDeque<String>();
+
+        while (reader.hasNext()) {
+            switch (reader.next()) {
+                case XMLStreamConstants.PROCESSING_INSTRUCTION -> {
+                    if ("import".equals(reader.getPITarget())) {
+                        file.imports.add(reader.getPIData().trim());
                     }
                 }
+                case XMLStreamConstants.START_ELEMENT ->
+                        elementStack.push(onStartElement(reader, elementStack, file, relativeResources));
+                case XMLStreamConstants.END_ELEMENT -> elementStack.pop();
             }
-            controllers.add(name);
-        };
+        }
+        reader.close();
+    }
 
-        onAttribute(content, "", "fx:controller", addController);
-        onAttribute(content, "fx:root", "type", addController);
+    /**
+     * @return the class that encloses the child elements, or {@link #NO_CLASS} for property elements
+     */
+    private static String onStartElement(XMLStreamReader reader, Deque<String> elementStack, FxmlFile file, List<String> relativeResources) {
+        String localName = reader.getLocalName();
 
-        /*
-         * handle relative image loading and CSS Files
-         *     <Image url="@../images/ProbeDimensionsCustom.png" />
-         *     <URL value="@../styles/style.css" />
-         */
-        Consumer<String> addResourceUrl = url -> {
-            // @../path are relative to the file while ../path are relative to the
-            // working directory, i.e., outside of the jar.
-            if (url.startsWith("@")) {
-                resources.add(resolve(path, url.substring(1)));
+        // Special handling for fx:include and fx:root
+        if (isFxNamespace(reader.getPrefix(), reader.getNamespaceURI())) {
+            if ("include".equals(localName)) {
+                tryGetAttribute(reader, "source").ifPresent(relativeResources::add);
             }
-        };
+            if ("root".equals(localName)) {
+                var type = tryGetAttribute(reader, "type");
+                type.ifPresent(file::addClass);
+                if (type.isPresent()) {
+                    addAttributeProperties(reader, type.get(), "type", file, relativeResources);
+                    return type.get();
+                }
+            }
 
-        onAttribute(content, "Image", "url", addResourceUrl);
-        onAttribute(content, "URL", "value", addResourceUrl);
+            // abort on stuff like fx:define, fx:copy etc.
+            return NO_CLASS;
+        }
 
-        // Nested files
-        onAttribute(content, "fx:include", "source", source -> addFxmlFile(resolve(path, source)));
+        // fx:controller is only allowed on the root element, so there can be at most one
+        tryGetFxAttribute(reader, "controller").ifPresent(file::addClass);
 
-        return;
+        // Elements can be properties, e.g., <children> or <GridPane.margin>
+        if (isPropertyElement(localName)) {
+            addProperty(findEnclosingClass(elementStack), localName, file);
+            return NO_CLASS;
+        }
+
+        // Class construction, e.g. <VBox/>. Attributes are always properties
+        file.addClass(localName);
+        addAttributeProperties(reader, localName, "", file, relativeResources);
+        return localName;
     }
 
-    public static void onAttribute(String content, String tag, String attribute, Consumer<String> consumer) {
-        for (String element : SpanUtil.findBetween(content, "<" + tag, ">")) {
-            SpanUtil.findBetween(element, attribute + "=\"", "\"").forEach(consumer);
+    private static void addAttributeProperties(XMLStreamReader reader, String className, String ignoredName, FxmlFile file, List<String> relativeResources) {
+        for (int i = 0; i < reader.getAttributeCount(); i++) {
+            String prefix = reader.getAttributePrefix(i);
+            if (prefix != null && !prefix.isEmpty()) {
+                continue; // fx:id and friends are not properties
+            }
+            String name = reader.getAttributeLocalName(i);
+            if ("xmlns".equals(name) || name.equals(ignoredName)) {
+                continue;
+            }
+            if (name.startsWith("on")) {
+                continue; // event handlers like onAction="#handle" are resolved against the controller
+            }
+            addProperty(className, name, file);
+            tryAddResourceValue(reader.getAttributeValue(i), relativeResources);
         }
     }
 
-    @Override
-    public String toString() {
-        StringBuilder out = new StringBuilder();
-        out.append("Imports:\n");
-        for (var v : imports) {
-            out.append("  ").append(v).append("\n");
+    /**
+     * Properties can be nested elements. FXMLLoader decides by the character after the
+     * last dot, i.e., uppercase is a class construction, and lowercase is a property.
+     *
+     * @param name localName of the element
+     * @return true if the element is considered a property
+     */
+    private static boolean isPropertyElement(String name) {
+        return Character.isLowerCase(name.charAt(name.lastIndexOf('.') + 1));
+    }
+
+    /**
+     * Adds a property to the file. Dotted properties get resolved against the target class.
+     */
+    private static void addProperty(String className, String property, FxmlFile file) {
+        // Properties with dots belong to a different class, e.g., GridPane.vgrow="ALWAYS"
+        int dot = property.lastIndexOf('.');
+        if (dot > 0) {
+            className = property.substring(0, dot);
+            property = property.substring(dot + 1);
         }
-        out.append("Controllers:\n");
-        for (var v : controllers) {
-            out.append("  ").append(v).append("\n");
+        if (NO_CLASS.equals(className)) {
+            return;
         }
-        out.append("Resources:\n");
-        for (var v : resources) {
-            out.append("  ").append(v).append("\n");
+        file.addProperty(className, property);
+    }
+
+    /**
+     * FXMLLoader resolves any value starting with @ as a location relative to the file,
+     * e.g. {@code <Image url="@../images/logo.png"/>} or {@code stylesheets="@../styles/style.css"}.
+     * Values without the prefix are relative to the working directory, i.e., outside of the jar.
+     */
+    private static void tryAddResourceValue(String value, List<String> relativeResources) {
+        if (value.startsWith("@")) {
+            relativeResources.add(value.substring(1));
         }
-        return out.toString();
     }
 
-    public Set<String> getImports() {
-        return imports;
+    private static XMLStreamReader createReader(String content) throws XMLStreamException {
+        var factory = XMLInputFactory.newFactory();
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        return factory.createXMLStreamReader(new StringReader(content));
     }
 
-    public Set<String> getControllers() {
-        return controllers;
+    private static Optional<String> tryGetAttribute(XMLStreamReader reader, String name) {
+        return Optional.ofNullable(reader.getAttributeValue(null, name));
     }
 
-    public Set<Path> getResources() {
-        return resources;
+    private static Optional<String> tryGetFxAttribute(XMLStreamReader reader, String name) {
+        for (int i = 0; i < reader.getAttributeCount(); i++) {
+            if (name.equals(reader.getAttributeLocalName(i))
+                && isFxNamespace(reader.getAttributePrefix(i), reader.getAttributeNamespace(i))) {
+                return Optional.of(reader.getAttributeValue(i));
+            }
+        }
+        return Optional.empty();
     }
 
-    final Set<String> imports = new TreeSet<>();
-    final Set<String> controllers = new TreeSet<>();
-    final Set<Path> resources = new TreeSet<>();
+    private static boolean isFxNamespace(String prefix, String namespaceUri) {
+        return "fx".equals(prefix) || (namespaceUri != null && namespaceUri.startsWith(FX_NAMESPACE));
+    }
 
-    private Path resolve(Path origin, String path) {
+    private static String findEnclosingClass(Deque<String> elementStack) {
+        for (String className : elementStack) {
+            if (!className.isEmpty()) {
+                return className;
+            }
+        }
+        return NO_CLASS;
+    }
+
+    private static Path resolve(Path rootDir, Path origin, String path) {
         return path.startsWith("/") ? rootDir.resolve(path.substring(1)) : origin.resolveSibling(path);
     }
 
-    private final Path rootDir;
+    private static final String FX_NAMESPACE = "http://javafx.com/fxml";
+    private static final String NO_CLASS = ""; // ArrayDeque does not accept null
 
 }

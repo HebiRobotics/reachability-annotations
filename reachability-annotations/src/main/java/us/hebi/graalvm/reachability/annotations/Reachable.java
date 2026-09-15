@@ -114,8 +114,8 @@ public @interface Reachable {
      * Unified routing path using glob syntax (e.g. "assets/*.png" or "META-INF/services/*").
      * Leading '/' are relative to the classpath root, otherwise relative to the annotated type.
      * <p>
-     * Note that globstar wildcards (**) must stand alone as a directory segment and cannot
-     * be mixed with file extensions.
+     * Note that globstar wildcards (**) must stand alone as a directory segment and match
+     * zero or more directory levels. They cannot be mixed with file extensions.
      */
     String[] resources() default {};
 
