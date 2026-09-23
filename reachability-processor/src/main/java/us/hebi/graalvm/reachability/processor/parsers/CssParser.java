@@ -42,6 +42,13 @@ public class CssParser {
         }
         resources.add(path);
 
+        // StyleManager probes for a binary .bss first. The exact metadata flag assumes that
+        // all probed resources exist, so it requires a rule for it.
+        var name = path.getFileName().toString();
+        if (name.endsWith(".css")) {
+            resources.add(path.resolveSibling(name.substring(0, name.length() - 4) + ".bss"));
+        }
+
         var contentOpt = FxmlParser.tryReadContent(path);
         if (contentOpt.isEmpty()) {
             return; // TODO: warn if a file does not exist?
