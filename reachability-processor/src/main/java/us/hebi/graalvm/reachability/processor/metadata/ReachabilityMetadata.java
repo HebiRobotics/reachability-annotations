@@ -127,14 +127,22 @@ public class ReachabilityMetadata {
             }
         }
 
-        public ResourceEntry toBundle() {
+        /**
+         * Relative names get the dotted package prefix, absolute ones stay as written because exact mode matches getBundle's argument
+         */
+        public static ResourceEntry bundleFromString(String baseDir, String bundle) {
+            var entry = fromString(baseDir, bundle);
+            boolean isRelative = ReachabilityMetadata.getModulePrefix(bundle).isEmpty() && !bundle.startsWith("/");
+            if (isRelative && !StringUtil.isNullOrEmpty(baseDir)) {
+                return new ResourceEntry(entry.module, entry.globOrName.replace('/', '.'));
+            }
+            return entry;
+        }
+
+        void checkBundle() {
             if (GlobUtil.hasWildcards(module) || GlobUtil.hasWildcards(globOrName)) {
                 throw new IllegalArgumentException("Bundles can't contain wildcards: " + toString());
             }
-            if (globOrName.contains("/")) {
-                return new ResourceEntry(module, globOrName.replace('/', '.'));
-            }
-            return this;
         }
 
         @Override
@@ -182,8 +190,8 @@ public class ReachabilityMetadata {
         }
 
         public void addBundle(ResourceEntry entry) {
-            var bundle = entry.toBundle();
-            bundles.putIfAbsent(bundle.toString(), bundle);
+            entry.checkBundle();
+            bundles.putIfAbsent(entry.toString(), entry);
         }
 
         public void addProxyInterfaces(String... fullyQualifiedNames) {
