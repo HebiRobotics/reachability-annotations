@@ -76,7 +76,7 @@ Place the annotation on the class that performs the lookup, not on the target, u
 | A single method or field looked up reflectively | `@ReachableMember` | the member |
 | A skin or other class instantiated from a string | `@Reachable(condition = Control.class, memberAccess = MemberAccess.ALL_PUBLIC_CONSTRUCTORS)` | the instantiated class |
 | Resources read by a class | `@Reachable(resources = "images/*.png")`, relative to the class, or with a leading `/` for the classpath root | the class that reads them |
-| Resource bundles | `@Reachable(bundles = "messages")` | the class that reads them |
+| Resource bundles | `@Reachable(bundles = "messages")`, relative names become `com.example.messages`. Code that passes a slash-separated name needs the absolute form `"/com/example/messages"` | the class that reads them |
 | FXML views and stylesheets | `@ReachableFxView` or `@ReachableFxResources` | the view or application class |
 
 Some guidelines for the attributes:
@@ -114,6 +114,14 @@ Do not rely on the annotation diff. Build the project and read the generated fil
  - Treat `Skipping invalid pattern` and similar native-image build warnings as errors. Invalid entries get dropped without failing the build.
  - Delete the generated directory before switching `reachability.outputFormat`. Files from the previous format are not removed and get packaged along with the new ones.
  - Test the native image along the real code paths, e.g., open every view and dialog. Missing metadata typically only fails when the lookup runs.
+
+### Exact mode
+
+By default, a lookup without metadata behaves as if the class or resource does not exist, which makes gaps hard to spot. Building with `--exact-reachability-metadata` (GraalVM for JDK 23+) turns every unregistered lookup into a `Missing*RegistrationError` that names the entry to add. Run with `-XX:MissingRegistrationReportingMode=Warn` to log all of them in one run instead of failing on the first.
+
+Exact mode also reports lookups that are meant to fail, and code that catches `ClassNotFoundException` or `MissingResourceException` does not catch these errors. Typical cases are optional classes probed with `Class.forName`, service files that the JDK looks up on your behalf, and files that are only probed, e.g., the `.bss` that JavaFX tries before every stylesheet or `@2x` images on HiDPI screens. Register them by exact name, because the 1.0.0 format's patterns only match files that exist. `@ReachableFxView` and `@ReachableFxResources` add the `.bss` names automatically for every stylesheet they parse, so register stylesheets that get added from Java code through them rather than through `@Reachable(resources = ...)`.
+
+Bundle names are compared exactly as they are passed to `ResourceBundle.getBundle`, so `com.example.messages` does not cover `getBundle("com/example/messages")`.
 
 ## Common Failures
 
