@@ -126,6 +126,7 @@ public class ReachableConfig {
 
     @Reachable(bundles = {
             "/the.bundle.base",
+            "/the/slashed/bundle",
             "relative.bundle",
     })
     public static class AddBundle {

@@ -47,6 +47,26 @@ class FxViewConfigTest {
     }
 
     @Test
+    void testBinaryCss() {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/reachability/sample/javafx/javafx.bss\\\\E"
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/reachability/sample/javafx/theme-base.bss\\\\E"
+                }
+                """);
+    }
+
+    @Test
     void testIncludedCss() {
         assertContains(resourceConfig, """
                 {

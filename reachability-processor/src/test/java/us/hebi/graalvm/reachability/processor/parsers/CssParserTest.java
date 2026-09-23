@@ -42,8 +42,11 @@ class CssParserTest {
         parser.addCssFile(testDir.resolve("javafx.css"));
         assertThat(parser.getResources()).containsExactlyInAnyOrder(
                 testDir.resolve("javafx.css"),
+                testDir.resolve("javafx.bss"),
                 testDir.resolve("theme-base.css"),
+                testDir.resolve("theme-base.bss"),
                 rootDir.resolve("root/path/custom.css"),
+                rootDir.resolve("root/path/custom.bss"),
                 testDir.resolve("images/plain.png"),
                 testDir.resolve("images/wrapped.png"),
                 testDir.resolve("images/layer1.png"),

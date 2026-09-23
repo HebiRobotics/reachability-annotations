@@ -201,6 +201,14 @@ public class FxResourcesTest {
                   "pattern": "\\\\Qus/hebi/graalvm/reachability/sample/javafx/fxml-theme.css\\\\E"
                 }
                 """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddRelativeResources"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/reachability/sample/javafx/fxml-theme.bss\\\\E"
+                }
+                """);
         assertContains(reflectionConfig, """
                 {
                   "condition": {

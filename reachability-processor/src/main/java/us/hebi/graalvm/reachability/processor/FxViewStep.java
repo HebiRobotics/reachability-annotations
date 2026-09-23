@@ -61,7 +61,7 @@ public class FxViewStep extends RepeatedMetadataStep<ReachableFxView> {
         addAndTryParseResource(metadata, baseDir.resolve(conventionalName + ".css"), annotation.includeClassHierarchy());
 
         // Add language bundle
-        metadata.addBundle(ResourceEntry.fromString(sourceDir, conventionalName));
+        metadata.addBundle(ResourceEntry.bundleFromString(sourceDir, conventionalName));
 
         // TODO:
         //  initial tests of the bundle worked, but we haven't had a chance to actually try switching

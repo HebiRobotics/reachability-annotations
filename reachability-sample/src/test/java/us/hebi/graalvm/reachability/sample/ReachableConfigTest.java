@@ -537,6 +537,14 @@ public class ReachableConfigTest {
                   "name": "us.hebi.graalvm.reachability.sample.relative.bundle"
                 }
                 """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.ReachableConfig$AddBundle"
+                  },
+                  "name": "the/slashed/bundle"
+                }
+                """);
     }
 
     @Test

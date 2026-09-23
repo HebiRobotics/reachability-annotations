@@ -56,7 +56,7 @@ public class ReachableStep extends RepeatedMetadataStep<Reachable> {
 
             // Bundles
             for (var resource : annotation.bundles()) {
-                metadata.addBundle(ResourceEntry.fromString(baseDir, resource));
+                metadata.addBundle(ResourceEntry.bundleFromString(baseDir, resource));
             }
 
         }
