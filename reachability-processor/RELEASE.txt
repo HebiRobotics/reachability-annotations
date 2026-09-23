@@ -1,5 +1,0 @@
-mvn versions:set -DprocessAllModules -DnewVersion=<version>
-
-mvn8 clean deploy -Duser.name=ci -Prelease
-
-mvn versions:set -DprocessAllModules -DnewVersion=1.0-SNAPSHOT

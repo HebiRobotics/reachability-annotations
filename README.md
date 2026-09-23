@@ -304,7 +304,7 @@ Note that starting with JDK23, `javac` no longer runs annotation processors by d
 
 ```xml
 <properties>
-    <reachability.version>1.0.0-RC4</reachability.version>
+    <reachability.version>1.0.0-RC5</reachability.version>
 </properties>
 
 <dependencies>
