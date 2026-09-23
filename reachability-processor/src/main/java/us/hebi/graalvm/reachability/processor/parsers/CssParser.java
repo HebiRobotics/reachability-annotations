@@ -99,6 +99,7 @@ public class CssParser {
             addCssFile(path);
         } else {
             resources.add(path);
+            ScaledImages.addProbedSiblings(path, resources);
         }
     }
 

@@ -53,7 +53,12 @@ class FxmlParserTest {
                 "javafx.scene.layout.AnchorPane"
         );
 
-        assertThat(javafx.getResources()).containsExactly(testDir.resolve("image.jpg"));
+        assertThat(javafx.getResources()).containsExactlyInAnyOrder(
+                testDir.resolve("image.jpg"),
+                testDir.resolve("image@2x.jpg"),
+                testDir.resolve("image@3x.jpg"),
+                testDir.resolve("image@4x.jpg")
+        );
 
         // class names stay as written in the source, and the controller is a class without properties
         assertThat(javafx.getProperties()).containsOnlyKeys("AnchorPane", "Button", "Image", "ImageView", "nonexisting.Controller");

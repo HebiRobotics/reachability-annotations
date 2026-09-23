@@ -84,6 +84,7 @@ public class FxmlParser {
                 addFxmlFile(rootDir, resource, files);
             } else {
                 fxmlFile.resources.add(resource);
+                ScaledImages.addProbedSiblings(resource, fxmlFile.resources);
             }
         }
     }

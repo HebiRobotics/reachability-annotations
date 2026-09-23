@@ -40,7 +40,7 @@ class CssParserTest {
         var parser = new CssParser(rootDir);
 
         parser.addCssFile(testDir.resolve("javafx.css"));
-        assertThat(parser.getResources()).containsExactlyInAnyOrder(
+        assertThat(parser.getResources()).filteredOn(path -> !path.getFileName().toString().contains("@")).containsExactlyInAnyOrder(
                 testDir.resolve("javafx.css"),
                 testDir.resolve("javafx.bss"),
                 testDir.resolve("theme-base.css"),
@@ -54,6 +54,13 @@ class CssParserTest {
                 rootDir.resolve("root/path/border.png"),
                 testDir.resolve("fonts/font.ttf")
         );
+        assertThat(parser.getResources()).filteredOn(path -> path.getFileName().toString().startsWith("plain@"))
+                .containsExactlyInAnyOrder(
+                        testDir.resolve("images/plain@2x.png"),
+                        testDir.resolve("images/plain@3x.png"),
+                        testDir.resolve("images/plain@4x.png")
+                );
+        assertThat(parser.getResources()).filteredOn(path -> path.getFileName().toString().startsWith("font")).hasSize(1);
         assertThat(parser.getClasses()).containsExactlyInAnyOrder("com.example.CustomSkin");
 
     }

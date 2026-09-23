@@ -67,6 +67,26 @@ class FxViewConfigTest {
     }
 
     @Test
+    void testScaledImages() {
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/reachability/sample/javafx/image@2x.jpg\\\\E"
+                }
+                """);
+        assertContains(resourceConfig, """
+                {
+                  "condition": {
+                    "typeReachable": "us.hebi.graalvm.reachability.sample.javafx.JavaFxView"
+                  },
+                  "pattern": "\\\\Qus/hebi/graalvm/reachability/sample/javafx/image@4x.jpg\\\\E"
+                }
+                """);
+    }
+
+    @Test
     void testIncludedCss() {
         assertContains(resourceConfig, """
                 {
